@@ -117,7 +117,8 @@ trap cleanup EXIT INT TERM
 export PORT=$API_PORT
 export CORS_ORIGIN="http://localhost:$WEB_PORT"
 export VITE_PORT=$WEB_PORT
-export VITE_API_URL="http://localhost:$API_PORT"
+# Leave VITE_API_URL unset so the frontend uses same-origin requests via Vite proxy.
+# This avoids cross-origin cookie blocking (session cookies treated as third-party).
 
 echo "Starting dev servers..."
 echo "  API: http://localhost:$API_PORT"
