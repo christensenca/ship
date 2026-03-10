@@ -1,0 +1,87 @@
+name: API Latency Report
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Monday morning in America/Chicago (approx, UTC)
+    - cron: '0 14 * * 1'
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: ship_perf
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres -d ship_perf"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/ship_perf
+      API_URL: http://localhost:3000
+      API_BENCHMARK: '1'
+      PERF_BENCH_EMAIL: perf.admin@ship.local
+      PERF_BENCH_PASSWORD: admin123
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build shared package
+        run: pnpm build:shared
+
+      - name: Run migrations
+        run: pnpm db:migrate
+
+      - name: Seed benchmark dataset
+        run: pnpm db:seed:perf
+
+      - name: Verify seed idempotency
+        run: pnpm db:seed:perf
+
+      - name: Start API
+        run: pnpm dev:api > /tmp/api.log 2>&1 &
+
+      - name: Wait for API health
+        run: |
+          for i in {1..60}; do
+            if curl -sSf "${API_URL}/health" >/dev/null; then
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "API failed to become healthy"
+          tail -n 200 /tmp/api.log || true
+          exit 1
+
+      - name: Run API latency report
+        run: pnpm report:api-latency
+
+      - name: Upload API latency artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-latency-report
+          path: reports/api-latency/
+          if-no-files-found: error
