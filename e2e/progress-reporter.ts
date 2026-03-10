@@ -28,16 +28,28 @@ interface ProgressEntry {
   error?: string;
 }
 
-const RESULTS_DIR = 'test-results';
+interface FinalTestResult {
+  test: string;
+  title: string;
+  status: 'passed' | 'failed' | 'skipped';
+  outcome: 'expected' | 'unexpected' | 'flaky' | 'skipped';
+  retries: number;
+  duration: number;
+  errors: string[];
+}
+
+const RESULTS_DIR = process.env.SHIP_TEST_RESULTS_DIR || path.resolve(process.cwd(), 'test-results');
 const PROGRESS_FILE = path.join(RESULTS_DIR, 'progress.jsonl');
 const ERRORS_DIR = path.join(RESULTS_DIR, 'errors');
-
 const SUMMARY_FILE = path.join(RESULTS_DIR, 'summary.json');
+const RESULTS_FILE = path.join(RESULTS_DIR, 'results.json');
 
 class ProgressReporter implements Reporter {
   private totalTests = 0;
+  private suite: Suite | null = null;
 
   onBegin(config: FullConfig, suite: Suite): void {
+    this.suite = suite;
     // Ensure directories exist
     fs.mkdirSync(RESULTS_DIR, { recursive: true });
     fs.mkdirSync(ERRORS_DIR, { recursive: true });
@@ -68,6 +80,7 @@ class ProgressReporter implements Reporter {
           failed: 0,
           skipped: 0,
           pending: this.totalTests,
+          duration_ms: 0,
           ts: Date.now(),
         }, null, 2)
       );
@@ -108,6 +121,73 @@ class ProgressReporter implements Reporter {
   }
 
   onEnd(result: FullResult): void {
+    const tests = this.suite ? this.collectTests(this.suite) : [];
+    const finalResults: FinalTestResult[] = tests.map((test) => {
+      const mappedResults = test.results.map((entry) => ({
+        status: this.mapStatus(entry.status),
+        duration: entry.duration,
+        errors: entry.errors.map((error) => error.message || String(error)),
+      }));
+      const finalAttempt = mappedResults[mappedResults.length - 1];
+
+      return {
+        test: this.getTestFile(test),
+        title: test.titlePath().slice(1).join(' > '),
+        status: finalAttempt?.status ?? 'failed',
+        outcome: test.outcome(),
+        retries: Math.max(0, mappedResults.length - 1),
+        duration: mappedResults.reduce((total, entry) => total + entry.duration, 0),
+        errors: mappedResults.flatMap((entry) => entry.errors),
+      };
+    });
+
+    const aggregate = finalResults.reduce(
+      (summary, test) => {
+        if (test.status === 'passed') summary.passed += 1;
+        else if (test.status === 'failed') summary.failed += 1;
+        else summary.skipped += 1;
+        if (test.outcome === 'flaky') summary.flaky += 1;
+        return summary;
+      },
+      { passed: 0, failed: 0, skipped: 0, flaky: 0 }
+    );
+
+    fs.writeFileSync(
+      RESULTS_FILE,
+      JSON.stringify(
+        {
+          status: result.status,
+          duration_ms: result.duration,
+          total: finalResults.length,
+          passed: aggregate.passed,
+          failed: aggregate.failed,
+          skipped: aggregate.skipped,
+          flaky: aggregate.flaky,
+          tests: finalResults,
+        },
+        null,
+        2
+      )
+    );
+
+    fs.writeFileSync(
+      SUMMARY_FILE,
+      JSON.stringify(
+        {
+          total: finalResults.length,
+          passed: aggregate.passed,
+          failed: aggregate.failed,
+          skipped: aggregate.skipped,
+          pending: 0,
+          flaky: aggregate.flaky,
+          duration_ms: result.duration,
+          ts: Date.now(),
+        },
+        null,
+        2
+      )
+    );
+
     // Write final summary
     this.writeProgress({
       test: '__summary__',
@@ -168,10 +248,14 @@ class ProgressReporter implements Reporter {
   }
 
   private writeProgress(entry: ProgressEntry): void {
+    fs.mkdirSync(RESULTS_DIR, { recursive: true });
     fs.appendFileSync(PROGRESS_FILE, JSON.stringify(entry) + '\n');
   }
 
   private writeErrorLog(test: TestCase, result: TestResult): string {
+    fs.mkdirSync(RESULTS_DIR, { recursive: true });
+    fs.mkdirSync(ERRORS_DIR, { recursive: true });
+
     const testFile = this.getTestFile(test);
     const safeFileName = testFile.replace(/[/\\]/g, '_').replace('.ts', '');
     const safeTitle = test.title.replace(/[^a-zA-Z0-9]/g, '_').slice(0, 50);

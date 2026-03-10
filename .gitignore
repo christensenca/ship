@@ -53,6 +53,13 @@ evidence/
 playwright-report/
 test-results/
 
+# Test coverage HTML reports (Istanbul/Vitest - per-file coverage views)
+reports/test-coverage/
+web/coverage/
+api/coverage/
+*.ts.html
+*.tsx.html
+
 # Plans
 /plans
 
