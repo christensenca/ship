@@ -1,0 +1,920 @@
+{
+  "audit": "Bundle Size",
+  "date": "2026-03-10",
+  "note": "All sizes are \"rendered\" (post-treeshake, pre-minify) matching the treemap visualization. Gzip/brotli are estimated compressed sizes of the rendered output.",
+  "summary": {
+    "total_rendered_kb": 4771.2,
+    "total_gzip_kb": 1205.3,
+    "total_brotli_kb": 1027.6,
+    "largest_chunk": {
+      "name": "assets/index-oqS4spmW.js",
+      "rendered_kb": 4532.3,
+      "gzip_kb": 1102,
+      "brotli_kb": 938.2
+    },
+    "number_of_chunks": 261,
+    "top_dependencies": [
+      {
+        "name": "app code",
+        "rendered_kb": 1317.5,
+        "gzip_kb": 294.1,
+        "percent": 27.6
+      },
+      {
+        "name": "emoji-picker-react@4.18.0_react",
+        "rendered_kb": 480.6,
+        "gzip_kb": 84.7,
+        "percent": 10.1
+      },
+      {
+        "name": "highlight.js",
+        "rendered_kb": 377.9,
+        "gzip_kb": 118.4,
+        "percent": 7.9
+      },
+      {
+        "name": "yjs",
+        "rendered_kb": 264.9,
+        "gzip_kb": 55.4,
+        "percent": 5.6
+      },
+      {
+        "name": "prosemirror-view",
+        "rendered_kb": 238.4,
+        "gzip_kb": 57.6,
+        "percent": 5
+      },
+      {
+        "name": "@tiptap/core@2.27.2_@tiptap/pm",
+        "rendered_kb": 181.2,
+        "gzip_kb": 36.9,
+        "percent": 3.8
+      },
+      {
+        "name": "react-dom@18.3.1_react",
+        "rendered_kb": 131.7,
+        "gzip_kb": 42.3,
+        "percent": 2.8
+      },
+      {
+        "name": "prosemirror-model",
+        "rendered_kb": 121.2,
+        "gzip_kb": 28.6,
+        "percent": 2.5
+      },
+      {
+        "name": "@uswds/uswds",
+        "rendered_kb": 111.7,
+        "gzip_kb": 71.8,
+        "percent": 2.3
+      },
+      {
+        "name": "lib0",
+        "rendered_kb": 106.5,
+        "gzip_kb": 34.1,
+        "percent": 2.2
+      }
+    ],
+    "unused_dependencies": [
+      "@tanstack/query-sync-storage-persister"
+    ]
+  },
+  "chunks": [
+    {
+      "name": "assets/index-oqS4spmW.js",
+      "rendered_kb": 4532.3,
+      "gzip_kb": 1102,
+      "brotli_kb": 938.2
+    },
+    {
+      "name": "assets/ProgramWeeksTab-Cp-MlMWk.js",
+      "rendered_kb": 32.2,
+      "gzip_kb": 8.2,
+      "brotli_kb": 7.3
+    },
+    {
+      "name": "assets/WeekReviewTab-B0xIxR4O.js",
+      "rendered_kb": 22.9,
+      "gzip_kb": 5.1,
+      "brotli_kb": 4.4
+    },
+    {
+      "name": "assets/ProjectRetroTab-CbVl5wAq.js",
+      "rendered_kb": 16,
+      "gzip_kb": 2.9,
+      "brotli_kb": 2.6
+    },
+    {
+      "name": "assets/StandupFeed-CZW_6gg7.js",
+      "rendered_kb": 15.3,
+      "gzip_kb": 3.2,
+      "brotli_kb": 2.8
+    },
+    {
+      "name": "assets/ProjectWeeksTab-DIEyrFGm.js",
+      "rendered_kb": 11.7,
+      "gzip_kb": 2.8,
+      "brotli_kb": 2.5
+    },
+    {
+      "name": "assets/ProgramProjectsTab-C6xm8XTb.js",
+      "rendered_kb": 7,
+      "gzip_kb": 1.8,
+      "brotli_kb": 1.5
+    },
+    {
+      "name": "assets/ProjectDetailsTab-CaMv7sxU.js",
+      "rendered_kb": 7,
+      "gzip_kb": 1.8,
+      "brotli_kb": 1.6
+    },
+    {
+      "name": "assets/WeekPlanningTab-sPyRtQUU.js",
+      "rendered_kb": 4.7,
+      "gzip_kb": 1.7,
+      "brotli_kb": 1.5
+    },
+    {
+      "name": "assets/WeekOverviewTab-Do6eJw6W.js",
+      "rendered_kb": 3.5,
+      "gzip_kb": 1.1,
+      "brotli_kb": 1
+    },
+    {
+      "name": "assets/ProgramOverviewTab-B05pvCv0.js",
+      "rendered_kb": 3.2,
+      "gzip_kb": 1,
+      "brotli_kb": 0.9
+    },
+    {
+      "name": "assets/WeekIssuesTab-CFBZeSYM.js",
+      "rendered_kb": 1.8,
+      "gzip_kb": 0.8,
+      "brotli_kb": 0.7
+    },
+    {
+      "name": "assets/fingerprint-5PPE-sjr.js",
+      "rendered_kb": 1.8,
+      "gzip_kb": 0.9,
+      "brotli_kb": 0.8
+    },
+    {
+      "name": "assets/instagram-CYRSMkQG.js",
+      "rendered_kb": 1.7,
+      "gzip_kb": 0.8,
+      "brotli_kb": 0.7
+    },
+    {
+      "name": "assets/coronavirus-CYBKVzEI.js",
+      "rendered_kb": 1.6,
+      "gzip_kb": 0.6,
+      "brotli_kb": 0.6
+    },
+    {
+      "name": "assets/ProgramIssuesTab-CHbNX0y-.js",
+      "rendered_kb": 1,
+      "gzip_kb": 0.5,
+      "brotli_kb": 0.4
+    },
+    {
+      "name": "assets/language-CbbWVSC-.js",
+      "rendered_kb": 1,
+      "gzip_kb": 0.5,
+      "brotli_kb": 0.5
+    },
+    {
+      "name": "assets/reduce_capacity-B0ZsaeRE.js",
+      "rendered_kb": 1,
+      "gzip_kb": 0.4,
+      "brotli_kb": 0.4
+    },
+    {
+      "name": "assets/pets-v1Lb-4gO.js",
+      "rendered_kb": 0.9,
+      "gzip_kb": 0.4,
+      "brotli_kb": 0.4
+    },
+    {
+      "name": "assets/settings-lSPkjZfd.js",
+      "rendered_kb": 0.9,
+      "gzip_kb": 0.5,
+      "brotli_kb": 0.4
+    }
+  ],
+  "dependency_breakdown": [
+    {
+      "name": "app code",
+      "rendered_kb": 1317.5,
+      "gzip_kb": 294.1,
+      "percent": 27.6
+    },
+    {
+      "name": "emoji-picker-react@4.18.0_react",
+      "rendered_kb": 480.6,
+      "gzip_kb": 84.7,
+      "percent": 10.1
+    },
+    {
+      "name": "highlight.js",
+      "rendered_kb": 377.9,
+      "gzip_kb": 118.4,
+      "percent": 7.9
+    },
+    {
+      "name": "yjs",
+      "rendered_kb": 264.9,
+      "gzip_kb": 55.4,
+      "percent": 5.6
+    },
+    {
+      "name": "prosemirror-view",
+      "rendered_kb": 238.4,
+      "gzip_kb": 57.6,
+      "percent": 5
+    },
+    {
+      "name": "@tiptap/core@2.27.2_@tiptap/pm",
+      "rendered_kb": 181.2,
+      "gzip_kb": 36.9,
+      "percent": 3.8
+    },
+    {
+      "name": "react-dom@18.3.1_react",
+      "rendered_kb": 131.7,
+      "gzip_kb": 42.3,
+      "percent": 2.8
+    },
+    {
+      "name": "prosemirror-model",
+      "rendered_kb": 121.2,
+      "gzip_kb": 28.6,
+      "percent": 2.5
+    },
+    {
+      "name": "@uswds/uswds",
+      "rendered_kb": 111.7,
+      "gzip_kb": 71.8,
+      "percent": 2.3
+    },
+    {
+      "name": "lib0",
+      "rendered_kb": 106.5,
+      "gzip_kb": 34.1,
+      "percent": 2.2
+    },
+    {
+      "name": "@dnd-kit/core@6.3.1_react-dom@18.3.1_react@18.3.1__react",
+      "rendered_kb": 101,
+      "gzip_kb": 21.1,
+      "percent": 2.1
+    },
+    {
+      "name": "react-router@7.13.1_react-dom@18.3.1_react@18.3.1__react",
+      "rendered_kb": 81,
+      "gzip_kb": 19.8,
+      "percent": 1.7
+    },
+    {
+      "name": "prosemirror-transform",
+      "rendered_kb": 80.7,
+      "gzip_kb": 18.8,
+      "percent": 1.7
+    },
+    {
+      "name": "diff-match-patch",
+      "rendered_kb": 80.6,
+      "gzip_kb": 18.2,
+      "percent": 1.7
+    },
+    {
+      "name": "@tiptap/extension-code-block-lowlight@2.27.2_@tiptap/core@2.27.2_@tiptap/pm@2.27.2__",
+      "rendered_kb": 80,
+      "gzip_kb": 23.3,
+      "percent": 1.7
+    },
+    {
+      "name": "@tanstack/query-core",
+      "rendered_kb": 77.6,
+      "gzip_kb": 20.5,
+      "percent": 1.6
+    },
+    {
+      "name": "tailwind-merge",
+      "rendered_kb": 70.3,
+      "gzip_kb": 12.1,
+      "percent": 1.5
+    },
+    {
+      "name": "prosemirror-tables",
+      "rendered_kb": 70.1,
+      "gzip_kb": 16.3,
+      "percent": 1.5
+    },
+    {
+      "name": "linkifyjs",
+      "rendered_kb": 59.1,
+      "gzip_kb": 20.1,
+      "percent": 1.2
+    },
+    {
+      "name": "y-prosemirror@1.3.7_prosemirror-model@1.25.4_prosemirror-state@1.4.4_prosemirror-view",
+      "rendered_kb": 58.7,
+      "gzip_kb": 15.4,
+      "percent": 1.2
+    },
+    {
+      "name": "@popperjs/core",
+      "rendered_kb": 57.3,
+      "gzip_kb": 22.1,
+      "percent": 1.2
+    },
+    {
+      "name": "tippy.js",
+      "rendered_kb": 35.8,
+      "gzip_kb": 8.1,
+      "percent": 0.8
+    },
+    {
+      "name": "prosemirror-state",
+      "rendered_kb": 35.2,
+      "gzip_kb": 9,
+      "percent": 0.7
+    },
+    {
+      "name": "@tiptap/react@2.27.2_@tiptap/core@2.27.2_@tiptap/pm@2.27.2__@tiptap/pm",
+      "rendered_kb": 32.5,
+      "gzip_kb": 7.4,
+      "percent": 0.7
+    },
+    {
+      "name": "@floating-ui/core",
+      "rendered_kb": 26.8,
+      "gzip_kb": 6.2,
+      "percent": 0.6
+    },
+    {
+      "name": "@floating-ui/dom",
+      "rendered_kb": 25.2,
+      "gzip_kb": 6.7,
+      "percent": 0.5
+    },
+    {
+      "name": "prosemirror-commands",
+      "rendered_kb": 24.6,
+      "gzip_kb": 5.3,
+      "percent": 0.5
+    },
+    {
+      "name": "@radix-ui/react-tooltip@1.2.8_@types/react-dom@18.3.7_@types/react@18.3.28__",
+      "rendered_kb": 18.3,
+      "gzip_kb": 3.9,
+      "percent": 0.4
+    },
+    {
+      "name": "prosemirror-history",
+      "rendered_kb": 16.7,
+      "gzip_kb": 4.6,
+      "percent": 0.4
+    },
+    {
+      "name": "@dnd-kit/sortable@10.0.0_@dnd-kit/core@6.3.1_react-dom@18.3.1_react@18.3.1__react@18.3.1__react",
+      "rendered_kb": 16.5,
+      "gzip_kb": 4.1,
+      "percent": 0.3
+    },
+    {
+      "name": "@tiptap/extension-link@2.27.2_@tiptap/core@2.27.2_@tiptap/pm@2.27.2__@tiptap/pm",
+      "rendered_kb": 16.1,
+      "gzip_kb": 3.8,
+      "percent": 0.3
+    },
+    {
+      "name": "react-remove-scroll@2.7.2_@types/react@18.3.28_react",
+      "rendered_kb": 14.8,
+      "gzip_kb": 4.7,
+      "percent": 0.3
+    },
+    {
+      "name": "y-websocket@2.1.0_yjs",
+      "rendered_kb": 14.2,
+      "gzip_kb": 3.7,
+      "percent": 0.3
+    },
+    {
+      "name": "y-protocols@1.0.7_yjs",
+      "rendered_kb": 13.2,
+      "gzip_kb": 4,
+      "percent": 0.3
+    },
+    {
+      "name": "@tiptap/extension-table@2.27.2_@tiptap/core@2.27.2_@tiptap/pm@2.27.2__@tiptap/pm",
+      "rendered_kb": 12.4,
+      "gzip_kb": 2.9,
+      "percent": 0.3
+    },
+    {
+      "name": "cmdk@1.1.1_@types/react-dom@18.3.7_@types/react@18.3.28__@types/react",
+      "rendered_kb": 12.3,
+      "gzip_kb": 4.6,
+      "percent": 0.3
+    },
+    {
+      "name": "@radix-ui/react-dialog@1.1.15_@types/react-dom@18.3.7_@types/react@18.3.28__",
+      "rendered_kb": 12.1,
+      "gzip_kb": 2.7,
+      "percent": 0.3
+    },
+    {
+      "name": "@tiptap/suggestion@2.27.2_@tiptap/core@2.27.2_@tiptap/pm@2.27.2__@tiptap/pm",
+      "rendered_kb": 11.9,
+      "gzip_kb": 3,
+      "percent": 0.3
+    },
+    {
+      "name": "lowlight",
+      "rendered_kb": 11.9,
+      "gzip_kb": 3.2,
+      "percent": 0.2
+    },
+    {
+      "name": "@radix-ui/react-popover@1.1.15_@types/react-dom@18.3.7_@types/react@18.3.28__",
+      "rendered_kb": 10.7,
+      "gzip_kb": 2.2,
+      "percent": 0.2
+    },
+    {
+      "name": "@radix-ui/react-popper@1.2.8_@types/react-dom@18.3.7_@types/react@18.3.28__",
+      "rendered_kb": 10.6,
+      "gzip_kb": 3.1,
+      "percent": 0.2
+    },
+    {
+      "name": "@floating-ui/react-dom@2.1.8_react-dom@18.3.1_react@18.3.1__react",
+      "rendered_kb": 9.8,
+      "gzip_kb": 2.6,
+      "percent": 0.2
+    },
+    {
+      "name": "flairup",
+      "rendered_kb": 9.7,
+      "gzip_kb": 2.6,
+      "percent": 0.2
+    },
+    {
+      "name": "react",
+      "rendered_kb": 9.4,
+      "gzip_kb": 3.9,
+      "percent": 0.2
+    },
+    {
+      "name": "@tiptap/extension-mention@2.27.2_@tiptap/core@2.27.2_@tiptap/pm@2.27.2__@tiptap/pm",
+      "rendered_kb": 9.2,
+      "gzip_kb": 2.3,
+      "percent": 0.2
+    },
+    {
+      "name": "@floating-ui/utils",
+      "rendered_kb": 9,
+      "gzip_kb": 2.8,
+      "percent": 0.2
+    },
+    {
+      "name": "@tiptap/extension-bubble-menu@2.27.2_@tiptap/core@2.27.2_@tiptap/pm@2.27.2__@tiptap/pm",
+      "rendered_kb": 8.8,
+      "gzip_kb": 2.2,
+      "percent": 0.2
+    },
+    {
+      "name": "@radix-ui/react-dismissable-layer@1.1.11_@types/react-dom@18.3.7_@types/react",
+      "rendered_kb": 8.3,
+      "gzip_kb": 1.9,
+      "percent": 0.2
+    },
+    {
+      "name": "prosemirror-gapcursor",
+      "rendered_kb": 8.2,
+      "gzip_kb": 2.5,
+      "percent": 0.2
+    },
+    {
+      "name": "@tiptap/extension-code-block@2.27.2_@tiptap/core@2.27.2_@tiptap/pm@2.27.2__@tiptap/pm",
+      "rendered_kb": 8.2,
+      "gzip_kb": 2.1,
+      "percent": 0.2
+    },
+    {
+      "name": "@radix-ui/react-focus-scope@1.1.7_@types/react-dom@18.3.7_@types/react@18.3.28__",
+      "rendered_kb": 7.6,
+      "gzip_kb": 2.1,
+      "percent": 0.2
+    },
+    {
+      "name": "@dnd-kit/utilities@3.2.2_react",
+      "rendered_kb": 7.5,
+      "gzip_kb": 2.2,
+      "percent": 0.2
+    },
+    {
+      "name": "rope-sequence",
+      "rendered_kb": 7.1,
+      "gzip_kb": 1.8,
+      "percent": 0.1
+    },
+    {
+      "name": "prosemirror-schema-list",
+      "rendered_kb": 6.9,
+      "gzip_kb": 2,
+      "percent": 0.1
+    },
+    {
+      "name": "@tanstack/react-query@5.90.21_react",
+      "rendered_kb": 6.5,
+      "gzip_kb": 2.7,
+      "percent": 0.1
+    },
+    {
+      "name": "@tiptap/extension-task-item@2.27.2_@tiptap/core@2.27.2_@tiptap/pm@2.27.2__@tiptap/pm",
+      "rendered_kb": 6,
+      "gzip_kb": 1.7,
+      "percent": 0.1
+    },
+    {
+      "name": "prosemirror-dropcursor",
+      "rendered_kb": 6,
+      "gzip_kb": 1.8,
+      "percent": 0.1
+    },
+    {
+      "name": "@tiptap/extension-collaboration@2.27.2_@tiptap/core@2.27.2_@tiptap/pm@2.27.2__",
+      "rendered_kb": 5.9,
+      "gzip_kb": 1.5,
+      "percent": 0.1
+    },
+    {
+      "name": "aria-hidden",
+      "rendered_kb": 5.2,
+      "gzip_kb": 1.4,
+      "percent": 0.1
+    },
+    {
+      "name": "y-indexeddb@9.0.12_yjs",
+      "rendered_kb": 5.1,
+      "gzip_kb": 1.4,
+      "percent": 0.1
+    },
+    {
+      "name": "scheduler",
+      "rendered_kb": 4.8,
+      "gzip_kb": 2.1,
+      "percent": 0.1
+    },
+    {
+      "name": "prosemirror-keymap",
+      "rendered_kb": 4.7,
+      "gzip_kb": 1.8,
+      "percent": 0.1
+    },
+    {
+      "name": "@radix-ui/react-presence@1.1.5_@types/react-dom@18.3.7_@types/react@18.3.28__",
+      "rendered_kb": 4.5,
+      "gzip_kb": 1.3,
+      "percent": 0.1
+    },
+    {
+      "name": "react-remove-scroll-bar@2.3.8_@types/react@18.3.28_react",
+      "rendered_kb": 4.4,
+      "gzip_kb": 1.7,
+      "percent": 0.1
+    },
+    {
+      "name": "orderedmap",
+      "rendered_kb": 4.3,
+      "gzip_kb": 1.3,
+      "percent": 0.1
+    },
+    {
+      "name": "@radix-ui/react-slot@1.2.4_@types/react@18.3.28_react",
+      "rendered_kb": 4.1,
+      "gzip_kb": 1.2,
+      "percent": 0.1
+    },
+    {
+      "name": "@radix-ui/react-slot@1.2.3_@types/react@18.3.28_react",
+      "rendered_kb": 3.8,
+      "gzip_kb": 1.1,
+      "percent": 0.1
+    },
+    {
+      "name": "other",
+      "rendered_kb": 3.5,
+      "gzip_kb": 1.6,
+      "percent": 0.1
+    },
+    {
+      "name": "use-callback-ref@1.3.3_@types/react@18.3.28_react",
+      "rendered_kb": 3.3,
+      "gzip_kb": 1.5,
+      "percent": 0.1
+    },
+    {
+      "name": "@tiptap/extension-horizontal-rule@2.27.2_@tiptap/core@2.27.2_@tiptap/pm@2.27.2__@tiptap/pm",
+      "rendered_kb": 3.3,
+      "gzip_kb": 0.9,
+      "percent": 0.1
+    },
+    {
+      "name": "@radix-ui/react-context@1.1.2_@types/react@18.3.28_react",
+      "rendered_kb": 3.2,
+      "gzip_kb": 0.8,
+      "percent": 0.1
+    },
+    {
+      "name": "@tiptap/extension-collaboration-cursor@2.26.2_@tiptap/core@2.27.2_@tiptap/pm",
+      "rendered_kb": 3.2,
+      "gzip_kb": 0.9,
+      "percent": 0.1
+    },
+    {
+      "name": "@tiptap/extension-ordered-list@2.27.2_@tiptap/core@2.27.2_@tiptap/pm",
+      "rendered_kb": 3.1,
+      "gzip_kb": 0.9,
+      "percent": 0.1
+    },
+    {
+      "name": "use-sidecar@1.1.3_@types/react@18.3.28_react",
+      "rendered_kb": 2.8,
+      "gzip_kb": 0.9,
+      "percent": 0.1
+    },
+    {
+      "name": "@tiptap/extension-placeholder@2.27.2_@tiptap/core@2.27.2_@tiptap/pm@2.27.2__@tiptap/pm",
+      "rendered_kb": 2.7,
+      "gzip_kb": 0.8,
+      "percent": 0.1
+    },
+    {
+      "name": "w3c-keyname",
+      "rendered_kb": 2.6,
+      "gzip_kb": 1.1,
+      "percent": 0.1
+    },
+    {
+      "name": "@tiptap/starter-kit",
+      "rendered_kb": 2.6,
+      "gzip_kb": 0.5,
+      "percent": 0.1
+    },
+    {
+      "name": "@tiptap/extension-bold@2.27.2_@tiptap/core@2.27.2_@tiptap/pm",
+      "rendered_kb": 2.6,
+      "gzip_kb": 0.7,
+      "percent": 0.1
+    },
+    {
+      "name": "@tiptap/extension-italic@2.27.2_@tiptap/core@2.27.2_@tiptap/pm",
+      "rendered_kb": 2.5,
+      "gzip_kb": 0.6,
+      "percent": 0.1
+    },
+    {
+      "name": "react-style-singleton@2.2.3_@types/react@18.3.28_react",
+      "rendered_kb": 2.3,
+      "gzip_kb": 1,
+      "percent": 0
+    },
+    {
+      "name": "@tiptap/extension-hard-break@2.27.2_@tiptap/core@2.27.2_@tiptap/pm",
+      "rendered_kb": 2.2,
+      "gzip_kb": 0.7,
+      "percent": 0
+    },
+    {
+      "name": "idb-keyval",
+      "rendered_kb": 2.2,
+      "gzip_kb": 0.7,
+      "percent": 0
+    },
+    {
+      "name": "@tiptap/extension-bullet-list@2.27.2_@tiptap/core@2.27.2_@tiptap/pm",
+      "rendered_kb": 2.2,
+      "gzip_kb": 0.7,
+      "percent": 0
+    },
+    {
+      "name": "@tiptap/extension-heading@2.27.2_@tiptap/core@2.27.2_@tiptap/pm",
+      "rendered_kb": 2.1,
+      "gzip_kb": 0.7,
+      "percent": 0
+    },
+    {
+      "name": "tslib",
+      "rendered_kb": 2.1,
+      "gzip_kb": 1,
+      "percent": 0
+    },
+    {
+      "name": "@radix-ui/react-use-controllable-state@1.2.2_@types/react@18.3.28_react",
+      "rendered_kb": 2.1,
+      "gzip_kb": 0.7,
+      "percent": 0
+    },
+    {
+      "name": "@tiptap/extension-code@2.27.2_@tiptap/core@2.27.2_@tiptap/pm",
+      "rendered_kb": 1.9,
+      "gzip_kb": 0.7,
+      "percent": 0
+    },
+    {
+      "name": "@tiptap/extension-strike@2.27.2_@tiptap/core@2.27.2_@tiptap/pm",
+      "rendered_kb": 1.9,
+      "gzip_kb": 0.6,
+      "percent": 0
+    },
+    {
+      "name": "@tanstack/query-persist-client-core",
+      "rendered_kb": 1.6,
+      "gzip_kb": 0.5,
+      "percent": 0
+    },
+    {
+      "name": "@tiptap/extension-blockquote@2.27.2_@tiptap/core@2.27.2_@tiptap/pm",
+      "rendered_kb": 1.3,
+      "gzip_kb": 0.5,
+      "percent": 0
+    },
+    {
+      "name": "@tiptap/extension-history@2.27.2_@tiptap/core@2.27.2_@tiptap/pm@2.27.2__@tiptap/pm",
+      "rendered_kb": 1.3,
+      "gzip_kb": 0.5,
+      "percent": 0
+    },
+    {
+      "name": "@radix-ui/react-use-size@1.1.1_@types/react@18.3.28_react",
+      "rendered_kb": 1.1,
+      "gzip_kb": 0.4,
+      "percent": 0
+    },
+    {
+      "name": "@tiptap/extension-table-header@2.27.2_@tiptap/core@2.27.2_@tiptap/pm",
+      "rendered_kb": 1.1,
+      "gzip_kb": 0.4,
+      "percent": 0
+    },
+    {
+      "name": "@tiptap/extension-table-cell@2.27.2_@tiptap/core@2.27.2_@tiptap/pm",
+      "rendered_kb": 1.1,
+      "gzip_kb": 0.4,
+      "percent": 0
+    },
+    {
+      "name": "@dnd-kit/accessibility@3.1.1_react",
+      "rendered_kb": 1.1,
+      "gzip_kb": 0.5,
+      "percent": 0
+    },
+    {
+      "name": "@tanstack/react-query-persist-client@5.90.24_@tanstack/react-query@5.90.21_react@18.3.1__react",
+      "rendered_kb": 1,
+      "gzip_kb": 0.4,
+      "percent": 0
+    },
+    {
+      "name": "@tiptap/extension-task-list@2.27.2_@tiptap/core@2.27.2_@tiptap/pm",
+      "rendered_kb": 1,
+      "gzip_kb": 0.4,
+      "percent": 0
+    },
+    {
+      "name": "@tiptap/extension-list-item@2.27.2_@tiptap/core@2.27.2_@tiptap/pm",
+      "rendered_kb": 0.9,
+      "gzip_kb": 0.4,
+      "percent": 0
+    },
+    {
+      "name": "@radix-ui/react-compose-refs@1.1.2_@types/react@18.3.28_react",
+      "rendered_kb": 0.9,
+      "gzip_kb": 0.4,
+      "percent": 0
+    },
+    {
+      "name": "@radix-ui/react-primitive@2.1.3_@types/react-dom@18.3.7_@types/react@18.3.28__",
+      "rendered_kb": 0.9,
+      "gzip_kb": 0.5,
+      "percent": 0
+    },
+    {
+      "name": "@radix-ui/react-focus-guards@1.1.3_@types/react@18.3.28_react",
+      "rendered_kb": 0.8,
+      "gzip_kb": 0.4,
+      "percent": 0
+    },
+    {
+      "name": "@tiptap/extension-paragraph@2.27.2_@tiptap/core@2.27.2_@tiptap/pm",
+      "rendered_kb": 0.8,
+      "gzip_kb": 0.4,
+      "percent": 0
+    },
+    {
+      "name": "@tiptap/extension-gapcursor@2.27.2_@tiptap/core@2.27.2_@tiptap/pm@2.27.2__@tiptap/pm",
+      "rendered_kb": 0.8,
+      "gzip_kb": 0.4,
+      "percent": 0
+    },
+    {
+      "name": "@radix-ui/react-primitive@2.1.4_@types/react-dom@18.3.7_@types/react@18.3.28__",
+      "rendered_kb": 0.7,
+      "gzip_kb": 0.4,
+      "percent": 0
+    },
+    {
+      "name": "@radix-ui/react-visually-hidden@1.2.3_@types/react-dom@18.3.7_@types/react@18.3.28__",
+      "rendered_kb": 0.7,
+      "gzip_kb": 0.4,
+      "percent": 0
+    },
+    {
+      "name": "@radix-ui/react-use-escape-keydown@1.1.1_@types/react@18.3.28_react",
+      "rendered_kb": 0.6,
+      "gzip_kb": 0.3,
+      "percent": 0
+    },
+    {
+      "name": "@radix-ui/react-arrow@1.1.7_@types/react-dom@18.3.7_@types/react@18.3.28__@types/react",
+      "rendered_kb": 0.6,
+      "gzip_kb": 0.3,
+      "percent": 0
+    },
+    {
+      "name": "@radix-ui/react-portal@1.1.9_@types/react-dom@18.3.7_@types/react@18.3.28__",
+      "rendered_kb": 0.5,
+      "gzip_kb": 0.3,
+      "percent": 0
+    },
+    {
+      "name": "@tiptap/extension-table-row@2.27.2_@tiptap/core@2.27.2_@tiptap/pm",
+      "rendered_kb": 0.5,
+      "gzip_kb": 0.3,
+      "percent": 0
+    },
+    {
+      "name": "@tiptap/extension-dropcursor@2.27.2_@tiptap/core@2.27.2_@tiptap/pm@2.27.2__@tiptap/pm",
+      "rendered_kb": 0.5,
+      "gzip_kb": 0.3,
+      "percent": 0
+    },
+    {
+      "name": "@radix-ui/react-id@1.1.1_@types/react@18.3.28_react",
+      "rendered_kb": 0.4,
+      "gzip_kb": 0.3,
+      "percent": 0
+    },
+    {
+      "name": "clsx",
+      "rendered_kb": 0.4,
+      "gzip_kb": 0.2,
+      "percent": 0
+    },
+    {
+      "name": "@radix-ui/primitive",
+      "rendered_kb": 0.3,
+      "gzip_kb": 0.2,
+      "percent": 0
+    },
+    {
+      "name": "@radix-ui/react-use-callback-ref@1.1.1_@types/react@18.3.28_react",
+      "rendered_kb": 0.3,
+      "gzip_kb": 0.2,
+      "percent": 0
+    },
+    {
+      "name": "@tiptap/extension-document@2.27.2_@tiptap/core@2.27.2_@tiptap/pm",
+      "rendered_kb": 0.2,
+      "gzip_kb": 0.2,
+      "percent": 0
+    },
+    {
+      "name": "@tiptap/extension-text@2.27.2_@tiptap/core@2.27.2_@tiptap/pm",
+      "rendered_kb": 0.2,
+      "gzip_kb": 0.2,
+      "percent": 0
+    },
+    {
+      "name": "@radix-ui/react-use-layout-effect@1.1.1_@types/react@18.3.28_react",
+      "rendered_kb": 0.1,
+      "gzip_kb": 0.1,
+      "percent": 0
+    },
+    {
+      "name": "get-nonce",
+      "rendered_kb": 0.1,
+      "gzip_kb": 0.1,
+      "percent": 0
+    },
+    {
+      "name": "@tanstack/react-query-devtools@5.91.3_@tanstack/react-query@5.90.21_react@18.3.1__react",
+      "rendered_kb": 0.1,
+      "gzip_kb": 0.1,
+      "percent": 0
+    }
+  ]
+}

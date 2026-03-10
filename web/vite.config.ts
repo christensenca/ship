@@ -46,6 +46,13 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [
       react(),
+      // Bundle analysis treemap — enabled via ANALYZE=true
+      ...(process.env.ANALYZE ? [import('rollup-plugin-visualizer').then(m => m.visualizer({
+        filename: 'stats.html',
+        gzipSize: true,
+        brotliSize: true,
+        template: 'treemap',
+      }))] : []),
       svgr({
         // Allow importing SVGs as React components with ?react suffix
         // e.g., import CheckIcon from '@uswds/uswds/dist/img/usa-icons/check.svg?react'
