@@ -1,0 +1,38 @@
+name: Type Safety Report
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 14 * * 1'
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate type safety report
+        run: pnpm report:type-safety
+
+      - name: Upload report artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: type-safety-report
+          path: reports/type-safety/
+          if-no-files-found: error

@@ -1,0 +1,155 @@
+{
+  "generated_at": "2026-03-10T15:34:27.524Z",
+  "strict_mode": {
+    "enabled": true,
+    "by_config": {
+      "root": {
+        "path": "tsconfig.json",
+        "strict": true
+      },
+      "api": {
+        "path": "api/tsconfig.json",
+        "strict": true
+      },
+      "web": {
+        "path": "web/tsconfig.json",
+        "strict": true
+      },
+      "shared": {
+        "path": "shared/tsconfig.json",
+        "strict": true
+      }
+    },
+    "strict_error_count_if_disabled": null,
+    "strict_error_count_total_if_disabled": null
+  },
+  "totals": {
+    "overall": 7201,
+    "by_violation_type": {
+      "explicit_any": 260,
+      "type_assertion_as": 696,
+      "non_null_assertion": 343,
+      "ts_comment_directive": 1,
+      "untyped_parameter": 1452,
+      "missing_return_type": 4449
+    }
+  },
+  "package_breakdown": {
+    "api": {
+      "explicit_any": 227,
+      "type_assertion_as": 322,
+      "non_null_assertion": 310,
+      "ts_comment_directive": 0,
+      "untyped_parameter": 289,
+      "missing_return_type": 1246
+    },
+    "web": {
+      "explicit_any": 33,
+      "type_assertion_as": 372,
+      "non_null_assertion": 33,
+      "ts_comment_directive": 1,
+      "untyped_parameter": 1163,
+      "missing_return_type": 3203
+    },
+    "shared": {
+      "explicit_any": 0,
+      "type_assertion_as": 2,
+      "non_null_assertion": 0,
+      "ts_comment_directive": 0,
+      "untyped_parameter": 0,
+      "missing_return_type": 0
+    }
+  },
+  "top_violation_dense_files": [
+    {
+      "file": "web/src/components/IssuesList.tsx",
+      "package": "web",
+      "total": 189,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 4,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 47,
+        "missing_return_type": 138
+      },
+      "explanation": "Dominant violation types: missing_return_type (138), untyped_parameter (47)."
+    },
+    {
+      "file": "web/src/pages/App.tsx",
+      "package": "web",
+      "total": 180,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 1,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 30,
+        "missing_return_type": 149
+      },
+      "explanation": "Dominant violation types: missing_return_type (149), untyped_parameter (30)."
+    },
+    {
+      "file": "api/src/routes/weeks.ts",
+      "package": "api",
+      "total": 159,
+      "counts": {
+        "explicit_any": 11,
+        "type_assertion_as": 26,
+        "non_null_assertion": 48,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 24,
+        "missing_return_type": 50
+      },
+      "explanation": "Dominant violation types: missing_return_type (50), non_null_assertion (48)."
+    },
+    {
+      "file": "web/src/pages/ReviewsPage.tsx",
+      "package": "web",
+      "total": 150,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 6,
+        "non_null_assertion": 4,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 57,
+        "missing_return_type": 83
+      },
+      "explanation": "Dominant violation types: missing_return_type (83), untyped_parameter (57)."
+    },
+    {
+      "file": "api/src/routes/issues.ts",
+      "package": "api",
+      "total": 122,
+      "counts": {
+        "explicit_any": 4,
+        "type_assertion_as": 8,
+        "non_null_assertion": 37,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 29,
+        "missing_return_type": 44
+      },
+      "explanation": "Dominant violation types: missing_return_type (44), non_null_assertion (37)."
+    }
+  ],
+  "delta_from_previous": {
+    "overall": 35,
+    "by_violation_type": {
+      "explicit_any": 0,
+      "type_assertion_as": 5,
+      "non_null_assertion": 14,
+      "ts_comment_directive": 0,
+      "untyped_parameter": 9,
+      "missing_return_type": 7
+    },
+    "status_band": "Stable"
+  },
+  "matching_rules": {
+    "explicit_any": "AST nodes where type annotation uses AnyKeyword.",
+    "type_assertion_as": "AST AsExpression nodes.",
+    "non_null_assertion": "AST NonNullExpression nodes.",
+    "ts_comment_directive": "Text matches for @ts-ignore and @ts-expect-error.",
+    "untyped_parameter": "Function-like parameters with no explicit type annotation.",
+    "missing_return_type": "Function-like implementations with body and no explicit return type annotation."
+  }
+}
