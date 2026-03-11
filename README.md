@@ -17,6 +17,10 @@
   <img src="https://img.shields.io/badge/WCAG_2.1-AA-blue.svg" alt="WCAG 2.1 AA">
 </p>
 
+<p align="center">
+  <a href="https://docs.google.com/document/d/1ejYaTAokblzvM-HIpMUKEx3_XrMvftYMFxvJlzcsWlE/edit?tab=t.0">Ship Audit</a>
+</p>
+
 ---
 
 ## What is Ship?
