@@ -71,6 +71,7 @@ reports/type-safety/*-vitest.json
 
 # Audit artifacts
 .audit
+web/stats.html
 
 # Terraform
 terraform/.terraform/
