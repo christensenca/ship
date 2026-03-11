@@ -1,16 +1,16 @@
 # Type Safety Audit Report
 
-Generated: 2026-03-11T20:13:04.634Z
+Generated: 2026-03-11T20:16:22.446Z
 
 ## Summary
 
 | Metric | Baseline |
 |---|---|
-| Total violations | 5879 |
-| Production-only violations | 4218 |
+| Total violations | 5816 |
+| Production-only violations | 4155 |
 | Test-only violations | 1661 |
 | Total any types | 251 |
-| Total type assertions (as) | 690 |
+| Total type assertions (as) | 687 |
 | Total non-null assertions (!) | 247 |
 | Total @ts-ignore / @ts-expect-error | 1 |
 | Strict mode enabled? | Yes |
@@ -19,16 +19,16 @@ Generated: 2026-03-11T20:13:04.634Z
 
 ## Trend Status
 
-- Status: **Improving**
-- Total violations: 5879
-- Delta from previous: -60
+- Status: **Stable**
+- Total violations: 5816
+- Delta from previous: -5
 
 ## Package Breakdown
 
 | Package | explicit_any | type_assertion_as | non_null_assertion | ts_comment_directive | untyped_parameter | missing_return_type | total |
 |---|---:|---:|---:|---:|---:|---:|---:|
 | api | 226 | 322 | 219 | 0 | 289 | 1190 | 2246 |
-| web | 25 | 366 | 28 | 1 | 874 | 2337 | 3631 |
+| web | 25 | 363 | 28 | 1 | 848 | 2303 | 3568 |
 | shared | 0 | 2 | 0 | 0 | 0 | 0 | 2 |
 
 ## Top 5 Violation-Dense Files
@@ -37,4 +37,4 @@ Generated: 2026-03-11T20:13:04.634Z
 2. `api/src/db/seed.ts` (79) - Dominant violation types: non_null_assertion (35), missing_return_type (24).
 3. `api/src/routes/projects.ts` (74) - Dominant violation types: missing_return_type (22), non_null_assertion (20).
 4. `web/src/pages/OrgChartPage.tsx` (74) - Dominant violation types: missing_return_type (51), untyped_parameter (22).
-5. `web/src/hooks/useDocumentsQuery.ts` (70) - Dominant violation types: missing_return_type (34), untyped_parameter (26).
+5. `api/src/routes/team.ts` (69) - Dominant violation types: missing_return_type (28), non_null_assertion (28).
