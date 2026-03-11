@@ -59,6 +59,7 @@ web/coverage/
 api/coverage/
 *.ts.html
 *.tsx.html
+reports/type-safety/*-vitest.json
 
 # Plans
 /plans

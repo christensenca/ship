@@ -1,5 +1,6 @@
 {
-  "generated_at": "2026-03-10T15:34:27.524Z",
+  "schema_version": 2,
+  "generated_at": "2026-03-11T18:48:20.574Z",
   "strict_mode": {
     "enabled": true,
     "by_config": {
@@ -24,14 +25,34 @@
     "strict_error_count_total_if_disabled": null
   },
   "totals": {
-    "overall": 7201,
+    "overall": 6635,
+    "production_only": 4974,
+    "tests_only": 1661,
     "by_violation_type": {
       "explicit_any": 260,
-      "type_assertion_as": 696,
-      "non_null_assertion": 343,
+      "type_assertion_as": 691,
+      "non_null_assertion": 339,
       "ts_comment_directive": 1,
-      "untyped_parameter": 1452,
-      "missing_return_type": 4449
+      "untyped_parameter": 1231,
+      "missing_return_type": 4113
+    },
+    "by_scope": {
+      "production_only": {
+        "explicit_any": 83,
+        "type_assertion_as": 504,
+        "non_null_assertion": 335,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 1159,
+        "missing_return_type": 2893
+      },
+      "tests_only": {
+        "explicit_any": 177,
+        "type_assertion_as": 187,
+        "non_null_assertion": 4,
+        "ts_comment_directive": 1,
+        "untyped_parameter": 72,
+        "missing_return_type": 1220
+      }
     }
   },
   "package_breakdown": {
@@ -45,11 +66,11 @@
     },
     "web": {
       "explicit_any": 33,
-      "type_assertion_as": 372,
-      "non_null_assertion": 33,
+      "type_assertion_as": 367,
+      "non_null_assertion": 29,
       "ts_comment_directive": 1,
-      "untyped_parameter": 1163,
-      "missing_return_type": 3203
+      "untyped_parameter": 942,
+      "missing_return_type": 2867
     },
     "shared": {
       "explicit_any": 0,
@@ -60,6 +81,3732 @@
       "missing_return_type": 0
     }
   },
+  "file_breakdown": [
+    {
+      "file": "web/src/components/IssuesList.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 189,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 4,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 47,
+        "missing_return_type": 138
+      }
+    },
+    {
+      "file": "web/src/pages/App.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 180,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 1,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 30,
+        "missing_return_type": 149
+      }
+    },
+    {
+      "file": "api/src/routes/weeks.ts",
+      "package": "api",
+      "is_test_like": false,
+      "total": 159,
+      "counts": {
+        "explicit_any": 11,
+        "type_assertion_as": 26,
+        "non_null_assertion": 48,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 24,
+        "missing_return_type": 50
+      }
+    },
+    {
+      "file": "web/src/hooks/useSessionTimeout.test.ts",
+      "package": "web",
+      "is_test_like": true,
+      "total": 159,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 2,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 157
+      }
+    },
+    {
+      "file": "api/src/routes/issues.ts",
+      "package": "api",
+      "is_test_like": false,
+      "total": 122,
+      "counts": {
+        "explicit_any": 4,
+        "type_assertion_as": 8,
+        "non_null_assertion": 37,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 29,
+        "missing_return_type": 44
+      }
+    },
+    {
+      "file": "api/src/services/accountability.test.ts",
+      "package": "api",
+      "is_test_like": true,
+      "total": 114,
+      "counts": {
+        "explicit_any": 32,
+        "type_assertion_as": 32,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 13,
+        "missing_return_type": 37
+      }
+    },
+    {
+      "file": "web/src/components/Editor.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 114,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 2,
+        "non_null_assertion": 3,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 19,
+        "missing_return_type": 90
+      }
+    },
+    {
+      "file": "api/src/__tests__/transformIssueLinks.test.ts",
+      "package": "api",
+      "is_test_like": true,
+      "total": 105,
+      "counts": {
+        "explicit_any": 37,
+        "type_assertion_as": 28,
+        "non_null_assertion": 1,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 39
+      }
+    },
+    {
+      "file": "api/src/routes/projects.ts",
+      "package": "api",
+      "is_test_like": false,
+      "total": 92,
+      "counts": {
+        "explicit_any": 15,
+        "type_assertion_as": 10,
+        "non_null_assertion": 26,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 8,
+        "missing_return_type": 33
+      }
+    },
+    {
+      "file": "web/src/pages/UnifiedDocumentPage.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 92,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 36,
+        "non_null_assertion": 1,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 16,
+        "missing_return_type": 39
+      }
+    },
+    {
+      "file": "api/src/__tests__/auth.test.ts",
+      "package": "api",
+      "is_test_like": true,
+      "total": 91,
+      "counts": {
+        "explicit_any": 24,
+        "type_assertion_as": 39,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 28
+      }
+    },
+    {
+      "file": "web/src/components/editor/SlashCommands.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 86,
+      "counts": {
+        "explicit_any": 8,
+        "type_assertion_as": 2,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 30,
+        "missing_return_type": 46
+      }
+    },
+    {
+      "file": "api/src/db/seed.ts",
+      "package": "api",
+      "is_test_like": false,
+      "total": 79,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 35,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 20,
+        "missing_return_type": 24
+      }
+    },
+    {
+      "file": "web/src/pages/Projects.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 79,
+      "counts": {
+        "explicit_any": 2,
+        "type_assertion_as": 4,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 21,
+        "missing_return_type": 52
+      }
+    },
+    {
+      "file": "api/src/__tests__/activity.test.ts",
+      "package": "api",
+      "is_test_like": true,
+      "total": 77,
+      "counts": {
+        "explicit_any": 23,
+        "type_assertion_as": 23,
+        "non_null_assertion": 3,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 2,
+        "missing_return_type": 26
+      }
+    },
+    {
+      "file": "web/src/pages/OrgChartPage.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 74,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 1,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 22,
+        "missing_return_type": 51
+      }
+    },
+    {
+      "file": "web/src/components/CommandPalette.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 70,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 1,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 8,
+        "missing_return_type": 61
+      }
+    },
+    {
+      "file": "web/src/hooks/useDocumentsQuery.ts",
+      "package": "web",
+      "is_test_like": false,
+      "total": 70,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 10,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 26,
+        "missing_return_type": 34
+      }
+    },
+    {
+      "file": "api/src/routes/team.ts",
+      "package": "api",
+      "is_test_like": false,
+      "total": 69,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 3,
+        "non_null_assertion": 28,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 10,
+        "missing_return_type": 28
+      }
+    },
+    {
+      "file": "api/src/routes/weeks.test.ts",
+      "package": "api",
+      "is_test_like": true,
+      "total": 69,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 69
+      }
+    },
+    {
+      "file": "web/src/hooks/useSelection.test.ts",
+      "package": "web",
+      "is_test_like": true,
+      "total": 69,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 12,
+        "missing_return_type": 57
+      }
+    },
+    {
+      "file": "api/src/collaboration/index.ts",
+      "package": "api",
+      "is_test_like": false,
+      "total": 68,
+      "counts": {
+        "explicit_any": 1,
+        "type_assertion_as": 2,
+        "non_null_assertion": 4,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 28,
+        "missing_return_type": 33
+      }
+    },
+    {
+      "file": "web/src/hooks/useProgramsQuery.ts",
+      "package": "web",
+      "is_test_like": false,
+      "total": 67,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 9,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 26,
+        "missing_return_type": 32
+      }
+    },
+    {
+      "file": "api/src/routes/issues-history.test.ts",
+      "package": "api",
+      "is_test_like": true,
+      "total": 65,
+      "counts": {
+        "explicit_any": 20,
+        "type_assertion_as": 20,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 3,
+        "missing_return_type": 22
+      }
+    },
+    {
+      "file": "web/src/components/PlanQualityBanner.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 65,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 17,
+        "missing_return_type": 48
+      }
+    },
+    {
+      "file": "web/src/pages/AdminWorkspaceDetail.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 64,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 3,
+        "non_null_assertion": 2,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 17,
+        "missing_return_type": 42
+      }
+    },
+    {
+      "file": "api/src/routes/projects.test.ts",
+      "package": "api",
+      "is_test_like": true,
+      "total": 62,
+      "counts": {
+        "explicit_any": 17,
+        "type_assertion_as": 17,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 3,
+        "missing_return_type": 25
+      }
+    },
+    {
+      "file": "web/src/components/sidebars/IssueSidebar.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 62,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 3,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 21,
+        "missing_return_type": 38
+      }
+    },
+    {
+      "file": "web/src/lib/document-tabs.test.ts",
+      "package": "web",
+      "is_test_like": true,
+      "total": 61,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 17,
+        "missing_return_type": 44
+      }
+    },
+    {
+      "file": "api/src/collaboration/__tests__/collaboration.test.ts",
+      "package": "api",
+      "is_test_like": true,
+      "total": 57,
+      "counts": {
+        "explicit_any": 1,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 1,
+        "missing_return_type": 55
+      }
+    },
+    {
+      "file": "api/src/routes/admin.ts",
+      "package": "api",
+      "is_test_like": false,
+      "total": 54,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 12,
+        "non_null_assertion": 14,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 14,
+        "missing_return_type": 14
+      }
+    },
+    {
+      "file": "web/src/pages/Documents.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 54,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 1,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 19,
+        "missing_return_type": 34
+      }
+    },
+    {
+      "file": "api/src/routes/weekly-plans.ts",
+      "package": "api",
+      "is_test_like": false,
+      "total": 52,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 15,
+        "non_null_assertion": 12,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 8,
+        "missing_return_type": 17
+      }
+    },
+    {
+      "file": "api/src/routes/claude.ts",
+      "package": "api",
+      "is_test_like": false,
+      "total": 51,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 2,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 20,
+        "missing_return_type": 29
+      }
+    },
+    {
+      "file": "web/src/pages/AdminDashboard.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 49,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 1,
+        "non_null_assertion": 1,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 11,
+        "missing_return_type": 36
+      }
+    },
+    {
+      "file": "api/src/__tests__/extractHypothesis.test.ts",
+      "package": "api",
+      "is_test_like": true,
+      "total": 47,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 47
+      }
+    },
+    {
+      "file": "web/src/components/document-tabs/ProjectDetailsTab.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 47,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 19,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 7,
+        "missing_return_type": 21
+      }
+    },
+    {
+      "file": "api/src/routes/programs.ts",
+      "package": "api",
+      "is_test_like": false,
+      "total": 46,
+      "counts": {
+        "explicit_any": 2,
+        "type_assertion_as": 1,
+        "non_null_assertion": 18,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 7,
+        "missing_return_type": 18
+      }
+    },
+    {
+      "file": "api/src/routes/workspaces.test.ts",
+      "package": "api",
+      "is_test_like": true,
+      "total": 46,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 46
+      }
+    },
+    {
+      "file": "web/src/lib/api.ts",
+      "package": "web",
+      "is_test_like": false,
+      "total": 46,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 5,
+        "non_null_assertion": 1,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 1,
+        "missing_return_type": 39
+      }
+    },
+    {
+      "file": "api/src/routes/associations-regression.test.ts",
+      "package": "api",
+      "is_test_like": true,
+      "total": 44,
+      "counts": {
+        "explicit_any": 6,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 1,
+        "missing_return_type": 37
+      }
+    },
+    {
+      "file": "web/src/components/BulkActionBar.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 44,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 4,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 4,
+        "missing_return_type": 36
+      }
+    },
+    {
+      "file": "api/src/routes/issues.test.ts",
+      "package": "api",
+      "is_test_like": true,
+      "total": 43,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 43
+      }
+    },
+    {
+      "file": "web/src/components/editor/MentionExtension.ts",
+      "package": "web",
+      "is_test_like": false,
+      "total": 43,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 5,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 17,
+        "missing_return_type": 21
+      }
+    },
+    {
+      "file": "web/src/components/dialogs/BacklogPickerModal.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 42,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 14,
+        "missing_return_type": 28
+      }
+    },
+    {
+      "file": "web/src/components/UnifiedEditor.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 42,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 28,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 14
+      }
+    },
+    {
+      "file": "web/src/hooks/useSessionTimeout.ts",
+      "package": "web",
+      "is_test_like": false,
+      "total": 40,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 3,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 5,
+        "missing_return_type": 32
+      }
+    },
+    {
+      "file": "web/src/components/editor/FileAttachment.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 39,
+      "counts": {
+        "explicit_any": 7,
+        "type_assertion_as": 1,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 10,
+        "missing_return_type": 21
+      }
+    },
+    {
+      "file": "web/src/components/sidebars/PropertiesPanel.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 39,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 25,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 3,
+        "missing_return_type": 11
+      }
+    },
+    {
+      "file": "api/src/routes/documents.test.ts",
+      "package": "api",
+      "is_test_like": true,
+      "total": 38,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 38
+      }
+    },
+    {
+      "file": "web/src/components/sidebars/ProjectSidebar.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 38,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 7,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 13,
+        "missing_return_type": 18
+      }
+    },
+    {
+      "file": "web/src/components/WeekReconciliation.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 37,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 9,
+        "missing_return_type": 28
+      }
+    },
+    {
+      "file": "web/src/pages/Dashboard.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 37,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 2,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 15,
+        "missing_return_type": 20
+      }
+    },
+    {
+      "file": "web/src/pages/PersonEditor.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 37,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 2,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 13,
+        "missing_return_type": 22
+      }
+    },
+    {
+      "file": "web/src/pages/Programs.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 37,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 13,
+        "missing_return_type": 24
+      }
+    },
+    {
+      "file": "api/src/routes/iterations.test.ts",
+      "package": "api",
+      "is_test_like": true,
+      "total": 36,
+      "counts": {
+        "explicit_any": 9,
+        "type_assertion_as": 9,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 3,
+        "missing_return_type": 15
+      }
+    },
+    {
+      "file": "api/src/db/seed-performance.ts",
+      "package": "api",
+      "is_test_like": false,
+      "total": 35,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 5,
+        "non_null_assertion": 14,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 9,
+        "missing_return_type": 7
+      }
+    },
+    {
+      "file": "api/src/routes/auth.test.ts",
+      "package": "api",
+      "is_test_like": true,
+      "total": 35,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 35
+      }
+    },
+    {
+      "file": "web/src/components/editor/DetailsExtension.ts",
+      "package": "web",
+      "is_test_like": false,
+      "total": 35,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 3,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 10,
+        "missing_return_type": 22
+      }
+    },
+    {
+      "file": "web/src/components/editor/EmojiExtension.ts",
+      "package": "web",
+      "is_test_like": false,
+      "total": 35,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 2,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 13,
+        "missing_return_type": 20
+      }
+    },
+    {
+      "file": "web/src/components/KanbanBoard.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 35,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 3,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 10,
+        "missing_return_type": 22
+      }
+    },
+    {
+      "file": "web/src/components/ui/Skeleton.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 35,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 18,
+        "missing_return_type": 17
+      }
+    },
+    {
+      "file": "web/src/components/week/WeekTimeline.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 35,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 1,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 9,
+        "missing_return_type": 25
+      }
+    },
+    {
+      "file": "web/src/components/document-tabs/WeekOverviewTab.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 34,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 10,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 7,
+        "missing_return_type": 17
+      }
+    },
+    {
+      "file": "web/src/components/sidebars/QualityAssistant.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 34,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 10,
+        "missing_return_type": 24
+      }
+    },
+    {
+      "file": "api/src/routes/documents.ts",
+      "package": "api",
+      "is_test_like": false,
+      "total": 33,
+      "counts": {
+        "explicit_any": 2,
+        "type_assertion_as": 5,
+        "non_null_assertion": 3,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 6,
+        "missing_return_type": 17
+      }
+    },
+    {
+      "file": "api/src/utils/__tests__/business-days.test.ts",
+      "package": "api",
+      "is_test_like": true,
+      "total": 33,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 33
+      }
+    },
+    {
+      "file": "web/src/components/AccountabilityGrid.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 33,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 1,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 9,
+        "missing_return_type": 23
+      }
+    },
+    {
+      "file": "web/src/components/editor/CommentDisplay.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 33,
+      "counts": {
+        "explicit_any": 4,
+        "type_assertion_as": 8,
+        "non_null_assertion": 1,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 7,
+        "missing_return_type": 13
+      }
+    },
+    {
+      "file": "web/src/lib/queryClient.ts",
+      "package": "web",
+      "is_test_like": false,
+      "total": 33,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 3,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 14,
+        "missing_return_type": 16
+      }
+    },
+    {
+      "file": "web/src/components/editor/DragHandle.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 32,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 1,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 12,
+        "missing_return_type": 19
+      }
+    },
+    {
+      "file": "web/src/components/SelectableList.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 32,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 13,
+        "missing_return_type": 19
+      }
+    },
+    {
+      "file": "web/src/contexts/SelectionPersistenceContext.test.tsx",
+      "package": "web",
+      "is_test_like": true,
+      "total": 32,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 1,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 31
+      }
+    },
+    {
+      "file": "api/src/routes/documents-visibility.test.ts",
+      "package": "api",
+      "is_test_like": true,
+      "total": 31,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 31
+      }
+    },
+    {
+      "file": "api/src/routes/workspaces.ts",
+      "package": "api",
+      "is_test_like": false,
+      "total": 31,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 7,
+        "non_null_assertion": 8,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 8,
+        "missing_return_type": 8
+      }
+    },
+    {
+      "file": "api/src/routes/dashboard.ts",
+      "package": "api",
+      "is_test_like": false,
+      "total": 29,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 5,
+        "non_null_assertion": 6,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 7,
+        "missing_return_type": 11
+      }
+    },
+    {
+      "file": "web/src/components/DiffViewer.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 29,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 8,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 10,
+        "missing_return_type": 11
+      }
+    },
+    {
+      "file": "web/src/components/ProjectCombobox.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 29,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 11,
+        "missing_return_type": 18
+      }
+    },
+    {
+      "file": "web/src/components/ui/MultiAssociationChips.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 29,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 1,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 9,
+        "missing_return_type": 19
+      }
+    },
+    {
+      "file": "web/src/hooks/useSelection.ts",
+      "package": "web",
+      "is_test_like": false,
+      "total": 29,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 7,
+        "missing_return_type": 22
+      }
+    },
+    {
+      "file": "api/src/routes/standups.test.ts",
+      "package": "api",
+      "is_test_like": true,
+      "total": 28,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 28
+      }
+    },
+    {
+      "file": "web/src/components/document-tabs/ProgramOverviewTab.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 28,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 9,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 5,
+        "missing_return_type": 14
+      }
+    },
+    {
+      "file": "web/src/components/editor/CommentMark.ts",
+      "package": "web",
+      "is_test_like": false,
+      "total": 28,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 8,
+        "missing_return_type": 20
+      }
+    },
+    {
+      "file": "web/src/components/editor/ImageUpload.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 28,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 2,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 11,
+        "missing_return_type": 15
+      }
+    },
+    {
+      "file": "web/src/components/editor/TableOfContents.test.ts",
+      "package": "web",
+      "is_test_like": true,
+      "total": 28,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 3,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 8,
+        "missing_return_type": 17
+      }
+    },
+    {
+      "file": "web/src/components/StatusOverviewHeatmap.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 28,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 9,
+        "missing_return_type": 19
+      }
+    },
+    {
+      "file": "web/src/lib/document-tabs.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 28,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 1,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 9,
+        "missing_return_type": 18
+      }
+    },
+    {
+      "file": "api/src/routes/backlinks.test.ts",
+      "package": "api",
+      "is_test_like": true,
+      "total": 27,
+      "counts": {
+        "explicit_any": 1,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 1,
+        "missing_return_type": 25
+      }
+    },
+    {
+      "file": "web/src/components/editor/MentionList.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 27,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 10,
+        "missing_return_type": 17
+      }
+    },
+    {
+      "file": "web/src/components/MultiPersonCombobox.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 27,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 10,
+        "missing_return_type": 17
+      }
+    },
+    {
+      "file": "web/src/components/ProjectRetro.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 27,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 8,
+        "missing_return_type": 19
+      }
+    },
+    {
+      "file": "web/src/components/sidebars/ProjectContextSidebar.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 27,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 6,
+        "missing_return_type": 21
+      }
+    },
+    {
+      "file": "web/src/pages/MyWeekPage.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 27,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 4,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 5,
+        "missing_return_type": 18
+      }
+    },
+    {
+      "file": "web/src/components/ui/ContextMenu.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 26,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 1,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 1,
+        "missing_return_type": 24
+      }
+    },
+    {
+      "file": "web/src/components/sidebars/WeekSidebar.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 25,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 2,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 7,
+        "missing_return_type": 16
+      }
+    },
+    {
+      "file": "web/src/hooks/useWeeklyReviewActions.ts",
+      "package": "web",
+      "is_test_like": false,
+      "total": 25,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 11,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 14
+      }
+    },
+    {
+      "file": "api/src/collaboration/__tests__/api-content-preservation.test.ts",
+      "package": "api",
+      "is_test_like": true,
+      "total": 24,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 1,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 23
+      }
+    },
+    {
+      "file": "web/src/components/dashboard/DashboardVariantC.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 24,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 12,
+        "missing_return_type": 12
+      }
+    },
+    {
+      "file": "web/src/components/dialogs/MergeProgramDialog.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 24,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 7,
+        "missing_return_type": 17
+      }
+    },
+    {
+      "file": "web/src/components/editor/PlanReferenceBlock.ts",
+      "package": "web",
+      "is_test_like": false,
+      "total": 24,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 1,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 9,
+        "missing_return_type": 14
+      }
+    },
+    {
+      "file": "web/src/hooks/useRealtimeEvents.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 24,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 1,
+        "non_null_assertion": 1,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 3,
+        "missing_return_type": 19
+      }
+    },
+    {
+      "file": "api/src/routes/search.test.ts",
+      "package": "api",
+      "is_test_like": true,
+      "total": 23,
+      "counts": {
+        "explicit_any": 3,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 20
+      }
+    },
+    {
+      "file": "api/src/routes/standups.ts",
+      "package": "api",
+      "is_test_like": false,
+      "total": 23,
+      "counts": {
+        "explicit_any": 1,
+        "type_assertion_as": 3,
+        "non_null_assertion": 10,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 2,
+        "missing_return_type": 7
+      }
+    },
+    {
+      "file": "web/src/components/StandupFeed.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 23,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 3,
+        "missing_return_type": 20
+      }
+    },
+    {
+      "file": "web/src/hooks/useColumnVisibility.ts",
+      "package": "web",
+      "is_test_like": false,
+      "total": 23,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 1,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 8,
+        "missing_return_type": 14
+      }
+    },
+    {
+      "file": "web/src/pages/TeamDirectory.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 23,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 6,
+        "missing_return_type": 17
+      }
+    },
+    {
+      "file": "api/src/mcp/server.ts",
+      "package": "api",
+      "is_test_like": false,
+      "total": 21,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 13,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 3,
+        "missing_return_type": 5
+      }
+    },
+    {
+      "file": "web/src/components/editor/BacklinksPanel.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 21,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 3,
+        "missing_return_type": 18
+      }
+    },
+    {
+      "file": "api/src/utils/yjsConverter.ts",
+      "package": "api",
+      "is_test_like": false,
+      "total": 20,
+      "counts": {
+        "explicit_any": 15,
+        "type_assertion_as": 2,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 3
+      }
+    },
+    {
+      "file": "web/src/components/icons/uswds/Icon.test.tsx",
+      "package": "web",
+      "is_test_like": true,
+      "total": 20,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 1,
+        "untyped_parameter": 2,
+        "missing_return_type": 17
+      }
+    },
+    {
+      "file": "web/src/components/ui/Toast.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 20,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 5,
+        "missing_return_type": 15
+      }
+    },
+    {
+      "file": "api/src/routes/project-retros.test.ts",
+      "package": "api",
+      "is_test_like": true,
+      "total": 19,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 19
+      }
+    },
+    {
+      "file": "web/src/components/ProjectSetupWizard.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 19,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 7,
+        "missing_return_type": 12
+      }
+    },
+    {
+      "file": "web/src/components/sidebars/ProgramSidebar.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 19,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 4,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 5,
+        "missing_return_type": 10
+      }
+    },
+    {
+      "file": "api/src/routes/sprint-reviews.test.ts",
+      "package": "api",
+      "is_test_like": true,
+      "total": 18,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 18
+      }
+    },
+    {
+      "file": "web/src/components/document-tabs/ProjectWeeksTab.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 18,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 4,
+        "missing_return_type": 14
+      }
+    },
+    {
+      "file": "web/src/components/editor/HypothesisBlockExtension.ts",
+      "package": "web",
+      "is_test_like": false,
+      "total": 18,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 1,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 5,
+        "missing_return_type": 12
+      }
+    },
+    {
+      "file": "web/src/components/editor/TableOfContents.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 18,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 1,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 4,
+        "missing_return_type": 13
+      }
+    },
+    {
+      "file": "web/src/components/InlineWeekSelector.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 18,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 1,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 4,
+        "missing_return_type": 13
+      }
+    },
+    {
+      "file": "web/src/components/ProgramCombobox.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 18,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 5,
+        "missing_return_type": 13
+      }
+    },
+    {
+      "file": "web/src/pages/Dashboard.test.tsx",
+      "package": "web",
+      "is_test_like": true,
+      "total": 18,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 18
+      }
+    },
+    {
+      "file": "api/src/app.ts",
+      "package": "api",
+      "is_test_like": false,
+      "total": 17,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 2,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 9,
+        "missing_return_type": 6
+      }
+    },
+    {
+      "file": "api/src/db/scripts/orphan-diagnostic.ts",
+      "package": "api",
+      "is_test_like": false,
+      "total": 17,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 8,
+        "missing_return_type": 9
+      }
+    },
+    {
+      "file": "api/src/routes/reports-to.test.ts",
+      "package": "api",
+      "is_test_like": true,
+      "total": 17,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 17
+      }
+    },
+    {
+      "file": "web/src/components/editor/AIScoringDisplay.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 17,
+      "counts": {
+        "explicit_any": 6,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 2,
+        "missing_return_type": 9
+      }
+    },
+    {
+      "file": "web/src/components/editor/DetailsExtension.test.ts",
+      "package": "web",
+      "is_test_like": true,
+      "total": 17,
+      "counts": {
+        "explicit_any": 2,
+        "type_assertion_as": 2,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 1,
+        "missing_return_type": 12
+      }
+    },
+    {
+      "file": "api/src/routes/circular-reference.test.ts",
+      "package": "api",
+      "is_test_like": true,
+      "total": 16,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 2,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 2,
+        "missing_return_type": 12
+      }
+    },
+    {
+      "file": "web/src/components/editor/EmojiList.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 16,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 6,
+        "missing_return_type": 10
+      }
+    },
+    {
+      "file": "web/src/components/editor/FileAttachment.test.ts",
+      "package": "web",
+      "is_test_like": true,
+      "total": 16,
+      "counts": {
+        "explicit_any": 2,
+        "type_assertion_as": 2,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 1,
+        "missing_return_type": 11
+      }
+    },
+    {
+      "file": "web/src/components/PersonCombobox.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 16,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 6,
+        "missing_return_type": 10
+      }
+    },
+    {
+      "file": "web/src/components/review/WeeklyReviewSubNav.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 16,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 1,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 4,
+        "missing_return_type": 11
+      }
+    },
+    {
+      "file": "web/src/lib/accountability.test.ts",
+      "package": "web",
+      "is_test_like": true,
+      "total": 16,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 3,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 13
+      }
+    },
+    {
+      "file": "web/src/pages/Login.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 16,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 1,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 2,
+        "missing_return_type": 13
+      }
+    },
+    {
+      "file": "api/src/routes/associations.ts",
+      "package": "api",
+      "is_test_like": false,
+      "total": 15,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 2,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 4,
+        "missing_return_type": 9
+      }
+    },
+    {
+      "file": "api/src/services/ai-analysis.ts",
+      "package": "api",
+      "is_test_like": false,
+      "total": 15,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 5,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 5,
+        "missing_return_type": 5
+      }
+    },
+    {
+      "file": "web/src/components/editor/ResizableImage.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 15,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 1,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 1,
+        "missing_return_type": 13
+      }
+    },
+    {
+      "file": "web/src/pages/ConvertedDocuments.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 15,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 1,
+        "missing_return_type": 14
+      }
+    },
+    {
+      "file": "api/src/routes/auth.ts",
+      "package": "api",
+      "is_test_like": false,
+      "total": 14,
+      "counts": {
+        "explicit_any": 2,
+        "type_assertion_as": 0,
+        "non_null_assertion": 2,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 5,
+        "missing_return_type": 5
+      }
+    },
+    {
+      "file": "web/src/components/ContentHistoryPanel.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 14,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 1,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 1,
+        "missing_return_type": 12
+      }
+    },
+    {
+      "file": "web/src/components/ui/Combobox.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 14,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 5,
+        "missing_return_type": 9
+      }
+    },
+    {
+      "file": "web/src/hooks/useWeeksQuery.ts",
+      "package": "web",
+      "is_test_like": false,
+      "total": 14,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 14,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 0
+      }
+    },
+    {
+      "file": "api/src/routes/comments.ts",
+      "package": "api",
+      "is_test_like": false,
+      "total": 13,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 7,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 1,
+        "missing_return_type": 5
+      }
+    },
+    {
+      "file": "web/src/components/DocumentListToolbar.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 13,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 2,
+        "missing_return_type": 11
+      }
+    },
+    {
+      "file": "web/src/components/week/WeekDetailView.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 13,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 5,
+        "missing_return_type": 8
+      }
+    },
+    {
+      "file": "web/src/hooks/useIssuesQuery.ts",
+      "package": "web",
+      "is_test_like": false,
+      "total": 13,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 13,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 0
+      }
+    },
+    {
+      "file": "web/src/hooks/useProjectsQuery.ts",
+      "package": "web",
+      "is_test_like": false,
+      "total": 13,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 13,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 0
+      }
+    },
+    {
+      "file": "api/src/routes/accountability.ts",
+      "package": "api",
+      "is_test_like": false,
+      "total": 12,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 2,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 5,
+        "missing_return_type": 5
+      }
+    },
+    {
+      "file": "api/src/utils/extractHypothesis.ts",
+      "package": "api",
+      "is_test_like": false,
+      "total": 12,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 4,
+        "non_null_assertion": 8,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 0
+      }
+    },
+    {
+      "file": "web/src/components/ContextTreeNav.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 12,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 5,
+        "missing_return_type": 7
+      }
+    },
+    {
+      "file": "web/src/components/document-tabs/WeekPlanningTab.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 12,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 3,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 2,
+        "missing_return_type": 7
+      }
+    },
+    {
+      "file": "web/src/components/sidebars/DocumentTypeSelector.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 12,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 1,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 3,
+        "missing_return_type": 8
+      }
+    },
+    {
+      "file": "web/src/components/VisibilityDropdown.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 12,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 2,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 2,
+        "missing_return_type": 8
+      }
+    },
+    {
+      "file": "web/src/contexts/ArchivedPersonsContext.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 12,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 1,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 1,
+        "missing_return_type": 10
+      }
+    },
+    {
+      "file": "web/src/lib/contextMenuActions.ts",
+      "package": "web",
+      "is_test_like": false,
+      "total": 12,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 2,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 6,
+        "missing_return_type": 4
+      }
+    },
+    {
+      "file": "web/src/pages/InviteAccept.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 12,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 2,
+        "missing_return_type": 10
+      }
+    },
+    {
+      "file": "web/src/pages/PublicFeedback.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 12,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 4,
+        "missing_return_type": 8
+      }
+    },
+    {
+      "file": "web/src/pages/Setup.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 12,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 4,
+        "missing_return_type": 8
+      }
+    },
+    {
+      "file": "api/src/routes/backlinks.ts",
+      "package": "api",
+      "is_test_like": false,
+      "total": 11,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 4,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 3,
+        "missing_return_type": 4
+      }
+    },
+    {
+      "file": "api/src/swagger.ts",
+      "package": "api",
+      "is_test_like": false,
+      "total": 11,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 7,
+        "missing_return_type": 4
+      }
+    },
+    {
+      "file": "web/src/components/DocumentTreeItem.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 11,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 2,
+        "missing_return_type": 9
+      }
+    },
+    {
+      "file": "web/src/components/EmojiPicker.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 11,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 1,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 10
+      }
+    },
+    {
+      "file": "web/src/components/PlanQualityBanner.test.tsx",
+      "package": "web",
+      "is_test_like": true,
+      "total": 11,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 1,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 2,
+        "missing_return_type": 8
+      }
+    },
+    {
+      "file": "web/src/hooks/useCommentsQuery.ts",
+      "package": "web",
+      "is_test_like": false,
+      "total": 11,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 11
+      }
+    },
+    {
+      "file": "web/src/hooks/useUnifiedDocuments.ts",
+      "package": "web",
+      "is_test_like": false,
+      "total": 11,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 4,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 7
+      }
+    },
+    {
+      "file": "api/src/routes/files.test.ts",
+      "package": "api",
+      "is_test_like": true,
+      "total": 10,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 10
+      }
+    },
+    {
+      "file": "api/src/routes/search.ts",
+      "package": "api",
+      "is_test_like": false,
+      "total": 10,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 4,
+        "non_null_assertion": 4,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 2
+      }
+    },
+    {
+      "file": "web/src/components/ActionItemsModal.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 10,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 3,
+        "missing_return_type": 7
+      }
+    },
+    {
+      "file": "web/src/components/WeekReview.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 10,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 10
+      }
+    },
+    {
+      "file": "web/src/contexts/ReviewQueueContext.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 10,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 2,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 8
+      }
+    },
+    {
+      "file": "web/src/components/ApprovalButton.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 9,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 9
+      }
+    },
+    {
+      "file": "web/src/components/ui/ScrollFade.test.tsx",
+      "package": "web",
+      "is_test_like": true,
+      "total": 9,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 2,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 7
+      }
+    },
+    {
+      "file": "web/src/hooks/useAutoSave.ts",
+      "package": "web",
+      "is_test_like": false,
+      "total": 9,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 2,
+        "missing_return_type": 7
+      }
+    },
+    {
+      "file": "web/src/main.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 9,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 1,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 8
+      }
+    },
+    {
+      "file": "api/src/routes/api-tokens.test.ts",
+      "package": "api",
+      "is_test_like": true,
+      "total": 8,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 8
+      }
+    },
+    {
+      "file": "api/src/routes/iterations.ts",
+      "package": "api",
+      "is_test_like": false,
+      "total": 8,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 4,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 1,
+        "missing_return_type": 3
+      }
+    },
+    {
+      "file": "web/src/components/editor/DocumentEmbed.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 8,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 1,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 1,
+        "missing_return_type": 6
+      }
+    },
+    {
+      "file": "web/src/components/SessionTimeoutModal.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 8,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 8
+      }
+    },
+    {
+      "file": "web/src/contexts/UploadContext.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 8,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 8
+      }
+    },
+    {
+      "file": "web/src/hooks/useAuth.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 8,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 1,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 7
+      }
+    },
+    {
+      "file": "web/src/hooks/useTeamMembersQuery.ts",
+      "package": "web",
+      "is_test_like": false,
+      "total": 8,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 4,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 1,
+        "missing_return_type": 3
+      }
+    },
+    {
+      "file": "web/src/pages/ReviewsPage.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 8,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 6,
+        "non_null_assertion": 2,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 0
+      }
+    },
+    {
+      "file": "api/src/routes/admin-credentials.ts",
+      "package": "api",
+      "is_test_like": false,
+      "total": 7,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 1,
+        "non_null_assertion": 6,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 0
+      }
+    },
+    {
+      "file": "api/src/routes/feedback.ts",
+      "package": "api",
+      "is_test_like": false,
+      "total": 7,
+      "counts": {
+        "explicit_any": 1,
+        "type_assertion_as": 2,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 4
+      }
+    },
+    {
+      "file": "web/src/components/ActionItems.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 7,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 2,
+        "missing_return_type": 5
+      }
+    },
+    {
+      "file": "web/src/components/DashboardSidebar.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 7,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 2,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 5
+      }
+    },
+    {
+      "file": "web/src/components/document-tabs/ProgramWeeksTab.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 7,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 1,
+        "missing_return_type": 6
+      }
+    },
+    {
+      "file": "web/src/components/icons/uswds/Icon.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 7,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 4,
+        "non_null_assertion": 1,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 2
+      }
+    },
+    {
+      "file": "web/src/components/sidebars/WikiSidebar.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 7,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 1,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 6
+      }
+    },
+    {
+      "file": "web/src/components/week/WeekProgressGraph.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 7,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 2,
+        "missing_return_type": 5
+      }
+    },
+    {
+      "file": "web/src/hooks/useContentHistoryQuery.ts",
+      "package": "web",
+      "is_test_like": false,
+      "total": 7,
+      "counts": {
+        "explicit_any": 2,
+        "type_assertion_as": 2,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 3
+      }
+    },
+    {
+      "file": "web/src/hooks/useDocumentContextQuery.ts",
+      "package": "web",
+      "is_test_like": false,
+      "total": 7,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 3,
+        "non_null_assertion": 1,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 3
+      }
+    },
+    {
+      "file": "web/src/hooks/useListFilters.ts",
+      "package": "web",
+      "is_test_like": false,
+      "total": 7,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 1,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 1,
+        "missing_return_type": 5
+      }
+    },
+    {
+      "file": "web/src/hooks/useStandupStatusQuery.ts",
+      "package": "web",
+      "is_test_like": false,
+      "total": 7,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 3,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 4
+      }
+    },
+    {
+      "file": "web/src/lib/documentTree.ts",
+      "package": "web",
+      "is_test_like": false,
+      "total": 7,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 2,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 2,
+        "missing_return_type": 3
+      }
+    },
+    {
+      "file": "api/src/routes/files.ts",
+      "package": "api",
+      "is_test_like": false,
+      "total": 6,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 6
+      }
+    },
+    {
+      "file": "web/src/components/document-tabs/ProgramProjectsTab.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 6,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 1,
+        "missing_return_type": 5
+      }
+    },
+    {
+      "file": "web/src/components/document-tabs/WeekReviewTab.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 6,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 2,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 1,
+        "missing_return_type": 3
+      }
+    },
+    {
+      "file": "web/src/contexts/SelectionPersistenceContext.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 6,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 6
+      }
+    },
+    {
+      "file": "web/src/styles/drag-handle.test.ts",
+      "package": "web",
+      "is_test_like": true,
+      "total": 6,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 6
+      }
+    },
+    {
+      "file": "api/src/db/migrate.ts",
+      "package": "api",
+      "is_test_like": false,
+      "total": 5,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 2,
+        "missing_return_type": 3
+      }
+    },
+    {
+      "file": "api/src/routes/ai.ts",
+      "package": "api",
+      "is_test_like": false,
+      "total": 5,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 2,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 3
+      }
+    },
+    {
+      "file": "api/src/services/caia.ts",
+      "package": "api",
+      "is_test_like": false,
+      "total": 5,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 5,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 0
+      }
+    },
+    {
+      "file": "api/src/utils/document-crud.ts",
+      "package": "api",
+      "is_test_like": false,
+      "total": 5,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 1,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 2,
+        "missing_return_type": 2
+      }
+    },
+    {
+      "file": "web/src/components/dialogs/ConversionDialog.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 5,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 5
+      }
+    },
+    {
+      "file": "web/src/components/document-tabs/ProgramIssuesTab.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 5,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 1,
+        "missing_return_type": 4
+      }
+    },
+    {
+      "file": "web/src/components/editor/ImageUpload.test.ts",
+      "package": "web",
+      "is_test_like": true,
+      "total": 5,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 5
+      }
+    },
+    {
+      "file": "web/src/components/editor/MentionExtension.test.ts",
+      "package": "web",
+      "is_test_like": true,
+      "total": 5,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 5
+      }
+    },
+    {
+      "file": "web/src/components/MutationErrorToast.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 5,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 2,
+        "missing_return_type": 3
+      }
+    },
+    {
+      "file": "web/src/contexts/WorkspaceContext.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 5,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 1,
+        "missing_return_type": 4
+      }
+    },
+    {
+      "file": "web/src/hooks/useActionItemsQuery.ts",
+      "package": "web",
+      "is_test_like": false,
+      "total": 5,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 2,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 3
+      }
+    },
+    {
+      "file": "web/src/hooks/useGlobalListNavigation.ts",
+      "package": "web",
+      "is_test_like": false,
+      "total": 5,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 1,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 4
+      }
+    },
+    {
+      "file": "api/src/index.ts",
+      "package": "api",
+      "is_test_like": false,
+      "total": 4,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 1,
+        "missing_return_type": 3
+      }
+    },
+    {
+      "file": "api/src/routes/activity.ts",
+      "package": "api",
+      "is_test_like": false,
+      "total": 4,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 1,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 1,
+        "missing_return_type": 2
+      }
+    },
+    {
+      "file": "api/src/routes/api-tokens.ts",
+      "package": "api",
+      "is_test_like": false,
+      "total": 4,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 2,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 1,
+        "missing_return_type": 1
+      }
+    },
+    {
+      "file": "api/src/routes/caia-auth.ts",
+      "package": "api",
+      "is_test_like": false,
+      "total": 4,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 1,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 1,
+        "missing_return_type": 2
+      }
+    },
+    {
+      "file": "web/src/components/document-tabs/ProjectIssuesTab.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 4,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 1,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 1,
+        "missing_return_type": 2
+      }
+    },
+    {
+      "file": "web/src/components/document-tabs/WeekIssuesTab.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 4,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 1,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 1,
+        "missing_return_type": 2
+      }
+    },
+    {
+      "file": "web/src/components/editor/DragHandle.test.ts",
+      "package": "web",
+      "is_test_like": true,
+      "total": 4,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 4
+      }
+    },
+    {
+      "file": "web/src/components/FilterTabs.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 4,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 1,
+        "missing_return_type": 3
+      }
+    },
+    {
+      "file": "web/src/components/ui/ScrollFade.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 4,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 4
+      }
+    },
+    {
+      "file": "web/src/components/ui/TabBar.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 4,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 1,
+        "missing_return_type": 3
+      }
+    },
+    {
+      "file": "web/src/contexts/CurrentDocumentContext.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 4,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 4
+      }
+    },
+    {
+      "file": "web/src/pages/Issues.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 4,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 1,
+        "missing_return_type": 3
+      }
+    },
+    {
+      "file": "web/src/components/CacheCorruptionAlert.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 3,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 3
+      }
+    },
+    {
+      "file": "web/src/components/ConfirmDialog.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 3,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 1,
+        "missing_return_type": 2
+      }
+    },
+    {
+      "file": "web/src/hooks/useDocumentConversion.ts",
+      "package": "web",
+      "is_test_like": false,
+      "total": 3,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 2,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 1
+      }
+    },
+    {
+      "file": "web/src/hooks/useFocusOnNavigate.ts",
+      "package": "web",
+      "is_test_like": false,
+      "total": 3,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 3
+      }
+    },
+    {
+      "file": "web/src/hooks/useMyWeekQuery.ts",
+      "package": "web",
+      "is_test_like": false,
+      "total": 3,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 1,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 2
+      }
+    },
+    {
+      "file": "web/src/lib/cn.ts",
+      "package": "web",
+      "is_test_like": false,
+      "total": 3,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 1,
+        "missing_return_type": 2
+      }
+    },
+    {
+      "file": "web/src/pages/StatusOverviewPage.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 3,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 1,
+        "missing_return_type": 2
+      }
+    },
+    {
+      "file": "web/src/services/uploadTracker.ts",
+      "package": "web",
+      "is_test_like": false,
+      "total": 3,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 1,
+        "missing_return_type": 2
+      }
+    },
+    {
+      "file": "api/src/db/client.ts",
+      "package": "api",
+      "is_test_like": false,
+      "total": 2,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 2
+      }
+    },
+    {
+      "file": "api/src/routes/health.test.ts",
+      "package": "api",
+      "is_test_like": true,
+      "total": 2,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 2
+      }
+    },
+    {
+      "file": "api/src/services/secrets-manager.ts",
+      "package": "api",
+      "is_test_like": false,
+      "total": 2,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 2,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 0
+      }
+    },
+    {
+      "file": "api/src/test/setup.ts",
+      "package": "api",
+      "is_test_like": false,
+      "total": 2,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 2
+      }
+    },
+    {
+      "file": "api/src/utils/allocation.ts",
+      "package": "api",
+      "is_test_like": false,
+      "total": 2,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 1,
+        "missing_return_type": 1
+      }
+    },
+    {
+      "file": "api/src/utils/document-content.ts",
+      "package": "api",
+      "is_test_like": false,
+      "total": 2,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 2,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 0
+      }
+    },
+    {
+      "file": "api/src/utils/transformIssueLinks.ts",
+      "package": "api",
+      "is_test_like": false,
+      "total": 2,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 2,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 0
+      }
+    },
+    {
+      "file": "shared/src/constants.ts",
+      "package": "shared",
+      "is_test_like": false,
+      "total": 2,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 2,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 0
+      }
+    },
+    {
+      "file": "web/src/components/editor/DetailsComponent.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 2,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 2
+      }
+    },
+    {
+      "file": "web/src/components/icons/uswds/types.ts",
+      "package": "web",
+      "is_test_like": false,
+      "total": 2,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 2,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 0
+      }
+    },
+    {
+      "file": "web/src/contexts/DocumentsContext.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 2,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 2
+      }
+    },
+    {
+      "file": "web/src/contexts/IssuesContext.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 2,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 2
+      }
+    },
+    {
+      "file": "web/src/contexts/ProgramsContext.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 2,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 2
+      }
+    },
+    {
+      "file": "web/src/contexts/ProjectsContext.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 2,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 2
+      }
+    },
+    {
+      "file": "web/src/hooks/useDashboardActionItems.ts",
+      "package": "web",
+      "is_test_like": false,
+      "total": 2,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 1,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 1
+      }
+    },
+    {
+      "file": "web/src/hooks/useDashboardFocus.ts",
+      "package": "web",
+      "is_test_like": false,
+      "total": 2,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 1,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 1
+      }
+    },
+    {
+      "file": "web/src/pages/FeedbackEditor.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 2,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 2
+      }
+    },
+    {
+      "file": "api/src/openapi/schemas/common.ts",
+      "package": "api",
+      "is_test_like": false,
+      "total": 1,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 1
+      }
+    },
+    {
+      "file": "api/src/services/oauth-state.ts",
+      "package": "api",
+      "is_test_like": false,
+      "total": 1,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 1
+      }
+    },
+    {
+      "file": "web/src/components/AccountabilityBanner.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 1,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 1
+      }
+    },
+    {
+      "file": "web/src/components/document-tabs/ProjectRetroTab.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 1,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 1
+      }
+    },
+    {
+      "file": "web/src/components/document-tabs/WeekStandupsTab.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 1,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 1
+      }
+    },
+    {
+      "file": "web/src/components/editor/HypothesisBlockComponent.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 1,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 1
+      }
+    },
+    {
+      "file": "web/src/components/editor/MentionNodeView.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 1,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 1
+      }
+    },
+    {
+      "file": "web/src/components/editor/PlanReferenceBlockComponent.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 1,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 1
+      }
+    },
+    {
+      "file": "web/src/components/icons/ArchiveIcon.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 1,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 1
+      }
+    },
+    {
+      "file": "web/src/components/icons/uswds/__mocks__/iconLoader.ts",
+      "package": "web",
+      "is_test_like": false,
+      "total": 1,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 1
+      }
+    },
+    {
+      "file": "web/src/components/ProtectedRoute.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 1,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 1
+      }
+    },
+    {
+      "file": "web/src/components/ui/PropertyRow.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 1,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 1
+      }
+    },
+    {
+      "file": "web/src/components/ui/Tooltip.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 1,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 1
+      }
+    },
+    {
+      "file": "web/src/components/UploadNavigationWarning.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 1,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 1
+      }
+    },
+    {
+      "file": "web/src/lib/accountability.ts",
+      "package": "web",
+      "is_test_like": false,
+      "total": 1,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 1
+      }
+    },
+    {
+      "file": "web/src/lib/statusColors.ts",
+      "package": "web",
+      "is_test_like": false,
+      "total": 1,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 1,
+        "missing_return_type": 0
+      }
+    },
+    {
+      "file": "web/src/pages/TeamMode.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 1,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 1,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 0
+      }
+    },
+    {
+      "file": "web/src/services/upload.ts",
+      "package": "web",
+      "is_test_like": false,
+      "total": 1,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 1
+      }
+    }
+  ],
   "top_violation_dense_files": [
     {
       "file": "web/src/components/IssuesList.tsx",
@@ -104,20 +3851,6 @@
       "explanation": "Dominant violation types: missing_return_type (50), non_null_assertion (48)."
     },
     {
-      "file": "web/src/pages/ReviewsPage.tsx",
-      "package": "web",
-      "total": 150,
-      "counts": {
-        "explicit_any": 0,
-        "type_assertion_as": 6,
-        "non_null_assertion": 4,
-        "ts_comment_directive": 0,
-        "untyped_parameter": 57,
-        "missing_return_type": 83
-      },
-      "explanation": "Dominant violation types: missing_return_type (83), untyped_parameter (57)."
-    },
-    {
       "file": "api/src/routes/issues.ts",
       "package": "api",
       "total": 122,
@@ -130,17 +3863,31 @@
         "missing_return_type": 44
       },
       "explanation": "Dominant violation types: missing_return_type (44), non_null_assertion (37)."
+    },
+    {
+      "file": "web/src/components/Editor.tsx",
+      "package": "web",
+      "total": 114,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 2,
+        "non_null_assertion": 3,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 19,
+        "missing_return_type": 90
+      },
+      "explanation": "Dominant violation types: missing_return_type (90), untyped_parameter (19)."
     }
   ],
   "delta_from_previous": {
-    "overall": 35,
+    "overall": 0,
     "by_violation_type": {
       "explicit_any": 0,
-      "type_assertion_as": 5,
-      "non_null_assertion": 14,
+      "type_assertion_as": 0,
+      "non_null_assertion": 0,
       "ts_comment_directive": 0,
-      "untyped_parameter": 9,
-      "missing_return_type": 7
+      "untyped_parameter": 0,
+      "missing_return_type": 0
     },
     "status_band": "Stable"
   },

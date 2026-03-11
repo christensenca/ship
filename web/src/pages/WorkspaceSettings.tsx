@@ -11,17 +11,21 @@ type Tab = 'members' | 'invites' | 'tokens' | 'audit';
 
 const VALID_TABS: Tab[] = ['members', 'invites', 'tokens', 'audit'];
 
-export function WorkspaceSettingsPage() {
+function isTab(value: string | null): value is Tab {
+  return value !== null && VALID_TABS.some((tab: Tab): boolean => tab === value);
+}
+
+export function WorkspaceSettingsPage(): React.JSX.Element {
   const { currentWorkspace, isWorkspaceAdmin } = useWorkspace();
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [searchParams, setSearchParams] = useSearchParams();
 
   // Derive active tab from URL query params
-  const tabParam = searchParams.get('tab') as Tab | null;
-  const activeTab: Tab = tabParam && VALID_TABS.includes(tabParam) ? tabParam : 'members';
+  const tabParam = searchParams.get('tab');
+  const activeTab: Tab = isTab(tabParam) ? tabParam : 'members';
 
-  const handleTabChange = useCallback((tab: Tab) => {
+  const handleTabChange = useCallback((tab: Tab): void => {
     setSearchParams({ tab }, { replace: true });
   }, [setSearchParams]);
   const [members, setMembers] = useState<WorkspaceMember[]>([]);
@@ -36,12 +40,12 @@ export function WorkspaceSettingsPage() {
   const [inviting, setInviting] = useState(false);
   const [showArchived, setShowArchived] = useState(false);
 
-  useEffect(() => {
+  useEffect((): void => {
     if (!currentWorkspace) return;
     loadData(showArchived);
   }, [currentWorkspace, showArchived]);
 
-  async function loadData(includeArchived = false) {
+  async function loadData(includeArchived: boolean = false): Promise<void> {
     if (!currentWorkspace) return;
     setLoading(true);
 
@@ -59,7 +63,7 @@ export function WorkspaceSettingsPage() {
     setLoading(false);
   }
 
-  async function handleInvite(e: React.FormEvent) {
+  async function handleInvite(e: React.FormEvent): Promise<void> {
     e.preventDefault();
     if (!currentWorkspace || !inviteEmail.trim()) return;
 
@@ -71,7 +75,7 @@ export function WorkspaceSettingsPage() {
     });
     if (res.success && res.data) {
       const { invite } = res.data;
-      setInvites(prev => [...prev, invite]);
+      setInvites((prev: WorkspaceInvite[]): WorkspaceInvite[] => [...prev, invite]);
       setInviteEmail('');
       setInviteSubjectDn('');
       setShowPivField(false);
@@ -79,19 +83,21 @@ export function WorkspaceSettingsPage() {
     setInviting(false);
   }
 
-  async function handleRevokeInvite(inviteId: string) {
+  async function handleRevokeInvite(inviteId: string): Promise<void> {
     if (!currentWorkspace) return;
     const res = await api.workspaces.revokeInvite(currentWorkspace.id, inviteId);
     if (res.success) {
-      setInvites(prev => prev.filter(i => i.id !== inviteId));
+      setInvites((prev: WorkspaceInvite[]): WorkspaceInvite[] =>
+        prev.filter((i: WorkspaceInvite): boolean => i.id !== inviteId)
+      );
     }
   }
 
-  async function handleUpdateRole(userId: string, newRole: 'admin' | 'member') {
+  async function handleUpdateRole(userId: string, newRole: 'admin' | 'member'): Promise<void> {
     if (!currentWorkspace) return;
 
     // Check if this is the last admin
-    const admins = members.filter(m => m.role === 'admin');
+    const admins = members.filter((m: WorkspaceMember): boolean => m.role === 'admin');
     if (admins.length === 1 && admins[0].userId === userId && newRole === 'member') {
       alert('Cannot demote the last admin. Promote another member first.');
       return;
@@ -99,16 +105,18 @@ export function WorkspaceSettingsPage() {
 
     const res = await api.workspaces.updateMember(currentWorkspace.id, userId, { role: newRole });
     if (res.success) {
-      setMembers(prev => prev.map(m => m.userId === userId ? { ...m, role: newRole } : m));
+      setMembers((prev: WorkspaceMember[]): WorkspaceMember[] =>
+        prev.map((m: WorkspaceMember): WorkspaceMember => m.userId === userId ? { ...m, role: newRole } : m)
+      );
     }
   }
 
-  async function handleArchiveMember(userId: string) {
+  async function handleArchiveMember(userId: string): Promise<void> {
     if (!currentWorkspace) return;
 
     // Check if this is the last admin
-    const admins = members.filter(m => m.role === 'admin');
-    const member = members.find(m => m.userId === userId);
+    const admins = members.filter((m: WorkspaceMember): boolean => m.role === 'admin');
+    const member = members.find((m: WorkspaceMember): boolean => m.userId === userId);
     if (member?.role === 'admin' && admins.length === 1) {
       alert('Cannot archive the last admin. Promote another member first.');
       return;
@@ -118,13 +126,15 @@ export function WorkspaceSettingsPage() {
 
     const res = await api.workspaces.removeMember(currentWorkspace.id, userId);
     if (res.success) {
-      setMembers(prev => prev.filter(m => m.userId !== userId));
+      setMembers((prev: WorkspaceMember[]): WorkspaceMember[] =>
+        prev.filter((m: WorkspaceMember): boolean => m.userId !== userId)
+      );
       // Invalidate archived persons cache so mentions update
       queryClient.invalidateQueries({ queryKey: archivedPersonsKey });
     }
   }
 
-  async function handleRestoreMember(userId: string) {
+  async function handleRestoreMember(userId: string): Promise<void> {
     if (!currentWorkspace) return;
 
     const res = await api.workspaces.restoreMember(currentWorkspace.id, userId);
@@ -165,16 +175,16 @@ export function WorkspaceSettingsPage() {
       {/* Tabs */}
       <div className="border-b border-border">
         <nav className="flex px-6">
-          <TabButton active={activeTab === 'members'} onClick={() => handleTabChange('members')}>
+          <TabButton active={activeTab === 'members'} onClick={(): void => handleTabChange('members')}>
             Members
           </TabButton>
-          <TabButton active={activeTab === 'invites'} onClick={() => handleTabChange('invites')}>
+          <TabButton active={activeTab === 'invites'} onClick={(): void => handleTabChange('invites')}>
             Pending Invites
           </TabButton>
-          <TabButton active={activeTab === 'tokens'} onClick={() => handleTabChange('tokens')}>
+          <TabButton active={activeTab === 'tokens'} onClick={(): void => handleTabChange('tokens')}>
             API Tokens
           </TabButton>
-          <TabButton active={activeTab === 'audit'} onClick={() => handleTabChange('audit')}>
+          <TabButton active={activeTab === 'audit'} onClick={(): void => handleTabChange('audit')}>
             Audit Logs
           </TabButton>
           <Link
@@ -227,8 +237,14 @@ export function WorkspaceSettingsPage() {
             {activeTab === 'tokens' && (
               <ApiTokensTab
                 tokens={apiTokens}
-                onTokenCreated={(token) => setApiTokens(prev => [token, ...prev])}
-                onTokenRevoked={(tokenId) => setApiTokens(prev => prev.filter(t => t.id !== tokenId))}
+                onTokenCreated={(token: ApiToken): void =>
+                  setApiTokens((prev: ApiToken[]): ApiToken[] => [token, ...prev])
+                }
+                onTokenRevoked={(tokenId: string): void =>
+                  setApiTokens((prev: ApiToken[]): ApiToken[] =>
+                    prev.filter((t: ApiToken): boolean => t.id !== tokenId)
+                  )
+                }
               />
             )}
             {activeTab === 'audit' && (
@@ -241,7 +257,7 @@ export function WorkspaceSettingsPage() {
   );
 }
 
-function TabButton({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
+function TabButton({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }): React.JSX.Element {
   return (
     <button
       onClick={onClick}
@@ -273,9 +289,9 @@ function MembersTab({
   onUpdateRole: (userId: string, role: 'admin' | 'member') => void;
   onArchiveMember: (userId: string) => void;
   onRestoreMember: (userId: string) => void;
-}) {
-  const activeMembers = members.filter(m => !m.isArchived);
-  const adminCount = activeMembers.filter(m => m.role === 'admin').length;
+}): React.JSX.Element {
+  const activeMembers = members.filter((m: WorkspaceMember): boolean => !m.isArchived);
+  const adminCount = activeMembers.filter((m: WorkspaceMember): boolean => m.role === 'admin').length;
 
   return (
     <div className="space-y-4">
@@ -285,7 +301,7 @@ function MembersTab({
           <input
             type="checkbox"
             checked={showArchived}
-            onChange={(e) => onShowArchivedChange(e.target.checked)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>): void => onShowArchivedChange(e.target.checked)}
             className="h-3.5 w-3.5 rounded border-border text-accent focus:ring-accent/50"
           />
           <span className="text-xs text-muted">Show archived</span>
@@ -304,10 +320,11 @@ function MembersTab({
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
-            {members.map((member) => {
+            {members.map((member: WorkspaceMember): React.JSX.Element => {
               const isArchived = member.isArchived;
               const isLastAdmin = member.role === 'admin' && adminCount === 1;
               const isSelf = member.userId === currentUserId;
+              const nextRole: 'admin' | 'member' = member.role === 'admin' ? 'admin' : 'member';
 
               return (
                 <tr key={member.id} className={cn(isArchived && "opacity-50")}>
@@ -322,8 +339,10 @@ function MembersTab({
                       <span className="text-muted">-</span>
                     ) : (
                       <select
-                        value={member.role || 'member'}
-                        onChange={(e) => onUpdateRole(member.userId, e.target.value as 'admin' | 'member')}
+                        value={nextRole}
+                        onChange={(e: React.ChangeEvent<HTMLSelectElement>): void =>
+                          onUpdateRole(member.userId, e.target.value === 'admin' ? 'admin' : 'member')
+                        }
                         disabled={isLastAdmin}
                         className={cn(
                           'px-2 py-1 rounded text-sm bg-background border border-border',
@@ -342,7 +361,7 @@ function MembersTab({
                   <td className="px-4 py-3 text-right">
                     {isArchived ? (
                       <button
-                        onClick={() => onRestoreMember(member.userId)}
+                        onClick={(): void => { void onRestoreMember(member.userId); }}
                         className="text-sm text-accent hover:text-accent/80 transition-colors"
                       >
                         Restore
@@ -350,7 +369,7 @@ function MembersTab({
                     ) : (
                       !isSelf && !isLastAdmin && (
                         <button
-                          onClick={() => onArchiveMember(member.userId)}
+                          onClick={(): void => { void onArchiveMember(member.userId); }}
                           className="text-sm text-red-500 hover:text-red-400 transition-colors"
                         >
                           Archive
@@ -394,14 +413,14 @@ function InvitesTab({
   inviting: boolean;
   onInvite: (e: React.FormEvent) => void;
   onRevoke: (id: string) => void;
-}) {
+}): React.JSX.Element {
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
-  function handleCopyLink(invite: WorkspaceInvite) {
+  function handleCopyLink(invite: WorkspaceInvite): void {
     const url = `${window.location.origin}/invite/${invite.token}`;
     navigator.clipboard.writeText(url);
     setCopiedId(invite.id);
-    setTimeout(() => setCopiedId(null), 2000);
+    setTimeout((): void => setCopiedId(null), 2000);
   }
 
   return (
@@ -412,14 +431,16 @@ function InvitesTab({
           <input
             type="email"
             value={inviteEmail}
-            onChange={(e) => setInviteEmail(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>): void => setInviteEmail(e.target.value)}
             placeholder="Email address"
             className="flex-1 max-w-md px-3 py-2 bg-background border border-border rounded-md text-foreground placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent"
             required
           />
           <select
             value={inviteRole}
-            onChange={(e) => setInviteRole(e.target.value as 'admin' | 'member')}
+            onChange={(e: React.ChangeEvent<HTMLSelectElement>): void =>
+              setInviteRole(e.target.value === 'admin' ? 'admin' : 'member')
+            }
             className="px-3 py-2 bg-background border border-border rounded-md text-foreground"
           >
             <option value="member">Member</option>
@@ -438,7 +459,7 @@ function InvitesTab({
         <div>
           <button
             type="button"
-            onClick={() => setShowPivField(!showPivField)}
+            onClick={(): void => setShowPivField(!showPivField)}
             className="text-xs text-muted hover:text-foreground transition-colors"
           >
             {showPivField ? '- Hide PIV options' : '+ Add PIV certificate identity'}
@@ -448,7 +469,7 @@ function InvitesTab({
               <input
                 type="text"
                 value={inviteSubjectDn}
-                onChange={(e) => setInviteSubjectDn(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>): void => setInviteSubjectDn(e.target.value)}
                 placeholder="X.509 Subject DN (e.g., CN=LASTNAME.FIRSTNAME.MIDDLE.1234567890)"
                 className="w-full max-w-lg px-3 py-2 bg-background border border-border rounded-md text-foreground placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent font-mono text-sm"
               />
@@ -477,7 +498,7 @@ function InvitesTab({
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {invites.map((invite) => (
+              {invites.map((invite: WorkspaceInvite): React.JSX.Element => (
                 <tr key={invite.id}>
                   <td className="px-4 py-3 text-sm text-foreground">{invite.email}</td>
                   <td className="px-4 py-3 text-sm text-muted">
@@ -493,7 +514,7 @@ function InvitesTab({
                   </td>
                   <td className="px-4 py-3 text-right space-x-3">
                     <button
-                      onClick={() => handleCopyLink(invite)}
+                      onClick={(): void => handleCopyLink(invite)}
                       className={cn(
                         "text-sm transition-colors",
                         copiedId === invite.id
@@ -504,7 +525,7 @@ function InvitesTab({
                       {copiedId === invite.id ? 'Copied!' : 'Copy Link'}
                     </button>
                     <button
-                      onClick={() => onRevoke(invite.id)}
+                      onClick={(): void => { void onRevoke(invite.id); }}
                       className="text-sm text-red-500 hover:text-red-400 transition-colors"
                     >
                       Revoke
@@ -528,14 +549,14 @@ function ApiTokensTab({
   tokens: ApiToken[];
   onTokenCreated: (token: ApiToken) => void;
   onTokenRevoked: (tokenId: string) => void;
-}) {
+}): React.JSX.Element {
   const [tokenName, setTokenName] = useState('');
   const [expiresInDays, setExpiresInDays] = useState<string>('90');
   const [creating, setCreating] = useState(false);
   const [newToken, setNewToken] = useState<ApiTokenCreateResponse | null>(null);
   const [copied, setCopied] = useState(false);
 
-  async function handleCreate(e: React.FormEvent) {
+  async function handleCreate(e: React.FormEvent): Promise<void> {
     e.preventDefault();
     if (!tokenName.trim()) return;
 
@@ -552,7 +573,7 @@ function ApiTokensTab({
     setCreating(false);
   }
 
-  async function handleRevoke(tokenId: string) {
+  async function handleRevoke(tokenId: string): Promise<void> {
     if (!confirm('Are you sure you want to revoke this token? This cannot be undone.')) return;
 
     const res = await api.apiTokens.revoke(tokenId);
@@ -561,14 +582,14 @@ function ApiTokensTab({
     }
   }
 
-  function handleCopy() {
+  function handleCopy(): void {
     if (!newToken) return;
     navigator.clipboard.writeText(newToken.token);
     setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    setTimeout((): void => setCopied(false), 2000);
   }
 
-  function handleDismissToken() {
+  function handleDismissToken(): void {
     setNewToken(null);
     setCopied(false);
   }
@@ -590,7 +611,7 @@ function ApiTokensTab({
             <input
               type="text"
               value={tokenName}
-              onChange={(e) => setTokenName(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>): void => setTokenName(e.target.value)}
               placeholder="e.g., Claude Code"
               className="w-full px-3 py-2 bg-background border border-border rounded-md text-foreground placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent"
               required
@@ -600,7 +621,7 @@ function ApiTokensTab({
             <label className="block text-xs text-muted mb-1">Expires</label>
             <select
               value={expiresInDays}
-              onChange={(e) => setExpiresInDays(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLSelectElement>): void => setExpiresInDays(e.target.value)}
               className="w-full px-3 py-2 bg-background border border-border rounded-md text-foreground"
             >
               <option value="30">30 days</option>
@@ -673,7 +694,7 @@ function ApiTokensTab({
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {tokens.map((token) => (
+              {tokens.map((token: ApiToken): React.JSX.Element => (
                 <tr key={token.id} className={token.is_active ? '' : 'opacity-50'}>
                   <td className="px-4 py-3 text-sm text-foreground font-medium">{token.name}</td>
                   <td className="px-4 py-3 text-sm text-muted font-mono">{token.token_prefix}...</td>
@@ -699,7 +720,7 @@ function ApiTokensTab({
                   <td className="px-4 py-3 text-right">
                     {token.is_active && (
                       <button
-                        onClick={() => handleRevoke(token.id)}
+                        onClick={(): void => { void handleRevoke(token.id); }}
                         className="text-sm text-red-500 hover:text-red-400 transition-colors"
                       >
                         Revoke
@@ -716,7 +737,7 @@ function ApiTokensTab({
   );
 }
 
-function AuditTab({ auditLogs }: { auditLogs: AuditLog[] }) {
+function AuditTab({ auditLogs }: { auditLogs: AuditLog[] }): React.JSX.Element {
   return (
     <div className="border border-border rounded-lg overflow-hidden">
       <table className="w-full">
@@ -729,7 +750,7 @@ function AuditTab({ auditLogs }: { auditLogs: AuditLog[] }) {
           </tr>
         </thead>
         <tbody className="divide-y divide-border">
-          {auditLogs.map((log) => (
+          {auditLogs.map((log: AuditLog): React.JSX.Element => (
             <tr key={log.id}>
               <td className="px-4 py-3 text-sm text-muted whitespace-nowrap">
                 {new Date(log.createdAt).toLocaleString()}

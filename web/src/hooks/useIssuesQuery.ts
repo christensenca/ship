@@ -1,6 +1,36 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import type { QueryKey, UseMutationResult, UseQueryResult } from '@tanstack/react-query';
 import { apiGet, apiPost, apiPatch } from '@/lib/api';
 import type { CascadeWarning, IncompleteChild, BelongsTo, BelongsToType } from '@ship/shared';
+
+type ApiError = Error & { status: number };
+type IssuesQueryKey = QueryKey;
+
+interface CreateIssueContext {
+  previousIssues?: Issue[];
+  optimisticId?: string;
+}
+
+interface UpdateIssueMutationData {
+  id: string;
+  updates: Partial<Issue>;
+}
+
+interface UpdateIssueContext {
+  previousIssues?: Issue[];
+}
+
+interface BulkUpdateContext {
+  previousIssues?: Issue[];
+}
+
+interface UseIssuesResult {
+  issues: Issue[];
+  loading: boolean;
+  createIssue: (options?: CreateIssueOptions) => Promise<Issue | null>;
+  updateIssue: (id: string, updates: Partial<Issue>) => Promise<Issue | null>;
+  refreshIssues: () => Promise<void>;
+}
 
 // Custom error type for cascade warning (409 response)
 export class CascadeWarningError extends Error {
@@ -49,7 +79,7 @@ export interface Issue {
 
 // Helper to extract association ID by type
 export function getAssociationId(issue: Issue, type: BelongsToType): string | null {
-  const association = issue.belongs_to?.find(a => a.type === type);
+  const association = issue.belongs_to?.find((a: BelongsTo): boolean => a.type === type);
   return association?.id ?? null;
 }
 
@@ -70,7 +100,7 @@ export function getProjectId(issue: Issue): string | null {
 
 // Helper to get association title by type (e.g., program name)
 export function getAssociationTitle(issue: Issue, type: BelongsToType): string | null {
-  const association = issue.belongs_to?.find(a => a.type === type);
+  const association = issue.belongs_to?.find((a: BelongsTo): boolean => a.type === type);
   return association?.title ?? null;
 }
 
@@ -99,10 +129,10 @@ export interface IssueFilters {
 // Query keys
 export const issueKeys = {
   all: ['issues'] as const,
-  lists: () => [...issueKeys.all, 'list'] as const,
-  list: (filters?: IssueFilters) => [...issueKeys.lists(), filters] as const,
-  details: () => [...issueKeys.all, 'detail'] as const,
-  detail: (id: string) => [...issueKeys.details(), id] as const,
+  lists: (): IssuesQueryKey => [...issueKeys.all, 'list'] as const,
+  list: (filters?: IssueFilters): IssuesQueryKey => [...issueKeys.lists(), filters] as const,
+  details: (): IssuesQueryKey => [...issueKeys.all, 'detail'] as const,
+  detail: (id: string): IssuesQueryKey => [...issueKeys.details(), id] as const,
 };
 
 // Transform API issue response to Issue type
@@ -127,7 +157,7 @@ async function fetchIssues(filters?: IssueFilters): Promise<Issue[]> {
 
   const res = await apiGet(url);
   if (!res.ok) {
-    const error = new Error('Failed to fetch issues') as Error & { status: number };
+    const error = new Error('Failed to fetch issues') as ApiError;
     error.status = res.status;
     throw error;
   }
@@ -136,8 +166,8 @@ async function fetchIssues(filters?: IssueFilters): Promise<Issue[]> {
 
   // Client-side filter for projectId (API doesn't support direct project_id param)
   if (filters?.projectId) {
-    issues = issues.filter(issue => {
-      const projectAssoc = issue.belongs_to?.find(a => a.type === 'project');
+    issues = issues.filter((issue: Issue): boolean => {
+      const projectAssoc = issue.belongs_to?.find((a: BelongsTo): boolean => a.type === 'project');
       return projectAssoc?.id === filters.projectId;
     });
   }
@@ -159,7 +189,7 @@ async function createIssueApi(data: CreateIssueData): Promise<Issue> {
 
   const res = await apiPost('/api/issues', apiData);
   if (!res.ok) {
-    const error = new Error('Failed to create issue') as Error & { status: number };
+    const error = new Error('Failed to create issue') as ApiError;
     error.status = res.status;
     throw error;
   }
@@ -179,7 +209,7 @@ async function updateIssueApi(id: string, updates: Partial<Issue>): Promise<Issu
         throw new CascadeWarningError(body as CascadeWarning);
       }
     }
-    const error = new Error('Failed to update issue') as Error & { status: number };
+    const error = new Error('Failed to update issue') as ApiError;
     error.status = res.status;
     throw error;
   }
@@ -193,23 +223,23 @@ export interface UseIssuesQueryOptions {
   enabled?: boolean;
 }
 
-export function useIssuesQuery(filters?: IssueFilters, options?: UseIssuesQueryOptions) {
+export function useIssuesQuery(filters?: IssueFilters, options?: UseIssuesQueryOptions): UseQueryResult<Issue[], ApiError> {
   const { enabled = true } = options ?? {};
   return useQuery({
     queryKey: issueKeys.list(filters),
-    queryFn: () => fetchIssues(filters),
+    queryFn: (): Promise<Issue[]> => fetchIssues(filters),
     staleTime: 1000 * 60 * 5, // 5 minutes
     enabled,
   });
 }
 
 // Hook to create issue with optimistic update
-export function useCreateIssue() {
+export function useCreateIssue(): UseMutationResult<Issue, ApiError, CreateIssueData | undefined, CreateIssueContext | undefined> {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data?: CreateIssueData) => createIssueApi(data || {}),
-    onMutate: async (newIssue) => {
+    mutationFn: (data?: CreateIssueData): Promise<Issue> => createIssueApi(data || {}),
+    onMutate: async (newIssue: CreateIssueData | undefined): Promise<CreateIssueContext> => {
       await queryClient.cancelQueries({ queryKey: issueKeys.lists() });
       const previousIssues = queryClient.getQueryData<Issue[]>(issueKeys.lists());
 
@@ -235,44 +265,44 @@ export function useCreateIssue() {
 
       queryClient.setQueryData<Issue[]>(
         issueKeys.lists(),
-        (old) => [optimisticIssue, ...(old || [])]
+        (old: Issue[] | undefined): Issue[] => [optimisticIssue, ...(old || [])]
       );
 
       return { previousIssues, optimisticId: optimisticIssue.id };
     },
-    onError: (_err, _newIssue, context) => {
+    onError: (_err: ApiError, _newIssue: CreateIssueData | undefined, context: CreateIssueContext | undefined): void => {
       if (context?.previousIssues) {
         queryClient.setQueryData(issueKeys.lists(), context.previousIssues);
       }
     },
-    onSuccess: (data, _variables, context) => {
+    onSuccess: (data: Issue, _variables: CreateIssueData | undefined, context: CreateIssueContext | undefined): void => {
       if (context?.optimisticId) {
         queryClient.setQueryData<Issue[]>(
           issueKeys.lists(),
-          (old) => old?.map(i => i.id === context.optimisticId ? data : i) || [data]
+          (old: Issue[] | undefined): Issue[] => old?.map((i: Issue): Issue => i.id === context.optimisticId ? data : i) || [data]
         );
       }
     },
-    onSettled: () => {
+    onSettled: (): void => {
       queryClient.invalidateQueries({ queryKey: issueKeys.lists() });
     },
   });
 }
 
 // Hook to update issue with optimistic update
-export function useUpdateIssue() {
+export function useUpdateIssue(): UseMutationResult<Issue, ApiError, UpdateIssueMutationData, UpdateIssueContext> {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, updates }: { id: string; updates: Partial<Issue> }) =>
+    mutationFn: ({ id, updates }: UpdateIssueMutationData): Promise<Issue> =>
       updateIssueApi(id, updates),
-    onMutate: async ({ id, updates }) => {
+    onMutate: async ({ id, updates }: UpdateIssueMutationData): Promise<UpdateIssueContext> => {
       await queryClient.cancelQueries({ queryKey: issueKeys.lists() });
       const previousIssues = queryClient.getQueryData<Issue[]>(issueKeys.lists());
 
       queryClient.setQueryData<Issue[]>(
         issueKeys.lists(),
-        (old) => old?.map(i => {
+        (old: Issue[] | undefined): Issue[] => old?.map((i: Issue): Issue => {
           if (i.id !== id) return i;
 
           // Merge belongs_to: if updates contains belongs_to, use it; otherwise keep existing
@@ -284,18 +314,18 @@ export function useUpdateIssue() {
 
       return { previousIssues };
     },
-    onError: (_err, _variables, context) => {
+    onError: (_err: ApiError, _variables: UpdateIssueMutationData, context: UpdateIssueContext | undefined): void => {
       if (context?.previousIssues) {
         queryClient.setQueryData(issueKeys.lists(), context.previousIssues);
       }
     },
-    onSuccess: (data, { id }) => {
+    onSuccess: (data: Issue, { id }: UpdateIssueMutationData): void => {
       queryClient.setQueryData<Issue[]>(
         issueKeys.lists(),
-        (old) => old?.map(i => i.id === id ? data : i) || []
+        (old: Issue[] | undefined): Issue[] => old?.map((i: Issue): Issue => i.id === id ? data : i) || []
       );
     },
-    onSettled: () => {
+    onSettled: (): void => {
       queryClient.invalidateQueries({ queryKey: issueKeys.lists() });
     },
   });
@@ -321,7 +351,7 @@ interface BulkUpdateResponse {
 async function bulkUpdateIssuesApi(data: BulkUpdateRequest): Promise<BulkUpdateResponse> {
   const res = await apiPost('/api/issues/bulk', data);
   if (!res.ok) {
-    const error = new Error('Failed to bulk update issues') as Error & { status: number };
+    const error = new Error('Failed to bulk update issues') as ApiError;
     error.status = res.status;
     throw error;
   }
@@ -329,24 +359,24 @@ async function bulkUpdateIssuesApi(data: BulkUpdateRequest): Promise<BulkUpdateR
 }
 
 // Hook for bulk updates
-export function useBulkUpdateIssues() {
+export function useBulkUpdateIssues(): UseMutationResult<BulkUpdateResponse, ApiError, BulkUpdateRequest, BulkUpdateContext> {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: BulkUpdateRequest) => bulkUpdateIssuesApi(data),
-    onMutate: async ({ ids, action, updates }) => {
+    mutationFn: (data: BulkUpdateRequest): Promise<BulkUpdateResponse> => bulkUpdateIssuesApi(data),
+    onMutate: async ({ ids, action, updates }: BulkUpdateRequest): Promise<BulkUpdateContext> => {
       await queryClient.cancelQueries({ queryKey: issueKeys.lists() });
       const previousIssues = queryClient.getQueryData<Issue[]>(issueKeys.lists());
 
-      queryClient.setQueryData<Issue[]>(issueKeys.lists(), (old) => {
+      queryClient.setQueryData<Issue[]>(issueKeys.lists(), (old: Issue[] | undefined): Issue[] | undefined => {
         if (!old) return old;
 
         if (action === 'archive' || action === 'delete') {
-          return old.filter(i => !ids.includes(i.id));
+          return old.filter((i: Issue): boolean => !ids.includes(i.id));
         }
 
         if (action === 'update' && updates) {
-          return old.map(i => {
+          return old.map((i: Issue): Issue => {
             if (!ids.includes(i.id)) return i;
 
             // Start with existing belongs_to
@@ -354,7 +384,7 @@ export function useBulkUpdateIssues() {
 
             // Handle project_id update: update or add project association
             if ('project_id' in updates) {
-              newBelongsTo = newBelongsTo.filter(a => a.type !== 'project');
+              newBelongsTo = newBelongsTo.filter((a: BelongsTo): boolean => a.type !== 'project');
               if (updates.project_id) {
                 newBelongsTo.push({ id: updates.project_id, type: 'project' });
               }
@@ -362,7 +392,7 @@ export function useBulkUpdateIssues() {
 
             // Handle sprint_id update: update or add sprint association
             if ('sprint_id' in updates) {
-              newBelongsTo = newBelongsTo.filter(a => a.type !== 'sprint');
+              newBelongsTo = newBelongsTo.filter((a: BelongsTo): boolean => a.type !== 'sprint');
               if (updates.sprint_id) {
                 newBelongsTo.push({ id: updates.sprint_id, type: 'sprint' });
               }
@@ -379,12 +409,12 @@ export function useBulkUpdateIssues() {
 
       return { previousIssues };
     },
-    onError: (_err, _variables, context) => {
+    onError: (_err: ApiError, _variables: BulkUpdateRequest, context: BulkUpdateContext | undefined): void => {
       if (context?.previousIssues) {
         queryClient.setQueryData(issueKeys.lists(), context.previousIssues);
       }
     },
-    onSettled: () => {
+    onSettled: (): void => {
       queryClient.invalidateQueries({ queryKey: issueKeys.lists() });
     },
   });
@@ -396,7 +426,7 @@ export interface CreateIssueOptions {
 }
 
 // Compatibility hook that matches the old useIssues interface
-export function useIssues() {
+export function useIssues(): UseIssuesResult {
   const { data: issues = [], isLoading: loading, refetch } = useIssuesQuery();
   const createMutation = useCreateIssue();
   const updateMutation = useUpdateIssue();
