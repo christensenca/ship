@@ -15,6 +15,19 @@ import { extractText } from '../utils/document-content.js';
 type RouterType = ReturnType<typeof Router>;
 const router: RouterType = Router();
 
+type RequestContext = {
+  userId: string;
+  workspaceId: string;
+};
+
+function getRequestContext(req: Request): RequestContext {
+  const { userId, workspaceId } = req;
+  if (!userId || !workspaceId) {
+    throw new Error('Missing authenticated request context');
+  }
+  return { userId, workspaceId };
+}
+
 /**
  * Look up the reports_to user_id for a sprint's owner.
  * The sprint's owner_id is a person document ID; this resolves their supervisor's user_id.
@@ -85,9 +98,9 @@ async function broadcastAccountabilityUpdateToSprintOwner(
 }
 
 // GET /api/weeks/lookup-person - Find person document by user_id
-router.get('/lookup-person', authMiddleware, async (req: Request, res: Response) => {
+router.get('/lookup-person', authMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
-    const workspaceId = req.workspaceId!;
+    const { workspaceId } = getRequestContext(req);
     const userId = req.query.user_id as string;
 
     if (!userId) {
@@ -117,9 +130,9 @@ router.get('/lookup-person', authMiddleware, async (req: Request, res: Response)
 
 // GET /api/weeks/lookup - Find sprint by project_id + sprint_number
 // Returns the sprint document with its approval properties
-router.get('/lookup', authMiddleware, async (req: Request, res: Response) => {
+router.get('/lookup', authMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
-    const workspaceId = req.workspaceId!;
+    const { workspaceId } = getRequestContext(req);
     const projectId = req.query.project_id as string;
     const sprintNumber = parseInt(req.query.sprint_number as string, 10);
 
@@ -183,7 +196,7 @@ const updatePlanSchema = z.object({
 
 // Helper to extract sprint from row
 // Dates and status are computed on frontend from sprint_number + workspace.sprint_start_date
-function extractSprintFromRow(row: any) {
+function extractSprintFromRow(row: any): Record<string, unknown> {
   const props = row.properties || {};
   return {
     id: row.id,
@@ -268,15 +281,14 @@ async function takeSprintSnapshot(sprintId: string): Promise<string[]> {
      WHERE da.related_id = $1 AND da.relationship_type = 'sprint' AND d.document_type = 'issue'`,
     [sprintId]
   );
-  return result.rows.map(row => row.id);
+  return result.rows.map((row) => row.id);
 }
 
 // Get all active sprints across the workspace
 // Active = sprint_number matches the current 7-day window based on workspace.sprint_start_date
-router.get('/', authMiddleware, async (req: Request, res: Response) => {
+router.get('/', authMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
-    const userId = req.userId!;
-    const workspaceId = req.workspaceId!;
+    const { userId, workspaceId } = getRequestContext(req);
 
     // Get visibility context for filtering
     const { isAdmin } = await getVisibilityContext(userId, workspaceId);
@@ -355,7 +367,7 @@ router.get('/', authMiddleware, async (req: Request, res: Response) => {
       [workspaceId, currentSprintNumber, userId, isAdmin, rawStartDate]
     );
 
-    const sprints = result.rows.map(row => ({
+    const sprints = result.rows.map((row) => ({
       ...extractSprintFromRow(row),
       days_remaining: daysRemaining,
       status: 'active' as const,
@@ -376,10 +388,9 @@ router.get('/', authMiddleware, async (req: Request, res: Response) => {
 
 // Get action items for current user (sprints needing docs)
 // Returns sprints owned by the user that need plan or retro
-router.get('/my-action-items', authMiddleware, async (req: Request, res: Response) => {
+router.get('/my-action-items', authMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
-    const userId = req.userId!;
-    const workspaceId = req.workspaceId!;
+    const { userId, workspaceId } = getRequestContext(req);
 
     // Get workspace sprint configuration
     const workspaceResult = await pool.query(
@@ -533,7 +544,7 @@ router.get('/my-action-items', authMiddleware, async (req: Request, res: Respons
 
     // Sort by urgency (overdue first, then due_today, due_soon, upcoming)
     const urgencyOrder = { overdue: 0, due_today: 1, due_soon: 2, upcoming: 3 };
-    actionItems.sort((a, b) => urgencyOrder[a.urgency] - urgencyOrder[b.urgency]);
+    actionItems.sort((a, b): number => urgencyOrder[a.urgency] - urgencyOrder[b.urgency]);
 
     res.json({ action_items: actionItems });
   } catch (err) {
@@ -545,10 +556,9 @@ router.get('/my-action-items', authMiddleware, async (req: Request, res: Respons
 // Get "My Week" view - aggregates issues from all active sprints
 // Virtual aggregation: no 'week' document created, purely computed
 // Supports historical week viewing via sprint_number query param
-router.get('/my-week', authMiddleware, async (req: Request, res: Response) => {
+router.get('/my-week', authMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
-    const userId = req.userId!;
-    const workspaceId = req.workspaceId!;
+    const { userId, workspaceId } = getRequestContext(req);
     const { state, assignee, show_mine, sprint_number: requestedSprintNumber } = req.query;
 
     // Get visibility context for filtering
@@ -709,9 +719,9 @@ router.get('/my-week', authMiddleware, async (req: Request, res: Response) => {
     // Calculate totals
     const totalIssues = groups.reduce((sum, g) => sum + g.issues.length, 0);
     const completedIssues = groups.reduce((sum, g) =>
-      sum + g.issues.filter((i: any) => i.state === 'done').length, 0);
+      sum + g.issues.filter((i: any): boolean => i.state === 'done').length, 0);
     const inProgressIssues = groups.reduce((sum, g) =>
-      sum + g.issues.filter((i: any) => i.state === 'in_progress' || i.state === 'in_review').length, 0);
+      sum + g.issues.filter((i: any): boolean => i.state === 'in_progress' || i.state === 'in_review').length, 0);
 
     res.json({
       groups,
@@ -738,11 +748,10 @@ router.get('/my-week', authMiddleware, async (req: Request, res: Response) => {
 
 // Get single sprint
 // Automatically takes a plan snapshot when sprint becomes active (start_date reached)
-router.get('/:id', authMiddleware, async (req: Request, res: Response) => {
+router.get('/:id', authMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const userId = req.userId!;
-    const workspaceId = req.workspaceId!;
+    const { userId, workspaceId } = getRequestContext(req);
 
     // Get visibility context for filtering
     const { isAdmin } = await getVisibilityContext(userId, workspaceId);
@@ -827,10 +836,9 @@ router.get('/:id', authMiddleware, async (req: Request, res: Response) => {
 // Create sprint (creates a document with document_type = 'sprint')
 // Only stores sprint_number and owner_id - dates/status computed from sprint_number
 // program_id is optional - allows creating projectless sprints for ad-hoc work
-router.post('/', authMiddleware, async (req: Request, res: Response) => {
+router.post('/', authMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
-    const userId = req.userId!;
-    const workspaceId = req.workspaceId!;
+    const { userId, workspaceId } = getRequestContext(req);
 
     const parsed = createSprintSchema.safeParse(req.body);
     if (!parsed.success) {
@@ -1016,11 +1024,10 @@ router.post('/', authMiddleware, async (req: Request, res: Response) => {
 
 // Update sprint - title, owner_id, and sprint_number can be updated
 // When sprint_number changes, the plan snapshot is cleared and will be retaken when the new date arrives
-router.patch('/:id', authMiddleware, async (req: Request, res: Response) => {
+router.patch('/:id', authMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const userId = req.userId!;
-    const workspaceId = req.workspaceId!;
+    const { userId, workspaceId } = getRequestContext(req);
 
     const parsed = updateSprintSchema.safeParse(req.body);
     if (!parsed.success) {
@@ -1073,7 +1080,7 @@ router.patch('/:id', authMiddleware, async (req: Request, res: Response) => {
           `SELECT u.id FROM users u
            JOIN workspace_memberships wm ON wm.user_id = u.id
            WHERE u.id = $1 AND wm.workspace_id = $2`,
-          [data.owner_id, req.workspaceId]
+          [data.owner_id, workspaceId]
         );
 
         if (ownerCheck.rows.length === 0) {
@@ -1150,7 +1157,7 @@ router.patch('/:id', authMiddleware, async (req: Request, res: Response) => {
     await pool.query(
       `UPDATE documents SET ${updates.join(', ')}
        WHERE id = $${paramIndex} AND workspace_id = $${paramIndex + 1} AND document_type = 'sprint'`,
-      [...values, id, req.workspaceId]
+      [...values, id, workspaceId]
     );
 
     // Re-query to get full sprint with owner info
@@ -1198,11 +1205,10 @@ router.patch('/:id', authMiddleware, async (req: Request, res: Response) => {
 
 // Start sprint - manually activate a planning sprint with scope snapshot
 // POST /api/weeks/:id/start
-router.post('/:id/start', authMiddleware, async (req: Request, res: Response) => {
+router.post('/:id/start', authMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const userId = req.userId!;
-    const workspaceId = req.workspaceId!;
+    const { userId, workspaceId } = getRequestContext(req);
 
     // Get visibility context for filtering
     const { isAdmin } = await getVisibilityContext(userId, workspaceId);
@@ -1253,7 +1259,7 @@ router.post('/:id/start', authMiddleware, async (req: Request, res: Response) =>
     );
 
     // Broadcast celebration when sprint is started
-    broadcastToUser(req.userId!, 'accountability:updated', { type: 'week_start', targetId: id as string });
+    broadcastToUser(userId, 'accountability:updated', { type: 'week_start', targetId: id as string });
 
     // Re-query to get full sprint with owner info
     const result = await pool.query(
@@ -1304,11 +1310,10 @@ router.post('/:id/start', authMiddleware, async (req: Request, res: Response) =>
 });
 
 // Delete sprint
-router.delete('/:id', authMiddleware, async (req: Request, res: Response) => {
+router.delete('/:id', authMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const userId = req.userId!;
-    const workspaceId = req.workspaceId!;
+    const { userId, workspaceId } = getRequestContext(req);
 
     // Get visibility context for filtering
     const { isAdmin } = await getVisibilityContext(userId, workspaceId);
@@ -1346,11 +1351,10 @@ router.delete('/:id', authMiddleware, async (req: Request, res: Response) => {
 
 // Update sprint plan (append mode - preserves history)
 // PATCH /api/weeks/:id/plan
-router.patch('/:id/plan', authMiddleware, async (req: Request, res: Response) => {
+router.patch('/:id/plan', authMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const userId = req.userId!;
-    const workspaceId = req.workspaceId!;
+    const { userId, workspaceId } = getRequestContext(req);
 
     const parsed = updatePlanSchema.safeParse(req.body);
     if (!parsed.success) {
@@ -1460,7 +1464,7 @@ router.patch('/:id/plan', authMiddleware, async (req: Request, res: Response) =>
 
     // Broadcast celebration when plan is added
     if (data.plan && data.plan.trim() !== '') {
-      broadcastToUser(req.userId!, 'accountability:updated', { type: 'weekly_plan', targetId: id as string });
+      broadcastToUser(userId, 'accountability:updated', { type: 'weekly_plan', targetId: id as string });
     }
 
     // Re-query to get full sprint with owner info
@@ -1507,11 +1511,10 @@ router.patch('/:id/plan', authMiddleware, async (req: Request, res: Response) =>
 });
 
 // Get sprint issues
-router.get('/:id/issues', authMiddleware, async (req: Request, res: Response) => {
+router.get('/:id/issues', authMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const userId = req.userId!;
-    const workspaceId = req.workspaceId!;
+    const { userId, workspaceId } = getRequestContext(req);
 
     // Get visibility context for filtering
     const { isAdmin } = await getVisibilityContext(userId, workspaceId);
@@ -1606,11 +1609,10 @@ router.get('/:id/issues', authMiddleware, async (req: Request, res: Response) =>
 
 // Get sprint scope changes
 // Returns: { originalScope, currentScope, scopeChangePercent, scopeChanges }
-router.get('/:id/scope-changes', authMiddleware, async (req: Request, res: Response) => {
+router.get('/:id/scope-changes', authMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const userId = req.userId!;
-    const workspaceId = req.workspaceId!;
+    const { userId, workspaceId } = getRequestContext(req);
 
     // Get visibility context for filtering
     const { isAdmin } = await getVisibilityContext(userId, workspaceId);
@@ -1830,11 +1832,10 @@ function formatStandupResponse(row: any) {
  *       404:
  *         description: Sprint not found
  */
-router.get('/:id/standups', authMiddleware, async (req: Request, res: Response) => {
+router.get('/:id/standups', authMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const userId = req.userId!;
-    const workspaceId = req.workspaceId!;
+    const { userId, workspaceId } = getRequestContext(req);
 
     // Get visibility context for filtering
     const { isAdmin } = await getVisibilityContext(userId, workspaceId);
@@ -1923,11 +1924,10 @@ router.get('/:id/standups', authMiddleware, async (req: Request, res: Response) 
  *       404:
  *         description: Sprint not found
  */
-router.post('/:id/standups', authMiddleware, async (req: Request, res: Response) => {
+router.post('/:id/standups', authMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const userId = req.userId!;
-    const workspaceId = req.workspaceId!;
+    const { userId, workspaceId } = getRequestContext(req);
 
     const parsed = createStandupSchema.safeParse(req.body);
     if (!parsed.success) {
@@ -2154,11 +2154,10 @@ async function generatePrefilledReviewContent(sprintData: any, issues: any[]) {
 }
 
 // GET /api/weeks/:id/review - Get or generate pre-filled sprint review
-router.get('/:id/review', authMiddleware, async (req: Request, res: Response) => {
+router.get('/:id/review', authMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const userId = req.userId!;
-    const workspaceId = req.workspaceId!;
+    const { userId, workspaceId } = getRequestContext(req);
 
     // Get visibility context for filtering
     const { isAdmin } = await getVisibilityContext(userId, workspaceId);
@@ -2268,11 +2267,10 @@ router.get('/:id/review', authMiddleware, async (req: Request, res: Response) =>
 });
 
 // POST /api/weeks/:id/review - Create finalized sprint review
-router.post('/:id/review', authMiddleware, async (req: Request, res: Response) => {
+router.post('/:id/review', authMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const userId = req.userId!;
-    const workspaceId = req.workspaceId!;
+    const { userId, workspaceId } = getRequestContext(req);
 
     const parsed = sprintReviewSchema.safeParse(req.body);
     if (!parsed.success) {
@@ -2381,11 +2379,10 @@ router.post('/:id/review', authMiddleware, async (req: Request, res: Response) =
 });
 
 // PATCH /api/weeks/:id/review - Update existing sprint review
-router.patch('/:id/review', authMiddleware, async (req: Request, res: Response) => {
+router.patch('/:id/review', authMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const userId = req.userId!;
-    const workspaceId = req.workspaceId!;
+    const { userId, workspaceId } = getRequestContext(req);
 
     const parsed = sprintReviewSchema.safeParse(req.body);
     if (!parsed.success) {
@@ -2548,11 +2545,10 @@ const carryoverSchema = z.object({
 });
 
 // POST /api/weeks/:id/carryover - Move incomplete issues to another sprint
-router.post('/:id/carryover', authMiddleware, async (req: Request, res: Response) => {
+router.post('/:id/carryover', authMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
     const { id: sourceSprintId } = req.params;
-    const userId = req.userId!;
-    const workspaceId = req.workspaceId!;
+    const { userId, workspaceId } = getRequestContext(req);
 
     const parsed = carryoverSchema.safeParse(req.body);
     if (!parsed.success) {
@@ -2681,11 +2677,10 @@ router.post('/:id/carryover', authMiddleware, async (req: Request, res: Response
 });
 
 // POST /api/weeks/:id/approve-plan - Approve sprint plan
-router.post('/:id/approve-plan', authMiddleware, async (req: Request, res: Response) => {
+router.post('/:id/approve-plan', authMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const userId = req.userId!;
-    const workspaceId = req.workspaceId!;
+    const { userId, workspaceId } = getRequestContext(req);
     const parsedComment = parseApprovalComment(req.body);
     if (parsedComment.error) {
       res.status(400).json({ error: parsedComment.error });
@@ -2781,11 +2776,10 @@ router.post('/:id/approve-plan', authMiddleware, async (req: Request, res: Respo
 });
 
 // POST /api/weeks/:id/unapprove-plan - Revoke plan approval (logged to history)
-router.post('/:id/unapprove-plan', authMiddleware, async (req: Request, res: Response) => {
+router.post('/:id/unapprove-plan', authMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const userId = req.userId!;
-    const workspaceId = req.workspaceId!;
+    const { userId, workspaceId } = getRequestContext(req);
 
     const { isAdmin } = await getVisibilityContext(userId, workspaceId);
 
@@ -2840,12 +2834,11 @@ router.post('/:id/unapprove-plan', authMiddleware, async (req: Request, res: Res
 });
 
 // POST /api/weeks/:id/approve-review - Approve sprint review (rating required)
-router.post('/:id/approve-review', authMiddleware, async (req: Request, res: Response) => {
+router.post('/:id/approve-review', authMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const { rating } = req.body || {};
-    const userId = req.userId!;
-    const workspaceId = req.workspaceId!;
+    const { userId, workspaceId } = getRequestContext(req);
     const parsedComment = parseApprovalComment(req.body);
     if (parsedComment.error) {
       res.status(400).json({ error: parsedComment.error });
@@ -2969,12 +2962,11 @@ router.post('/:id/approve-review', authMiddleware, async (req: Request, res: Res
 });
 
 // POST /api/weeks/:id/request-plan-changes - Request changes on sprint plan
-router.post('/:id/request-plan-changes', authMiddleware, async (req: Request, res: Response) => {
+router.post('/:id/request-plan-changes', authMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const { feedback } = req.body || {};
-    const userId = req.userId!;
-    const workspaceId = req.workspaceId!;
+    const { userId, workspaceId } = getRequestContext(req);
 
     // Validate feedback is provided and not too long
     if (!feedback || typeof feedback !== 'string' || feedback.trim().length === 0) {
@@ -3062,12 +3054,11 @@ router.post('/:id/request-plan-changes', authMiddleware, async (req: Request, re
 });
 
 // POST /api/weeks/:id/request-retro-changes - Request changes on sprint retro
-router.post('/:id/request-retro-changes', authMiddleware, async (req: Request, res: Response) => {
+router.post('/:id/request-retro-changes', authMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const { feedback } = req.body || {};
-    const userId = req.userId!;
-    const workspaceId = req.workspaceId!;
+    const { userId, workspaceId } = getRequestContext(req);
 
     // Validate feedback is provided and not too long
     if (!feedback || typeof feedback !== 'string' || feedback.trim().length === 0) {

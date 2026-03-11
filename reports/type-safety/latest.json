@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "generated_at": "2026-03-11T19:17:32.121Z",
+  "generated_at": "2026-03-11T19:42:45.538Z",
   "strict_mode": {
     "enabled": true,
     "by_config": {
@@ -25,25 +25,25 @@
     "strict_error_count_total_if_disabled": null
   },
   "totals": {
-    "overall": 6388,
-    "production_only": 4727,
+    "overall": 6258,
+    "production_only": 4597,
     "tests_only": 1661,
     "by_violation_type": {
       "explicit_any": 259,
       "type_assertion_as": 690,
-      "non_null_assertion": 333,
+      "non_null_assertion": 248,
       "ts_comment_directive": 1,
       "untyped_parameter": 1218,
-      "missing_return_type": 3887
+      "missing_return_type": 3842
     },
     "by_scope": {
       "production_only": {
         "explicit_any": 82,
         "type_assertion_as": 503,
-        "non_null_assertion": 329,
+        "non_null_assertion": 244,
         "ts_comment_directive": 0,
         "untyped_parameter": 1146,
-        "missing_return_type": 2667
+        "missing_return_type": 2622
       },
       "tests_only": {
         "explicit_any": 177,
@@ -59,10 +59,10 @@
     "api": {
       "explicit_any": 226,
       "type_assertion_as": 322,
-      "non_null_assertion": 304,
+      "non_null_assertion": 219,
       "ts_comment_directive": 0,
       "untyped_parameter": 289,
-      "missing_return_type": 1235
+      "missing_return_type": 1190
     },
     "web": {
       "explicit_any": 33,
@@ -83,20 +83,6 @@
   },
   "file_breakdown": [
     {
-      "file": "api/src/routes/weeks.ts",
-      "package": "api",
-      "is_test_like": false,
-      "total": 159,
-      "counts": {
-        "explicit_any": 11,
-        "type_assertion_as": 26,
-        "non_null_assertion": 48,
-        "ts_comment_directive": 0,
-        "untyped_parameter": 24,
-        "missing_return_type": 50
-      }
-    },
-    {
       "file": "web/src/hooks/useSessionTimeout.test.ts",
       "package": "web",
       "is_test_like": true,
@@ -108,20 +94,6 @@
         "ts_comment_directive": 0,
         "untyped_parameter": 0,
         "missing_return_type": 157
-      }
-    },
-    {
-      "file": "api/src/routes/issues.ts",
-      "package": "api",
-      "is_test_like": false,
-      "total": 122,
-      "counts": {
-        "explicit_any": 4,
-        "type_assertion_as": 8,
-        "non_null_assertion": 37,
-        "ts_comment_directive": 0,
-        "untyped_parameter": 29,
-        "missing_return_type": 44
       }
     },
     {
@@ -220,6 +192,20 @@
         "ts_comment_directive": 0,
         "untyped_parameter": 30,
         "missing_return_type": 46
+      }
+    },
+    {
+      "file": "api/src/routes/weeks.ts",
+      "package": "api",
+      "is_test_like": false,
+      "total": 83,
+      "counts": {
+        "explicit_any": 11,
+        "type_assertion_as": 26,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 24,
+        "missing_return_type": 22
       }
     },
     {
@@ -374,6 +360,20 @@
         "ts_comment_directive": 0,
         "untyped_parameter": 28,
         "missing_return_type": 33
+      }
+    },
+    {
+      "file": "api/src/routes/issues.ts",
+      "package": "api",
+      "is_test_like": false,
+      "total": 68,
+      "counts": {
+        "explicit_any": 4,
+        "type_assertion_as": 8,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 29,
+        "missing_return_type": 27
       }
     },
     {
@@ -3809,34 +3809,6 @@
   ],
   "top_violation_dense_files": [
     {
-      "file": "api/src/routes/weeks.ts",
-      "package": "api",
-      "total": 159,
-      "counts": {
-        "explicit_any": 11,
-        "type_assertion_as": 26,
-        "non_null_assertion": 48,
-        "ts_comment_directive": 0,
-        "untyped_parameter": 24,
-        "missing_return_type": 50
-      },
-      "explanation": "Dominant violation types: missing_return_type (50), non_null_assertion (48)."
-    },
-    {
-      "file": "api/src/routes/issues.ts",
-      "package": "api",
-      "total": 122,
-      "counts": {
-        "explicit_any": 4,
-        "type_assertion_as": 8,
-        "non_null_assertion": 37,
-        "ts_comment_directive": 0,
-        "untyped_parameter": 29,
-        "missing_return_type": 44
-      },
-      "explanation": "Dominant violation types: missing_return_type (44), non_null_assertion (37)."
-    },
-    {
       "file": "web/src/pages/App.tsx",
       "package": "web",
       "total": 101,
@@ -3877,17 +3849,45 @@
         "missing_return_type": 39
       },
       "explanation": "Dominant violation types: missing_return_type (39), type_assertion_as (36)."
+    },
+    {
+      "file": "web/src/components/editor/SlashCommands.tsx",
+      "package": "web",
+      "total": 86,
+      "counts": {
+        "explicit_any": 8,
+        "type_assertion_as": 2,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 30,
+        "missing_return_type": 46
+      },
+      "explanation": "Dominant violation types: missing_return_type (46), untyped_parameter (30)."
+    },
+    {
+      "file": "api/src/routes/weeks.ts",
+      "package": "api",
+      "total": 83,
+      "counts": {
+        "explicit_any": 11,
+        "type_assertion_as": 26,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 24,
+        "missing_return_type": 22
+      },
+      "explanation": "Dominant violation types: type_assertion_as (26), untyped_parameter (24)."
     }
   ],
   "delta_from_previous": {
-    "overall": -18,
+    "overall": -35,
     "by_violation_type": {
-      "explicit_any": -1,
+      "explicit_any": 0,
       "type_assertion_as": 0,
-      "non_null_assertion": -6,
+      "non_null_assertion": -25,
       "ts_comment_directive": 0,
       "untyped_parameter": 0,
-      "missing_return_type": -11
+      "missing_return_type": -10
     },
     "status_band": "Stable"
   },
