@@ -43,7 +43,7 @@ const SORT_OPTIONS = [
   { value: 'updated', label: 'Updated' },
 ];
 
-export function ProjectsPage() {
+export function ProjectsPage(): React.JSX.Element {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useAuth();
@@ -80,67 +80,69 @@ export function ProjectsPage() {
   const statusFilter = validStatuses.includes(rawStatusFilter) ? rawStatusFilter : '';
 
   // Compute unique programs from projects for the filter dropdown
-  const programOptions = useMemo(() => {
-    return programs.map(p => ({ value: p.id, label: p.name }))
-      .sort((a, b) => a.label.localeCompare(b.label));
+  const programOptions = useMemo((): Array<{ value: string; label: string }> => {
+    return programs.map((program): { value: string; label: string } => ({ value: program.id, label: program.name }))
+      .sort((a, b): number => a.label.localeCompare(b.label));
   }, [programs]);
 
   // Get program name lookup
-  const programNameById = useMemo(() => {
+  const programNameById = useMemo((): Map<string, string> => {
     const map = new Map<string, string>();
-    programs.forEach(p => map.set(p.id, p.name));
+    programs.forEach((program): void => {
+      map.set(program.id, program.name);
+    });
     return map;
   }, [programs]);
 
   // Compute counts for each status filter tab
-  const statusCounts = useMemo(() => {
+  const statusCounts = useMemo((): Record<'all' | 'active' | 'planned' | 'completed' | 'archived', number> => {
     // Apply program filter first to get the relevant projects
     const programFiltered = programFilter
-      ? allProjects.filter(project => project.program_id === programFilter)
+      ? allProjects.filter((project): boolean => project.program_id === programFilter)
       : allProjects;
 
     return {
-      all: programFiltered.filter(p => p.inferred_status !== 'archived').length,
-      active: programFiltered.filter(p => p.inferred_status === 'active').length,
-      planned: programFiltered.filter(p => p.inferred_status === 'planned').length,
-      completed: programFiltered.filter(p => p.inferred_status === 'completed').length,
-      archived: programFiltered.filter(p => p.inferred_status === 'archived').length,
+      all: programFiltered.filter((project): boolean => project.inferred_status !== 'archived').length,
+      active: programFiltered.filter((project): boolean => project.inferred_status === 'active').length,
+      planned: programFiltered.filter((project): boolean => project.inferred_status === 'planned').length,
+      completed: programFiltered.filter((project): boolean => project.inferred_status === 'completed').length,
+      archived: programFiltered.filter((project): boolean => project.inferred_status === 'archived').length,
     };
   }, [allProjects, programFilter]);
 
   // Filter projects client-side based on status filter AND program filter
-  const filteredProjects = useMemo(() => {
+  const filteredProjects = useMemo((): Project[] => {
     let filtered = allProjects;
 
     // Apply program filter
     if (programFilter) {
-      filtered = filtered.filter(project => project.program_id === programFilter);
+      filtered = filtered.filter((project): boolean => project.program_id === programFilter);
     }
 
     // Apply status filter based on inferred_status
     switch (statusFilter) {
       case 'active':
-        filtered = filtered.filter(project => project.inferred_status === 'active');
+        filtered = filtered.filter((project): boolean => project.inferred_status === 'active');
         break;
       case 'planned':
-        filtered = filtered.filter(project => project.inferred_status === 'planned');
+        filtered = filtered.filter((project): boolean => project.inferred_status === 'planned');
         break;
       case 'completed':
-        filtered = filtered.filter(project => project.inferred_status === 'completed');
+        filtered = filtered.filter((project): boolean => project.inferred_status === 'completed');
         break;
       case 'archived':
-        filtered = filtered.filter(project => project.inferred_status === 'archived');
+        filtered = filtered.filter((project): boolean => project.inferred_status === 'archived');
         break;
       default:
         // 'all' or empty = show all non-archived projects (active, planned, completed, backlog)
-        filtered = filtered.filter(project => project.inferred_status !== 'archived');
+        filtered = filtered.filter((project): boolean => project.inferred_status !== 'archived');
     }
 
     return filtered;
   }, [allProjects, statusFilter, programFilter]);
 
   // Sort projects
-  const projects = useMemo(() => {
+  const projects = useMemo((): Project[] => {
     const sorted = [...filteredProjects];
 
     // Helper to sort nullable values (nulls go to bottom)
@@ -151,7 +153,7 @@ export function ProjectsPage() {
       return bVal - aVal; // Descending
     };
 
-    sorted.sort((a, b) => {
+    sorted.sort((a: Project, b: Project): number => {
       switch (sortBy) {
         case 'ice_score':
           return sortNullable(a.ice_score, b.ice_score);
@@ -173,7 +175,7 @@ export function ProjectsPage() {
     return sorted;
   }, [filteredProjects, sortBy]);
 
-  const handleCreateProject = useCallback(async () => {
+  const handleCreateProject = useCallback(async (): Promise<void> => {
     if (!user?.id) {
       showToast('You must be logged in to create a project', 'error');
       return;
@@ -185,8 +187,8 @@ export function ProjectsPage() {
     }
   }, [createProject, navigate, user, showToast]);
 
-  const setFilter = (status: string) => {
-    setSearchParams((prev) => {
+  const setFilter = (status: string): void => {
+    setSearchParams((prev: URLSearchParams): URLSearchParams => {
       if (status) {
         prev.set('status', status);
       } else {
@@ -197,7 +199,7 @@ export function ProjectsPage() {
   };
 
   // Clear selection helper
-  const clearSelection = useCallback(() => {
+  const clearSelection = useCallback((): void => {
     setSelectedIds(new Set());
     selectionRef.current?.clearSelection();
     setContextMenu(null);
@@ -209,7 +211,7 @@ export function ProjectsPage() {
   }, [statusFilter, clearSelection]);
 
   // Bulk action handlers
-  const handleBulkArchive = useCallback(async () => {
+  const handleBulkArchive = useCallback(async (): Promise<void> => {
     const ids = Array.from(selectedIds);
     if (ids.length === 0) return;
     const count = ids.length;
@@ -228,7 +230,7 @@ export function ProjectsPage() {
         5000,
         {
           label: 'Undo',
-          onClick: async () => {
+          onClick: async (): Promise<void> => {
             for (const id of ids) {
               await updateProject(id, { archived_at: null } as any);
             }
@@ -241,7 +243,7 @@ export function ProjectsPage() {
     clearSelection();
   }, [selectedIds, updateProject, showToast, clearSelection, refreshProjects]);
 
-  const handleBulkDelete = useCallback(async () => {
+  const handleBulkDelete = useCallback(async (): Promise<void> => {
     const ids = Array.from(selectedIds);
     if (ids.length === 0) return;
     const count = ids.length;
@@ -259,13 +261,13 @@ export function ProjectsPage() {
   }, [selectedIds, deleteProject, showToast, clearSelection]);
 
   // Handle convert to issue - opens confirmation dialog
-  const handleConvertToIssue = useCallback((project: Project) => {
+  const handleConvertToIssue = useCallback((project: Project): void => {
     setConvertingProject(project);
     setContextMenu(null);
   }, []);
 
   // Execute the conversion to issue
-  const executeConversion = useCallback(async () => {
+  const executeConversion = useCallback(async (): Promise<void> => {
     if (!convertingProject) return;
     setIsConverting(true);
     try {
@@ -285,8 +287,8 @@ export function ProjectsPage() {
         setIsConverting(false);
         setConvertingProject(null);
       }
-    } catch (err) {
-      console.error('Failed to convert project:', err);
+    } catch (error) {
+      console.error('Failed to convert project:', error);
       showToast('Failed to convert project to issue', 'error');
       setIsConverting(false);
       setConvertingProject(null);
@@ -294,20 +296,20 @@ export function ProjectsPage() {
   }, [convertingProject, navigate, showToast, queryClient]);
 
   // Selection change handler - keeps parent state in sync with SelectableList
-  const handleSelectionChange = useCallback((newSelectedIds: Set<string>, selection: UseSelectionReturn) => {
+  const handleSelectionChange = useCallback((newSelectedIds: Set<string>, selection: UseSelectionReturn): void => {
     setSelectedIds(newSelectedIds);
     selectionRef.current = selection;
   }, []);
 
   // Context menu handler - receives selection from SelectableList
-  const handleContextMenu = useCallback((e: React.MouseEvent, _item: Project, selection: UseSelectionReturn) => {
+  const handleContextMenu = useCallback((e: React.MouseEvent, _item: Project, selection: UseSelectionReturn): void => {
     selectionRef.current = selection;
     setContextMenu({ x: e.clientX, y: e.clientY, selection });
   }, []);
 
   // Global keyboard shortcuts
   useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
+    const handler = (e: KeyboardEvent): void => {
       const target = e.target as HTMLElement;
       if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) {
         return;
@@ -325,12 +327,12 @@ export function ProjectsPage() {
   }, [handleCreateProject]);
 
   // Render function for project rows
-  const renderProjectRow = useCallback((project: Project, { isSelected }: RowRenderProps) => (
+  const renderProjectRow = useCallback((project: Project, { isSelected }: RowRenderProps): React.JSX.Element => (
     <ProjectRowContent project={project} isSelected={isSelected} visibleColumns={visibleColumns} programNameById={programNameById} />
   ), [visibleColumns, programNameById]);
 
   // Empty state for the list
-  const emptyState = useMemo(() => (
+  const emptyState = useMemo((): React.JSX.Element => (
     <div className="text-center">
       <p className="text-muted">No projects yet</p>
       <button
@@ -414,7 +416,7 @@ export function ProjectsPage() {
           renderRow={renderProjectRow}
           columns={columns}
           emptyState={emptyState}
-          onItemClick={(project) => navigate(`/documents/${project.id}`)}
+          onItemClick={(project: Project): void => { void navigate(`/documents/${project.id}`); }}
           onSelectionChange={handleSelectionChange}
           onContextMenu={handleContextMenu}
           ariaLabel="Projects list"
@@ -423,7 +425,7 @@ export function ProjectsPage() {
 
       {/* Context Menu */}
       {contextMenu && (
-        <ContextMenu x={contextMenu.x} y={contextMenu.y} onClose={() => setContextMenu(null)}>
+        <ContextMenu x={contextMenu.x} y={contextMenu.y} onClose={(): void => setContextMenu(null)}>
           <div className="px-3 py-1.5 text-xs text-muted border-b border-border mb-1">
             {Math.max(1, contextMenu.selection.selectedCount)} selected
           </div>
@@ -434,9 +436,9 @@ export function ProjectsPage() {
           {contextMenu.selection.selectedCount === 1 && (
             <>
               <ContextMenuSeparator />
-              <ContextMenuItem onClick={() => {
+              <ContextMenuItem onClick={(): void => {
                 const selectedId = Array.from(contextMenu.selection.selectedIds)[0];
-                const project = projects.find(p => p.id === selectedId);
+                const project = projects.find((item): boolean => item.id === selectedId);
                 if (project) handleConvertToIssue(project);
               }}>
                 <ArrowDownLeftIcon className="h-4 w-4" />
@@ -456,7 +458,7 @@ export function ProjectsPage() {
       {convertingProject && (
         <ConversionDialog
           isOpen={!!convertingProject}
-          onClose={() => setConvertingProject(null)}
+          onClose={(): void => setConvertingProject(null)}
           onConvert={executeConversion}
           sourceType="project"
           title={convertingProject.title}
@@ -478,7 +480,7 @@ interface ProjectRowContentProps {
   programNameById: Map<string, string>;
 }
 
-function ProjectRowContent({ project, visibleColumns, programNameById }: ProjectRowContentProps) {
+function ProjectRowContent({ project, visibleColumns, programNameById }: ProjectRowContentProps): React.JSX.Element {
   return (
     <>
       {/* Title with color dot */}
@@ -565,7 +567,7 @@ function ProjectRowContent({ project, visibleColumns, programNameById }: Project
   );
 }
 
-function ICEBadge({ value }: { value: number | null }) {
+function ICEBadge({ value }: { value: number | null }): React.JSX.Element {
   if (value === null) {
     return <span className="font-medium text-muted">&mdash;</span>;
   }
@@ -595,7 +597,7 @@ function ProjectsBulkActionBar({
   onClearSelection,
   onArchive,
   onDelete,
-}: ProjectsBulkActionBarProps) {
+}: ProjectsBulkActionBarProps): React.JSX.Element | null {
   if (selectedCount === 0) {
     return null;
   }
@@ -651,7 +653,7 @@ function ProjectsBulkActionBar({
   );
 }
 
-function TrashIcon({ className }: { className?: string }) {
+function TrashIcon({ className }: { className?: string }): React.JSX.Element {
   return (
     <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -659,7 +661,7 @@ function TrashIcon({ className }: { className?: string }) {
   );
 }
 
-function XIcon({ className }: { className?: string }) {
+function XIcon({ className }: { className?: string }): React.JSX.Element {
   return (
     <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
@@ -667,7 +669,7 @@ function XIcon({ className }: { className?: string }) {
   );
 }
 
-function ArrowDownLeftIcon({ className }: { className?: string }) {
+function ArrowDownLeftIcon({ className }: { className?: string }): React.JSX.Element {
   return (
     <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 7L7 17M7 17H17M7 17V7" />
@@ -675,7 +677,7 @@ function ArrowDownLeftIcon({ className }: { className?: string }) {
   );
 }
 
-function CheckIcon({ className }: { className?: string }) {
+function CheckIcon({ className }: { className?: string }): React.JSX.Element {
   return (
     <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -683,7 +685,7 @@ function CheckIcon({ className }: { className?: string }) {
   );
 }
 
-function XCircleIcon({ className }: { className?: string }) {
+function XCircleIcon({ className }: { className?: string }): React.JSX.Element {
   return (
     <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <circle cx="12" cy="12" r="10" strokeWidth={1.5} />

@@ -1,6 +1,7 @@
-import { Extension } from '@tiptap/core';
+import { Extension, type Editor, type Range } from '@tiptap/core';
+import { Node as ProseMirrorNode } from '@tiptap/pm/model';
 import { ReactRenderer } from '@tiptap/react';
-import Suggestion, { SuggestionOptions } from '@tiptap/suggestion';
+import Suggestion, { SuggestionOptions, type SuggestionProps } from '@tiptap/suggestion';
 import tippy, { Instance as TippyInstance } from 'tippy.js';
 import {
   forwardRef,
@@ -8,6 +9,8 @@ import {
   useImperativeHandle,
   useState,
   useCallback,
+  type ReactElement,
+  type ReactNode,
 } from 'react';
 import { cn } from '@/lib/cn';
 
@@ -50,12 +53,17 @@ export interface SlashCommandItem {
   title: string;
   description: string;
   aliases: string[];
-  icon: React.ReactNode;
-  command: (props: { editor: any; range: any }) => void;
+  icon: ReactNode;
+  command: (props: SlashCommandContext) => void | Promise<void>;
   /** If set, command only shows for these document types (e.g., ['program']) */
   documentTypes?: string[];
   /** If true, command requires onCreateSubDocument callback to function */
   requiresSubDocumentCallback?: boolean;
+}
+
+interface SlashCommandContext {
+  editor: Editor;
+  range: Range;
 }
 
 interface CommandListProps {
@@ -68,11 +76,11 @@ interface CommandListRef {
 }
 
 const CommandList = forwardRef<CommandListRef, CommandListProps>(
-  ({ items, command }, ref) => {
+  ({ items, command }, ref): ReactElement | null => {
     const [selectedIndex, setSelectedIndex] = useState(0);
 
     const selectItem = useCallback(
-      (index: number) => {
+      (index: number): void => {
         const item = items[index];
         if (item) {
           command(item);
@@ -81,19 +89,19 @@ const CommandList = forwardRef<CommandListRef, CommandListProps>(
       [items, command]
     );
 
-    useEffect(() => {
+    useEffect((): void => {
       setSelectedIndex(0);
     }, [items]);
 
     useImperativeHandle(ref, () => ({
-      onKeyDown: ({ event }: { event: KeyboardEvent }) => {
+      onKeyDown: ({ event }: { event: KeyboardEvent }): boolean => {
         if (event.key === 'ArrowUp') {
-          setSelectedIndex((prev) => (prev + items.length - 1) % items.length);
+          setSelectedIndex((prev: number): number => (prev + items.length - 1) % items.length);
           return true;
         }
 
         if (event.key === 'ArrowDown') {
-          setSelectedIndex((prev) => (prev + 1) % items.length);
+          setSelectedIndex((prev: number): number => (prev + 1) % items.length);
           return true;
         }
 
@@ -112,10 +120,10 @@ const CommandList = forwardRef<CommandListRef, CommandListProps>(
 
     return (
       <div className="z-50 min-w-[200px] overflow-hidden rounded-lg border border-border bg-background shadow-lg">
-        {items.map((item, index) => (
+        {items.map((item, index): ReactElement => (
           <button
             key={item.title}
-            onClick={() => selectItem(index)}
+            onClick={(): void => selectItem(index)}
             className={cn(
               'flex w-full items-center gap-3 px-3 py-2 text-left text-sm',
               'hover:bg-border/50 transition-colors',
@@ -255,7 +263,7 @@ const icons = {
   ),
 };
 
-export function createSlashCommands({ onCreateSubDocument, onNavigateToDocument, documentType, abortSignal }: CreateSlashCommandsOptions) {
+export function createSlashCommands({ onCreateSubDocument, onNavigateToDocument, documentType, abortSignal }: CreateSlashCommandsOptions): Extension {
   const slashCommands: SlashCommandItem[] = [
     // Sub-document (requires async callback)
     {
@@ -264,7 +272,7 @@ export function createSlashCommands({ onCreateSubDocument, onNavigateToDocument,
       aliases: ['doc', 'document', 'sub-document', 'page', 'sub-page', 'subpage', 'subdoc'],
       icon: icons.document,
       requiresSubDocumentCallback: true,
-      command: async ({ editor, range }) => {
+      command: async ({ editor, range }: SlashCommandContext): Promise<void> => {
         editor.chain().focus().deleteRange(range).run();
         const doc = await onCreateSubDocument?.();
         if (doc) {
@@ -279,7 +287,7 @@ export function createSlashCommands({ onCreateSubDocument, onNavigateToDocument,
       description: 'Large section heading',
       aliases: ['h1', 'heading1', 'title'],
       icon: icons.heading1,
-      command: ({ editor, range }) => {
+      command: ({ editor, range }: SlashCommandContext): void => {
         editor.chain().focus().deleteRange(range).setNode('heading', { level: 1 }).run();
       },
     },
@@ -288,7 +296,7 @@ export function createSlashCommands({ onCreateSubDocument, onNavigateToDocument,
       description: 'Medium section heading',
       aliases: ['h2', 'heading2', 'subtitle'],
       icon: icons.heading2,
-      command: ({ editor, range }) => {
+      command: ({ editor, range }: SlashCommandContext): void => {
         editor.chain().focus().deleteRange(range).setNode('heading', { level: 2 }).run();
       },
     },
@@ -297,7 +305,7 @@ export function createSlashCommands({ onCreateSubDocument, onNavigateToDocument,
       description: 'Small section heading',
       aliases: ['h3', 'heading3'],
       icon: icons.heading3,
-      command: ({ editor, range }) => {
+      command: ({ editor, range }: SlashCommandContext): void => {
         editor.chain().focus().deleteRange(range).setNode('heading', { level: 3 }).run();
       },
     },
@@ -307,7 +315,7 @@ export function createSlashCommands({ onCreateSubDocument, onNavigateToDocument,
       description: 'Create a simple bullet list',
       aliases: ['ul', 'unordered', 'bullet', 'list', 'bullets'],
       icon: icons.bulletList,
-      command: ({ editor, range }) => {
+      command: ({ editor, range }: SlashCommandContext): void => {
         editor.chain().focus().deleteRange(range).toggleBulletList().run();
       },
     },
@@ -316,7 +324,7 @@ export function createSlashCommands({ onCreateSubDocument, onNavigateToDocument,
       description: 'Create a numbered list',
       aliases: ['ol', 'ordered', 'number', 'numbered'],
       icon: icons.numberedList,
-      command: ({ editor, range }) => {
+      command: ({ editor, range }: SlashCommandContext): void => {
         editor.chain().focus().deleteRange(range).toggleOrderedList().run();
       },
     },
@@ -325,7 +333,7 @@ export function createSlashCommands({ onCreateSubDocument, onNavigateToDocument,
       description: 'Create a checklist with checkboxes',
       aliases: ['task', 'tasks', 'todo', 'todos', 'checkbox', 'checklist', 'check'],
       icon: icons.taskList,
-      command: ({ editor, range }) => {
+      command: ({ editor, range }: SlashCommandContext): void => {
         editor.chain().focus().deleteRange(range).toggleTaskList().run();
       },
     },
@@ -335,7 +343,7 @@ export function createSlashCommands({ onCreateSubDocument, onNavigateToDocument,
       description: 'Capture a quote',
       aliases: ['blockquote', 'quotation', 'cite'],
       icon: icons.quote,
-      command: ({ editor, range }) => {
+      command: ({ editor, range }: SlashCommandContext): void => {
         editor.chain().focus().deleteRange(range).toggleBlockquote().run();
       },
     },
@@ -344,7 +352,7 @@ export function createSlashCommands({ onCreateSubDocument, onNavigateToDocument,
       description: 'Capture a code snippet',
       aliases: ['code', 'codeblock', 'pre', 'snippet'],
       icon: icons.code,
-      command: ({ editor, range }) => {
+      command: ({ editor, range }: SlashCommandContext): void => {
         editor.chain().focus().deleteRange(range).toggleCodeBlock().run();
       },
     },
@@ -353,7 +361,7 @@ export function createSlashCommands({ onCreateSubDocument, onNavigateToDocument,
       description: 'Visually divide content',
       aliases: ['hr', 'horizontal', 'rule', 'separator', 'line'],
       icon: icons.divider,
-      command: ({ editor, range }) => {
+      command: ({ editor, range }: SlashCommandContext): void => {
         editor.chain().focus().deleteRange(range).setHorizontalRule().run();
       },
     },
@@ -363,13 +371,13 @@ export function createSlashCommands({ onCreateSubDocument, onNavigateToDocument,
       description: 'Upload an image',
       aliases: ['img', 'picture', 'photo', 'upload'],
       icon: icons.image,
-      command: ({ editor, range }) => {
+      command: ({ editor, range }: SlashCommandContext): void => {
         editor.chain().focus().deleteRange(range).run();
         // Trigger file picker
         const input = document.createElement('input');
         input.type = 'file';
         input.accept = 'image/*';
-        input.onchange = async () => {
+        input.onchange = async (): Promise<void> => {
           const file = input.files?.[0];
           if (!file) return;
 
@@ -378,7 +386,7 @@ export function createSlashCommands({ onCreateSubDocument, onNavigateToDocument,
 
           // Create data URL for immediate preview
           const reader = new FileReader();
-          reader.onload = async () => {
+          reader.onload = async (): Promise<void> => {
             // Check if aborted before processing
             if (abortSignal?.aborted) return;
 
@@ -401,7 +409,7 @@ export function createSlashCommands({ onCreateSubDocument, onNavigateToDocument,
               const { state, view } = editor;
               let imagePos: number | null = null;
 
-              state.doc.descendants((node: any, pos: number) => {
+              state.doc.descendants((node: ProseMirrorNode, pos: number): boolean => {
                 if (node.type.name === 'image' && node.attrs.src === dataUrl) {
                   imagePos = pos;
                   return false;
@@ -439,7 +447,7 @@ export function createSlashCommands({ onCreateSubDocument, onNavigateToDocument,
       description: 'Upload a file attachment',
       aliases: ['file', 'attachment', 'attach', 'pdf', 'doc', 'document'],
       icon: icons.file,
-      command: async ({ editor, range }) => {
+      command: async ({ editor, range }: SlashCommandContext): Promise<void> => {
         editor.chain().focus().deleteRange(range).run();
         // Import and trigger file upload
         const { triggerFileUpload } = await import('./FileAttachment');
@@ -452,7 +460,7 @@ export function createSlashCommands({ onCreateSubDocument, onNavigateToDocument,
       description: 'Create a collapsible section',
       aliases: ['toggle', 'collapsible', 'details', 'expand', 'collapse', 'accordion'],
       icon: icons.toggle,
-      command: ({ editor, range }) => {
+      command: ({ editor, range }: SlashCommandContext): void => {
         editor.chain().focus().deleteRange(range).setDetails().run();
       },
     },
@@ -462,7 +470,7 @@ export function createSlashCommands({ onCreateSubDocument, onNavigateToDocument,
       description: 'Insert a table',
       aliases: ['table', 'grid'],
       icon: icons.table,
-      command: ({ editor, range }) => {
+      command: ({ editor, range }: SlashCommandContext): void => {
         editor.chain().focus().deleteRange(range).insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run();
       },
     },
@@ -472,7 +480,7 @@ export function createSlashCommands({ onCreateSubDocument, onNavigateToDocument,
       description: 'Insert a table of contents',
       aliases: ['toc', 'outline', 'contents'],
       icon: icons.tableOfContents,
-      command: ({ editor, range }) => {
+      command: ({ editor, range }: SlashCommandContext): void => {
         editor
           .chain()
           .focus()
@@ -488,7 +496,7 @@ export function createSlashCommands({ onCreateSubDocument, onNavigateToDocument,
       aliases: ['plan', 'hypothesis', 'hypo', 'theory'],
       icon: icons.plan,
       documentTypes: ['sprint', 'project'],
-      command: ({ editor, range }) => {
+      command: ({ editor, range }: SlashCommandContext): void => {
         editor
           .chain()
           .focus()
@@ -506,7 +514,7 @@ export function createSlashCommands({ onCreateSubDocument, onNavigateToDocument,
       description: 'Add success criteria section',
       aliases: ['criteria', 'success', 'success-criteria', 'acceptance'],
       icon: icons.criteria,
-      command: ({ editor, range }) => {
+      command: ({ editor, range }: SlashCommandContext): void => {
         editor
           .chain()
           .focus()
@@ -533,7 +541,7 @@ export function createSlashCommands({ onCreateSubDocument, onNavigateToDocument,
       aliases: ['vision', 'direction', 'strategy'],
       icon: icons.vision,
       documentTypes: ['program'],
-      command: ({ editor, range }) => {
+      command: ({ editor, range }: SlashCommandContext): void => {
         editor
           .chain()
           .focus()
@@ -560,7 +568,7 @@ export function createSlashCommands({ onCreateSubDocument, onNavigateToDocument,
       aliases: ['goals', 'objectives', 'targets'],
       icon: icons.goals,
       documentTypes: ['program'],
-      command: ({ editor, range }) => {
+      command: ({ editor, range }: SlashCommandContext): void => {
         editor
           .chain()
           .focus()
@@ -585,18 +593,18 @@ export function createSlashCommands({ onCreateSubDocument, onNavigateToDocument,
   return Extension.create({
     name: 'slashCommands',
 
-    addOptions() {
+    addOptions(): { suggestion: Partial<SuggestionOptions> } {
       return {
         suggestion: {
           char: '/',
-          command: ({ editor, range, props }: { editor: any; range: any; props: SlashCommandItem }) => {
+          command: ({ editor, range, props }: { editor: Editor; range: Range; props: SlashCommandItem }): void => {
             props.command({ editor, range });
           },
         } as Partial<SuggestionOptions>,
       };
     },
 
-    addProseMirrorPlugins() {
+    addProseMirrorPlugins(): ReturnType<typeof Suggestion>[] {
       return [
         Suggestion({
           editor: this.editor,
@@ -604,7 +612,7 @@ export function createSlashCommands({ onCreateSubDocument, onNavigateToDocument,
           items: async ({ query }: { query: string }): Promise<SlashCommandItem[]> => {
             const search = query.toLowerCase();
             const filteredCommands = slashCommands.filter(
-              (item) => {
+              (item): boolean => {
                 // Filter out commands that require callback when callback is not provided
                 if (item.requiresSubDocumentCallback && !onCreateSubDocument) {
                   return false;
@@ -617,22 +625,22 @@ export function createSlashCommands({ onCreateSubDocument, onNavigateToDocument,
                 }
                 // Filter by search query
                 return item.title.toLowerCase().includes(search) ||
-                  item.aliases.some((alias) => alias.toLowerCase().includes(search));
+                  item.aliases.some((alias: string): boolean => alias.toLowerCase().includes(search));
               }
             );
 
             // If query matches document-related terms, also fetch existing documents
             const docAliases = ['doc', 'document', 'embed', 'link'];
-            const isDocQuery = docAliases.some((alias) => alias.includes(search) || search.includes(alias));
+            const isDocQuery = docAliases.some((alias: string): boolean => alias.includes(search) || search.includes(alias));
 
             if (isDocQuery && search.length > 0) {
               const documents = await fetchDocumentsForEmbed(search);
-              const documentItems: SlashCommandItem[] = documents.map((doc) => ({
+              const documentItems: SlashCommandItem[] = documents.map((doc): SlashCommandItem => ({
                 title: doc.title,
                 description: 'Embed this document',
                 aliases: [],
                 icon: icons.document,
-                command: ({ editor, range }) => {
+                command: ({ editor, range }: SlashCommandContext): void => {
                   editor
                     .chain()
                     .focus()
@@ -654,14 +662,22 @@ export function createSlashCommands({ onCreateSubDocument, onNavigateToDocument,
 
             return filteredCommands;
           },
-          render: () => {
+          render: (): NonNullable<SuggestionOptions['render']> extends (...args: never[]) => infer T ? T : never => {
             let component: ReactRenderer<CommandListRef> | null = null;
             let popup: TippyInstance[] | null = null;
 
             return {
-              onStart: (props: any) => {
+              onStart: (props: SuggestionProps & {
+                items: SlashCommandItem[];
+                command: (item: SlashCommandItem) => void;
+                editor: Editor;
+                clientRect?: (() => DOMRect | null) | null;
+              }): void => {
                 component = new ReactRenderer(CommandList, {
-                  props,
+                  props: {
+                    items: props.items,
+                    command: props.command,
+                  },
                   editor: props.editor,
                 });
 
@@ -669,8 +685,10 @@ export function createSlashCommands({ onCreateSubDocument, onNavigateToDocument,
                   return;
                 }
 
+                const getReferenceClientRect = (): DOMRect => props.clientRect?.() ?? new DOMRect();
+
                 popup = tippy('body', {
-                  getReferenceClientRect: props.clientRect,
+                  getReferenceClientRect,
                   appendTo: () => document.body,
                   content: component.element,
                   showOnCreate: true,
@@ -680,19 +698,28 @@ export function createSlashCommands({ onCreateSubDocument, onNavigateToDocument,
                 });
               },
 
-              onUpdate(props: any) {
-                component?.updateProps(props);
+              onUpdate(props: SuggestionProps & {
+                items: SlashCommandItem[];
+                command: (item: SlashCommandItem) => void;
+                clientRect?: (() => DOMRect | null) | null;
+              }): void {
+                component?.updateProps({
+                  items: props.items,
+                  command: props.command,
+                });
 
                 if (!props.clientRect) {
                   return;
                 }
 
+                const getReferenceClientRect = (): DOMRect => props.clientRect?.() ?? new DOMRect();
+
                 popup?.[0]?.setProps({
-                  getReferenceClientRect: props.clientRect,
+                  getReferenceClientRect,
                 });
               },
 
-              onKeyDown(props: any) {
+              onKeyDown(props: { event: KeyboardEvent }): boolean {
                 if (props.event.key === 'Escape') {
                   popup?.[0]?.hide();
                   return true;
@@ -701,7 +728,7 @@ export function createSlashCommands({ onCreateSubDocument, onNavigateToDocument,
                 return component?.ref?.onKeyDown(props) ?? false;
               },
 
-              onExit() {
+              onExit(): void {
                 popup?.[0]?.destroy();
                 component?.destroy();
               },

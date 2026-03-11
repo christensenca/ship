@@ -106,7 +106,7 @@ export function AppLayout(): React.JSX.Element {
   useRealtimeEvent('accountability:updated', handleAccountabilityUpdate);
 
   // Cleanup celebration timeout on unmount
-  useEffect(() => {
+  useEffect((): (() => void) => {
     return (): void => {
       if (celebrationTimeoutRef.current) {
         clearTimeout(celebrationTimeoutRef.current);
@@ -116,7 +116,7 @@ export function AppLayout(): React.JSX.Element {
 
   // Show action items modal on initial load if there are pending items
   // Disabled when localStorage flag is set (used by E2E tests to avoid blocking interactions)
-  useEffect(() => {
+  useEffect((): void => {
     if (localStorage.getItem('ship:disableActionItemsModal') === 'true') return;
     if (!actionItemsModalShownOnLoad && hasActionItems && actionItemsData?.items) {
       setActionItemsModalOpen(true);
@@ -128,12 +128,12 @@ export function AppLayout(): React.JSX.Element {
   useFocusOnNavigate();
 
   // Persist sidebar state
-  useEffect(() => {
+  useEffect((): void => {
     localStorage.setItem('ship:leftSidebarCollapsed', String(leftSidebarCollapsed));
   }, [leftSidebarCollapsed]);
 
   // Global Cmd+K keyboard shortcut for command palette
-  useEffect(() => {
+  useEffect((): (() => void) => {
     const handleKeyDown = (e: KeyboardEvent): void => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault();
@@ -300,7 +300,7 @@ export function AppLayout(): React.JSX.Element {
           {/* Workspace switcher */}
           <div className="relative mb-4">
             <button
-              onClick={() => setWorkspaceSwitcherOpen(!workspaceSwitcherOpen)}
+              onClick={(): void => setWorkspaceSwitcherOpen(!workspaceSwitcherOpen)}
               className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent/20 text-accent hover:bg-accent/30 transition-colors"
               title={currentWorkspace?.name || 'Select workspace'}
             >
@@ -311,15 +311,15 @@ export function AppLayout(): React.JSX.Element {
               <>
                 <div
                   className="fixed inset-0 z-40"
-                  onClick={() => setWorkspaceSwitcherOpen(false)}
+                  onClick={(): void => setWorkspaceSwitcherOpen(false)}
                 />
                 <div className="absolute left-full top-0 z-50 ml-2 w-56 rounded-lg border border-border bg-background shadow-lg">
                   <div className="p-2">
                     <div className="px-2 py-1 text-xs font-medium text-muted">Workspaces</div>
-                    {workspaces.map((ws) => (
+                    {workspaces.map((ws): React.JSX.Element => (
                       <button
                         key={ws.id}
-                        onClick={() => handleSwitchWorkspace(ws.id)}
+                        onClick={(): void => { void handleSwitchWorkspace(ws.id); }}
                         className={cn(
                           'flex w-full items-center justify-between rounded-md px-2 py-1.5 text-sm transition-colors',
                           ws.id === currentWorkspace?.id
@@ -335,9 +335,9 @@ export function AppLayout(): React.JSX.Element {
                   {isSuperAdmin && (
                     <div className="border-t border-border p-2">
                       <button
-                        onClick={() => {
+                        onClick={(): void => {
                           setWorkspaceSwitcherOpen(false);
-                          navigate('/admin');
+                          void navigate('/admin');
                         }}
                         className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-muted hover:bg-border/30 hover:text-foreground transition-colors"
                       >
@@ -357,31 +357,31 @@ export function AppLayout(): React.JSX.Element {
               icon={<DashboardIcon />}
               label="Dashboard"
               active={activeMode === 'dashboard'}
-              onClick={() => handleModeClick('dashboard')}
+              onClick={(): void => handleModeClick('dashboard')}
             />
             <RailIcon
               icon={<DocsIcon />}
               label="Docs"
               active={activeMode === 'docs'}
-              onClick={() => handleModeClick('docs')}
+              onClick={(): void => handleModeClick('docs')}
             />
             <RailIcon
               icon={<ProgramsIcon />}
               label="Programs"
               active={activeMode === 'programs'}
-              onClick={() => handleModeClick('programs')}
+              onClick={(): void => handleModeClick('programs')}
             />
             <RailIcon
               icon={<ProjectsIcon />}
               label="Projects"
               active={activeMode === 'projects'}
-              onClick={() => handleModeClick('projects')}
+              onClick={(): void => handleModeClick('projects')}
             />
             <RailIcon
               icon={<TeamIcon />}
               label={standupDue ? "Teams (standup due)" : "Teams"}
               active={activeMode === 'team'}
-              onClick={() => handleModeClick('team')}
+              onClick={(): void => handleModeClick('team')}
               showBadge={standupDue}
             />
           </div>
@@ -390,7 +390,7 @@ export function AppLayout(): React.JSX.Element {
           {leftSidebarCollapsed && !hideLeftSidebar && (
             <Tooltip content="Expand sidebar" side="right">
               <button
-                onClick={() => setLeftSidebarCollapsed(false)}
+                onClick={(): void => setLeftSidebarCollapsed(false)}
                 className="flex h-9 w-9 items-center justify-center rounded-lg text-muted hover:bg-border/50 hover:text-foreground transition-colors"
                 aria-label="Expand sidebar"
               >
@@ -405,7 +405,7 @@ export function AppLayout(): React.JSX.Element {
               icon={<SettingsIcon />}
               label="Settings"
               active={activeMode === 'settings'}
-              onClick={() => handleModeClick('settings')}
+              onClick={(): void => handleModeClick('settings')}
             />
             <button
               onClick={logout}
@@ -475,7 +475,7 @@ export function AppLayout(): React.JSX.Element {
                 )}
                 <Tooltip content="Collapse sidebar">
                   <button
-                    onClick={() => setLeftSidebarCollapsed(true)}
+                    onClick={(): void => setLeftSidebarCollapsed(true)}
                     className="flex h-6 w-6 items-center justify-center rounded text-muted hover:bg-border hover:text-foreground transition-colors"
                     aria-label="Collapse sidebar"
                   >
@@ -636,7 +636,7 @@ function DocumentsTree({ documents, activeId, onSelect }: { documents: WikiDocum
         </div>
         <ul role="tree" aria-label="Workspace documents" aria-live="polite" className="space-y-0.5 px-2">
           {workspaceToShow.length > 0 ? (
-            workspaceToShow.map((doc) => (
+            workspaceToShow.map((doc): React.JSX.Element => (
               <DocumentTreeItem
                 key={doc.id}
                 document={doc}
@@ -668,7 +668,7 @@ function DocumentsTree({ documents, activeId, onSelect }: { documents: WikiDocum
             Private
           </div>
           <ul role="tree" aria-label="Private documents" aria-live="polite" className="space-y-0.5 px-2">
-            {privateToShow.map((doc) => (
+            {privateToShow.map((doc): React.JSX.Element => (
               <DocumentTreeItem
                 key={doc.id}
                 document={doc}
@@ -729,7 +729,7 @@ function DocumentTreeItem({
   const menuButtonRef = useRef<HTMLButtonElement>(null);
 
   // Update isOpen when activeId changes (for navigation)
-  useEffect(() => {
+  useEffect((): void => {
     if (shouldAutoExpand && !isOpen) {
       setIsOpen(true);
     }
@@ -839,7 +839,7 @@ function DocumentTreeItem({
           <button
             type="button"
             className="w-4 h-4 flex-shrink-0 flex items-center justify-center p-0 rounded hover:bg-border/50"
-            onClick={() => setIsOpen(!isOpen)}
+            onClick={(): void => setIsOpen(!isOpen)}
             aria-label={isOpen ? 'Collapse' : 'Expand'}
           >
             <ChevronIcon isOpen={isOpen} />
@@ -886,7 +886,7 @@ function DocumentTreeItem({
             {VISIBILITY_OPTIONS.map((opt): React.JSX.Element => (
               <ContextMenuItem
                 key={opt.value}
-                onClick={() => handleChangeVisibility(opt.value)}
+                onClick={(): void => { void handleChangeVisibility(opt.value); }}
               >
                 {opt.value === 'private' && <LockIcon className="h-3.5 w-3.5 mr-2" />}
                 {opt.value === 'workspace' && <GlobeIcon className="h-3.5 w-3.5 mr-2" />}
@@ -1067,7 +1067,7 @@ function IssuesList({
             {/* Three-dot menu button */}
             <button
               type="button"
-              onClick={(e) => handleMenuClick(e, issue)}
+              onClick={(e: React.MouseEvent): void => handleMenuClick(e, issue)}
               className="absolute right-1 top-1/2 -translate-y-1/2 p-0.5 rounded opacity-0 group-hover:opacity-100 hover:bg-border/50 text-muted hover:text-foreground transition-opacity"
               aria-label={`Actions for ${issue.title || 'Untitled'}`}
             >
@@ -1085,25 +1085,25 @@ function IssuesList({
       {contextMenu && (
         <ContextMenu x={contextMenu.x} y={contextMenu.y} onClose={() => setContextMenu(null)}>
           <ContextMenuSubmenu label="Change Status">
-            <ContextMenuItem onClick={() => handleChangeStatus(contextMenu.issue, 'backlog')}>
+            <ContextMenuItem onClick={(): void => { void handleChangeStatus(contextMenu.issue, 'backlog'); }}>
               <IssueStatusIcon state="backlog" />
               Backlog
             </ContextMenuItem>
-            <ContextMenuItem onClick={() => handleChangeStatus(contextMenu.issue, 'todo')}>
+            <ContextMenuItem onClick={(): void => { void handleChangeStatus(contextMenu.issue, 'todo'); }}>
               <IssueStatusIcon state="todo" />
               Todo
             </ContextMenuItem>
-            <ContextMenuItem onClick={() => handleChangeStatus(contextMenu.issue, 'in_progress')}>
+            <ContextMenuItem onClick={(): void => { void handleChangeStatus(contextMenu.issue, 'in_progress'); }}>
               <IssueStatusIcon state="in_progress" />
               In Progress
             </ContextMenuItem>
-            <ContextMenuItem onClick={() => handleChangeStatus(contextMenu.issue, 'done')}>
+            <ContextMenuItem onClick={(): void => { void handleChangeStatus(contextMenu.issue, 'done'); }}>
               <IssueStatusIcon state="done" />
               Done
             </ContextMenuItem>
           </ContextMenuSubmenu>
           <ContextMenuSeparator />
-          <ContextMenuItem onClick={() => handleArchive(contextMenu.issue)}>
+          <ContextMenuItem onClick={(): void => { void handleArchive(contextMenu.issue); }}>
             <ArchiveIcon className="h-4 w-4" />
             Archive
           </ContextMenuItem>
@@ -1172,14 +1172,14 @@ function ProjectsList({
   });
 
   // Auto-expand when currentProjectId or activeId changes
-  useEffect(() => {
+  useEffect((): void => {
     if (currentProjectId && !expandedProjects.has(currentProjectId)) {
       setExpandedProjects((prev): Set<string> => new Set([...prev, currentProjectId]));
     }
   }, [currentProjectId]);
 
   // Auto-expand when viewing a project's tab
-  useEffect(() => {
+  useEffect((): void => {
     if (activeId && activeProjectTab && !expandedProjects.has(activeId)) {
       setExpandedProjects((prev): Set<string> => new Set([...prev, activeId]));
     }
@@ -1255,7 +1255,7 @@ function ProjectsList({
                   {/* Expand/collapse chevron */}
                   <button
                     type="button"
-                    onClick={() => toggleProject(project.id)}
+                    onClick={(): void => toggleProject(project.id)}
                     className="w-4 h-4 flex-shrink-0 flex items-center justify-center p-0 rounded hover:bg-border/50"
                     aria-label={isExpanded ? 'Collapse' : 'Expand'}
                   >
@@ -1279,7 +1279,7 @@ function ProjectsList({
                 {/* Three-dot menu button */}
                 <button
                   type="button"
-                  onClick={(e) => handleMenuClick(e, project)}
+                  onClick={(e: React.MouseEvent): void => handleMenuClick(e, project)}
                   className="absolute right-1 top-1/2 -translate-y-1/2 p-0.5 rounded opacity-0 group-hover:opacity-100 hover:bg-border/50 text-muted hover:text-foreground transition-opacity"
                   aria-label={`Actions for ${project.title || 'Untitled'}`}
                 >
@@ -1359,7 +1359,7 @@ function ProjectsList({
 
       {contextMenu && (
         <ContextMenu x={contextMenu.x} y={contextMenu.y} onClose={() => setContextMenu(null)}>
-          <ContextMenuItem onClick={() => handleArchive(contextMenu.project)}>
+          <ContextMenuItem onClick={(): void => { void handleArchive(contextMenu.project); }}>
             <ArchiveIcon className="h-4 w-4" />
             Archive
           </ContextMenuItem>
@@ -1514,7 +1514,7 @@ function ProgramsList({
                 </div>
               ) : (
                 <button
-                  onClick={() => onSelect(program.id)}
+                  onClick={(): void => onSelect(program.id)}
                   className={cn(
                     'flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm transition-colors',
                     activeId === program.id
@@ -1535,7 +1535,7 @@ function ProgramsList({
               {editingId !== program.id && (
                 <button
                   type="button"
-                  onClick={(e) => handleMenuClick(e, program.id)}
+                  onClick={(e: React.MouseEvent): void => handleMenuClick(e, program.id)}
                   className="absolute right-1 top-1/2 -translate-y-1/2 p-1 rounded hover:bg-border/50 opacity-0 group-hover:opacity-100 transition-opacity"
                   aria-label={`Actions for ${program.name}`}
                 >
@@ -1550,7 +1550,7 @@ function ProgramsList({
       {/* Context Menu */}
       {contextMenu && contextMenuProgram && (
         <ContextMenu x={contextMenu.x} y={contextMenu.y} onClose={() => setContextMenu(null)}>
-          <ContextMenuItem onClick={() => handleRename(contextMenuProgram)}>
+          <ContextMenuItem onClick={(): void => handleRename(contextMenuProgram)}>
             <EditIcon className="h-4 w-4" />
             Rename
           </ContextMenuItem>
@@ -1558,7 +1558,7 @@ function ProgramsList({
             {PROGRAM_COLORS.map((color): React.JSX.Element => (
               <ContextMenuItem
                 key={color.value}
-                onClick={() => handleChangeColor(contextMenuProgram.id, color.value)}
+                onClick={(): void => { void handleChangeColor(contextMenuProgram.id, color.value); }}
               >
                 <span
                   className="h-3 w-3 rounded-full"
@@ -1569,7 +1569,7 @@ function ProgramsList({
             ))}
           </ContextMenuSubmenu>
           <ContextMenuSeparator />
-          <ContextMenuItem onClick={() => handleArchive(contextMenuProgram)}>
+          <ContextMenuItem onClick={(): void => { void handleArchive(contextMenuProgram); }}>
             <ArchiveIcon className="h-4 w-4" />
             Archive
           </ContextMenuItem>
@@ -1622,7 +1622,7 @@ function TeamSidebar(): React.JSX.Element {
       <ul className="space-y-0.5">
         <li>
           <button
-            onClick={() => navigate('/team/allocation')}
+            onClick={(): void => { void navigate('/team/allocation'); }}
             className={cn(
               'flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm transition-colors',
               isAllocation
@@ -1636,7 +1636,7 @@ function TeamSidebar(): React.JSX.Element {
         </li>
         <li>
           <button
-            onClick={() => navigate('/team/directory')}
+            onClick={(): void => { void navigate('/team/directory'); }}
             className={cn(
               'flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm transition-colors',
               isDirectory
@@ -1650,7 +1650,7 @@ function TeamSidebar(): React.JSX.Element {
         </li>
         <li>
           <button
-            onClick={() => navigate('/team/status')}
+            onClick={(): void => { void navigate('/team/status'); }}
             className={cn(
               'flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm transition-colors',
               isStatusOverview
@@ -1664,7 +1664,7 @@ function TeamSidebar(): React.JSX.Element {
         </li>
         <li>
           <button
-            onClick={() => navigate('/team/reviews')}
+            onClick={(): void => { void navigate('/team/reviews'); }}
             className={cn(
               'flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm transition-colors',
               isReviews
@@ -1678,7 +1678,7 @@ function TeamSidebar(): React.JSX.Element {
         </li>
         <li>
           <button
-            onClick={() => navigate('/team/org-chart')}
+            onClick={(): void => { void navigate('/team/org-chart'); }}
             className={cn(
               'flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm transition-colors',
               isOrgChart
@@ -1702,7 +1702,7 @@ function TeamSidebar(): React.JSX.Element {
             {activePeople.map((person): React.JSX.Element => (
               <li key={person.id}>
                 <button
-                  onClick={() => navigate(`/team/${person.id}`)}
+                  onClick={(): void => { void navigate(`/team/${person.id}`); }}
                   className={cn(
                     'flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm transition-colors',
                     personIdFromUrl === person.id

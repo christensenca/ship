@@ -29,7 +29,7 @@ import {
  * using the UnifiedEditor component with the appropriate sidebar data.
  * Document types with tabs (projects, programs) get a tabbed interface.
  */
-export function UnifiedDocumentPage() {
+export function UnifiedDocumentPage(): JSX.Element | null {
   const { id, '*': wildcardPath } = useParams<{ id: string; '*'?: string }>();
   const navigate = useNavigate();
 
@@ -82,8 +82,8 @@ export function UnifiedDocumentPage() {
   const hasTabs = document ? documentTypeHasTabs(document.document_type) : false;
 
   // Derive activeTab from URL - if valid tab in URL, use it; otherwise default to first tab
-  const activeTab = useMemo(() => {
-    if (urlTab && tabConfig.some(t => t.id === urlTab)) {
+  const activeTab = useMemo((): string => {
+    if (urlTab && tabConfig.some((tab): boolean => tab.id === urlTab)) {
       return urlTab;
     }
     return tabConfig[0]?.id || '';
@@ -103,28 +103,28 @@ export function UnifiedDocumentPage() {
 
   // Fetch team members for sidebar data
   const { data: teamMembersData = [] } = useAssignableMembersQuery();
-  const teamMembers = useMemo(() => teamMembersData.map(m => ({
-    id: m.id,
-    user_id: m.user_id,
-    name: m.name,
-    email: m.email || '',
+  const teamMembers = useMemo(() => teamMembersData.map((member): { id: string; user_id: string; name: string; email: string } => ({
+    id: member.id,
+    user_id: member.user_id,
+    name: member.name,
+    email: member.email || '',
   })), [teamMembersData]);
 
   // Fetch programs for sidebar data
   const { data: programsData = [] } = useProgramsQuery();
-  const programs = useMemo(() => programsData.map(p => ({
-    id: p.id,
-    name: p.name,
-    color: p.color,
-    emoji: p.emoji,
+  const programs = useMemo(() => programsData.map((program): { id: string; name: string; color?: string; emoji?: string | null } => ({
+    id: program.id,
+    name: program.name,
+    color: program.color,
+    emoji: program.emoji,
   })), [programsData]);
 
   // Fetch projects for issue sidebar (multi-association)
   const { data: projectsData = [] } = useProjectsQuery();
-  const projects = useMemo(() => projectsData.map(p => ({
-    id: p.id,
-    title: p.title,
-    color: p.color,
+  const projects = useMemo(() => projectsData.map((project): { id: string; title: string; color?: string } => ({
+    id: project.id,
+    title: project.title,
+    color: project.color,
   })), [projectsData]);
 
   // Fetch counts for tabs (project weeks, etc.)
@@ -149,7 +149,7 @@ export function UnifiedDocumentPage() {
   }, [document, isProject, isProgram, projectWeeks.length]);
 
   // Handler for when associations change (invalidate document query to refetch)
-  const handleAssociationChange = useCallback(() => {
+  const handleAssociationChange = useCallback((): void => {
     queryClient.invalidateQueries({ queryKey: ['document', id] });
   }, [queryClient, id]);
 
@@ -159,13 +159,13 @@ export function UnifiedDocumentPage() {
   });
 
   // Conversion callbacks that use the current document
-  const handleConvert = useCallback(() => {
+  const handleConvert = useCallback((): void => {
     if (!document || !id) return;
     const sourceType = document.document_type as 'issue' | 'project';
     convert(id, sourceType, document.title);
   }, [convert, document, id]);
 
-  const handleUndoConversion = useCallback(async () => {
+  const handleUndoConversion = useCallback(async (): Promise<void> => {
     if (!document || !id) return;
 
     try {
@@ -183,13 +183,13 @@ export function UnifiedDocumentPage() {
         const error = await res.json();
         showToast(error.error || 'Failed to undo conversion', 'error');
       }
-    } catch (err) {
+    } catch (_err) {
       showToast('Failed to undo conversion', 'error');
     }
   }, [document, id, queryClient, showToast]);
 
   // Handle document type change via DocumentTypeSelector
-  const handleTypeChange = useCallback(async (newType: string) => {
+  const handleTypeChange = useCallback(async (newType: string): Promise<void> => {
     if (!document || !id) return;
 
     const currentType = document.document_type;
@@ -223,26 +223,36 @@ export function UnifiedDocumentPage() {
         const error = await res.json();
         showToast(error.error || 'Failed to convert document', 'error');
       }
-    } catch (err) {
+    } catch (_err) {
       showToast('Failed to convert document', 'error');
     }
   }, [document, id, navigate, queryClient, showToast]);
 
   // Handle WebSocket notification that document was converted
-  const handleDocumentConverted = useCallback((newDocId: string) => {
+  const handleDocumentConverted = useCallback((newDocId: string): void => {
     navigate(`/documents/${newDocId}`, { replace: true });
   }, [navigate]);
 
+  interface UpdateMutationVariables {
+    documentId: string;
+    updates: Partial<DocumentResponse>;
+  }
+
+  interface UpdateMutationContext {
+    previousDocument?: Record<string, unknown>;
+    documentId: string;
+  }
+
   // Update mutation with optimistic updates
   const updateMutation = useMutation({
-    mutationFn: async ({ documentId, updates }: { documentId: string; updates: Partial<DocumentResponse> }) => {
+    mutationFn: async ({ documentId, updates }: UpdateMutationVariables): Promise<DocumentResponse> => {
       const response = await apiPatch(`/api/documents/${documentId}`, updates);
       if (!response.ok) {
         throw new Error('Failed to update document');
       }
       return response.json();
     },
-    onMutate: async ({ documentId, updates }) => {
+    onMutate: async ({ documentId, updates }: UpdateMutationVariables): Promise<UpdateMutationContext> => {
       // Cancel any outgoing refetches
       await queryClient.cancelQueries({ queryKey: ['document', documentId] });
 
@@ -257,13 +267,13 @@ export function UnifiedDocumentPage() {
       // Return context with the previous value for rollback
       return { previousDocument, documentId };
     },
-    onError: (_err, _variables, context) => {
+    onError: (_err: Error, _variables: UpdateMutationVariables, context: UpdateMutationContext | undefined): void => {
       // Rollback to the previous value on error
       if (context?.previousDocument && context?.documentId) {
         queryClient.setQueryData(['document', context.documentId], context.previousDocument);
       }
     },
-    onSuccess: (_, { documentId }) => {
+    onSuccess: (_data: DocumentResponse, { documentId }: UpdateMutationVariables): void => {
       queryClient.invalidateQueries({ queryKey: ['document', documentId] });
       // Also invalidate type-specific queries for list views
       if (document?.document_type) {
@@ -277,25 +287,25 @@ export function UnifiedDocumentPage() {
 
   // Delete mutation
   const deleteMutation = useMutation({
-    mutationFn: async (documentId: string) => {
+    mutationFn: async (documentId: string): Promise<void> => {
       const response = await apiDelete(`/api/documents/${documentId}`);
       if (!response.ok) {
         throw new Error('Failed to delete document');
       }
     },
-    onSuccess: () => {
+    onSuccess: (): void => {
       navigate('/docs');
     },
   });
 
   // Handle update
-  const handleUpdate = useCallback(async (updates: Partial<UnifiedDocument>) => {
+  const handleUpdate = useCallback(async (updates: Partial<UnifiedDocument>): Promise<void> => {
     if (!id) return;
     await updateMutation.mutateAsync({ documentId: id, updates: updates as Partial<DocumentResponse> });
   }, [updateMutation, id]);
 
   // Handle delete
-  const handleDelete = useCallback(async () => {
+  const handleDelete = useCallback(async (): Promise<void> => {
     if (!id) return;
     if (!window.confirm('Are you sure you want to delete this document?')) return;
     await deleteMutation.mutateAsync(id);
@@ -306,15 +316,15 @@ export function UnifiedDocumentPage() {
   const hideBackButton = isWeeklyDoc || isStandup;
 
   // Resolve standup author name for title suffix
-  const standupAuthorName = useMemo(() => {
+  const standupAuthorName = useMemo((): string | undefined => {
     if (!isStandup) return undefined;
     const authorId = document?.properties?.author_id as string | undefined;
     if (!authorId) return undefined;
-    return teamMembersData.find(m => m.user_id === authorId)?.name;
+    return teamMembersData.find((member): boolean => member.user_id === authorId)?.name;
   }, [isStandup, document?.properties?.author_id, teamMembersData]);
 
   // Handle back navigation
-  const handleBack = useCallback(() => {
+  const handleBack = useCallback((): void => {
     // Navigate to type-specific list or docs
     if (document?.document_type === 'issue') {
       navigate('/issues');
@@ -331,7 +341,7 @@ export function UnifiedDocumentPage() {
 
   // Compute back label based on document type (just the noun - Editor adds "Back to")
   // Weekly plans/retros don't show a back button
-  const backLabel = useMemo(() => {
+  const backLabel = useMemo((): string => {
     switch (document?.document_type) {
       case 'issue': return 'issues';
       case 'project': return 'projects';
@@ -383,8 +393,8 @@ export function UnifiedDocumentPage() {
 
     // Extract program_id from belongs_to array (via document_associations)
     const belongsTo = document.belongs_to as Array<{ id: string; type: string }> | undefined;
-    const programIdFromBelongsTo = belongsTo?.find(b => b.type === 'program')?.id;
-    const sprintIdFromBelongsTo = belongsTo?.find(b => b.type === 'sprint')?.id;
+    const programIdFromBelongsTo = belongsTo?.find((association): boolean => association.type === 'program')?.id;
+    const sprintIdFromBelongsTo = belongsTo?.find((association): boolean => association.type === 'sprint')?.id;
 
     return {
       id: document.id,
@@ -472,10 +482,14 @@ export function UnifiedDocumentPage() {
     return null;
   }
 
+  if (!id) {
+    return null;
+  }
+
   // Documents with tabs get a tabbed interface
   if (hasTabs && tabConfig.length > 0) {
     const tabs = resolveTabLabels(tabConfig, document, tabCounts);
-    const currentTabConfig = tabConfig.find(t => t.id === activeTab) || tabConfig[0];
+    const currentTabConfig = tabConfig.find((tab): boolean => tab.id === activeTab) || tabConfig[0];
     const TabComponent = currentTabConfig?.component;
 
     return (
@@ -485,7 +499,7 @@ export function UnifiedDocumentPage() {
           <TabBar
             tabs={tabs}
             activeTab={activeTab || tabs[0]?.id}
-            onTabChange={(tab) => {
+            onTabChange={(tab: string): void => {
               // Navigate to new URL - first tab gets clean URL, others get tab suffix
               if (tab === tabConfig[0]?.id) {
                 navigate(`/documents/${id}`);
@@ -506,7 +520,7 @@ export function UnifiedDocumentPage() {
             }
           >
             {TabComponent && (
-              <TabComponent documentId={id!} document={document} nestedPath={nestedPath} />
+              <TabComponent documentId={id} document={document} nestedPath={nestedPath} />
             )}
           </Suspense>
         </div>

@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "generated_at": "2026-03-11T19:42:45.538Z",
+  "generated_at": "2026-03-11T20:08:04.200Z",
   "strict_mode": {
     "enabled": true,
     "by_config": {
@@ -25,25 +25,25 @@
     "strict_error_count_total_if_disabled": null
   },
   "totals": {
-    "overall": 6258,
-    "production_only": 4597,
+    "overall": 5966,
+    "production_only": 4305,
     "tests_only": 1661,
     "by_violation_type": {
-      "explicit_any": 259,
+      "explicit_any": 251,
       "type_assertion_as": 690,
-      "non_null_assertion": 248,
+      "non_null_assertion": 247,
       "ts_comment_directive": 1,
-      "untyped_parameter": 1218,
-      "missing_return_type": 3842
+      "untyped_parameter": 1166,
+      "missing_return_type": 3611
     },
     "by_scope": {
       "production_only": {
-        "explicit_any": 82,
+        "explicit_any": 74,
         "type_assertion_as": 503,
-        "non_null_assertion": 244,
+        "non_null_assertion": 243,
         "ts_comment_directive": 0,
-        "untyped_parameter": 1146,
-        "missing_return_type": 2622
+        "untyped_parameter": 1094,
+        "missing_return_type": 2391
       },
       "tests_only": {
         "explicit_any": 177,
@@ -65,12 +65,12 @@
       "missing_return_type": 1190
     },
     "web": {
-      "explicit_any": 33,
+      "explicit_any": 25,
       "type_assertion_as": 366,
-      "non_null_assertion": 29,
+      "non_null_assertion": 28,
       "ts_comment_directive": 1,
-      "untyped_parameter": 929,
-      "missing_return_type": 2652
+      "untyped_parameter": 877,
+      "missing_return_type": 2421
     },
     "shared": {
       "explicit_any": 0,
@@ -125,20 +125,6 @@
       }
     },
     {
-      "file": "web/src/pages/App.tsx",
-      "package": "web",
-      "is_test_like": false,
-      "total": 101,
-      "counts": {
-        "explicit_any": 0,
-        "type_assertion_as": 0,
-        "non_null_assertion": 0,
-        "ts_comment_directive": 0,
-        "untyped_parameter": 28,
-        "missing_return_type": 73
-      }
-    },
-    {
       "file": "web/src/components/IssuesList.tsx",
       "package": "web",
       "is_test_like": false,
@@ -153,20 +139,6 @@
       }
     },
     {
-      "file": "web/src/pages/UnifiedDocumentPage.tsx",
-      "package": "web",
-      "is_test_like": false,
-      "total": 92,
-      "counts": {
-        "explicit_any": 0,
-        "type_assertion_as": 36,
-        "non_null_assertion": 1,
-        "ts_comment_directive": 0,
-        "untyped_parameter": 16,
-        "missing_return_type": 39
-      }
-    },
-    {
       "file": "api/src/__tests__/auth.test.ts",
       "package": "api",
       "is_test_like": true,
@@ -178,20 +150,6 @@
         "ts_comment_directive": 0,
         "untyped_parameter": 0,
         "missing_return_type": 28
-      }
-    },
-    {
-      "file": "web/src/components/editor/SlashCommands.tsx",
-      "package": "web",
-      "is_test_like": false,
-      "total": 86,
-      "counts": {
-        "explicit_any": 8,
-        "type_assertion_as": 2,
-        "non_null_assertion": 0,
-        "ts_comment_directive": 0,
-        "untyped_parameter": 30,
-        "missing_return_type": 46
       }
     },
     {
@@ -220,20 +178,6 @@
         "ts_comment_directive": 0,
         "untyped_parameter": 20,
         "missing_return_type": 24
-      }
-    },
-    {
-      "file": "web/src/pages/Projects.tsx",
-      "package": "web",
-      "is_test_like": false,
-      "total": 79,
-      "counts": {
-        "explicit_any": 2,
-        "type_assertion_as": 4,
-        "non_null_assertion": 0,
-        "ts_comment_directive": 0,
-        "untyped_parameter": 21,
-        "missing_return_type": 52
       }
     },
     {
@@ -475,20 +419,6 @@
       }
     },
     {
-      "file": "web/src/components/Editor.tsx",
-      "package": "web",
-      "is_test_like": false,
-      "total": 58,
-      "counts": {
-        "explicit_any": 0,
-        "type_assertion_as": 2,
-        "non_null_assertion": 3,
-        "ts_comment_directive": 0,
-        "untyped_parameter": 10,
-        "missing_return_type": 43
-      }
-    },
-    {
       "file": "api/src/collaboration/__tests__/collaboration.test.ts",
       "package": "api",
       "is_test_like": true,
@@ -500,6 +430,20 @@
         "ts_comment_directive": 0,
         "untyped_parameter": 1,
         "missing_return_type": 55
+      }
+    },
+    {
+      "file": "web/src/pages/UnifiedDocumentPage.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 57,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 36,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 9,
+        "missing_return_type": 12
       }
     },
     {
@@ -517,17 +461,17 @@
       }
     },
     {
-      "file": "web/src/pages/Documents.tsx",
+      "file": "web/src/pages/App.tsx",
       "package": "web",
       "is_test_like": false,
       "total": 54,
       "counts": {
         "explicit_any": 0,
-        "type_assertion_as": 1,
+        "type_assertion_as": 0,
         "non_null_assertion": 0,
         "ts_comment_directive": 0,
-        "untyped_parameter": 19,
-        "missing_return_type": 34
+        "untyped_parameter": 25,
+        "missing_return_type": 29
       }
     },
     {
@@ -1399,6 +1343,20 @@
       }
     },
     {
+      "file": "web/src/pages/Projects.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 26,
+      "counts": {
+        "explicit_any": 2,
+        "type_assertion_as": 4,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 17,
+        "missing_return_type": 3
+      }
+    },
+    {
       "file": "web/src/components/sidebars/WeekSidebar.tsx",
       "package": "web",
       "is_test_like": false,
@@ -1564,6 +1522,20 @@
         "ts_comment_directive": 0,
         "untyped_parameter": 6,
         "missing_return_type": 17
+      }
+    },
+    {
+      "file": "web/src/components/Editor.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 22,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 2,
+        "non_null_assertion": 3,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 8,
+        "missing_return_type": 9
       }
     },
     {
@@ -2421,6 +2393,20 @@
       }
     },
     {
+      "file": "web/src/components/editor/SlashCommands.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 10,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 2,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 6,
+        "missing_return_type": 2
+      }
+    },
+    {
       "file": "web/src/components/WeekReview.tsx",
       "package": "web",
       "is_test_like": false,
@@ -2502,6 +2488,20 @@
         "ts_comment_directive": 0,
         "untyped_parameter": 0,
         "missing_return_type": 8
+      }
+    },
+    {
+      "file": "web/src/pages/Documents.tsx",
+      "package": "web",
+      "is_test_like": false,
+      "total": 9,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 1,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 7,
+        "missing_return_type": 1
       }
     },
     {
@@ -3809,20 +3809,6 @@
   ],
   "top_violation_dense_files": [
     {
-      "file": "web/src/pages/App.tsx",
-      "package": "web",
-      "total": 101,
-      "counts": {
-        "explicit_any": 0,
-        "type_assertion_as": 0,
-        "non_null_assertion": 0,
-        "ts_comment_directive": 0,
-        "untyped_parameter": 28,
-        "missing_return_type": 73
-      },
-      "explanation": "Dominant violation types: missing_return_type (73), untyped_parameter (28)."
-    },
-    {
       "file": "web/src/components/IssuesList.tsx",
       "package": "web",
       "total": 95,
@@ -3837,34 +3823,6 @@
       "explanation": "Dominant violation types: missing_return_type (46), untyped_parameter (45)."
     },
     {
-      "file": "web/src/pages/UnifiedDocumentPage.tsx",
-      "package": "web",
-      "total": 92,
-      "counts": {
-        "explicit_any": 0,
-        "type_assertion_as": 36,
-        "non_null_assertion": 1,
-        "ts_comment_directive": 0,
-        "untyped_parameter": 16,
-        "missing_return_type": 39
-      },
-      "explanation": "Dominant violation types: missing_return_type (39), type_assertion_as (36)."
-    },
-    {
-      "file": "web/src/components/editor/SlashCommands.tsx",
-      "package": "web",
-      "total": 86,
-      "counts": {
-        "explicit_any": 8,
-        "type_assertion_as": 2,
-        "non_null_assertion": 0,
-        "ts_comment_directive": 0,
-        "untyped_parameter": 30,
-        "missing_return_type": 46
-      },
-      "explanation": "Dominant violation types: missing_return_type (46), untyped_parameter (30)."
-    },
-    {
       "file": "api/src/routes/weeks.ts",
       "package": "api",
       "total": 83,
@@ -3877,17 +3835,59 @@
         "missing_return_type": 22
       },
       "explanation": "Dominant violation types: type_assertion_as (26), untyped_parameter (24)."
+    },
+    {
+      "file": "api/src/db/seed.ts",
+      "package": "api",
+      "total": 79,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 35,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 20,
+        "missing_return_type": 24
+      },
+      "explanation": "Dominant violation types: non_null_assertion (35), missing_return_type (24)."
+    },
+    {
+      "file": "api/src/routes/projects.ts",
+      "package": "api",
+      "total": 74,
+      "counts": {
+        "explicit_any": 14,
+        "type_assertion_as": 10,
+        "non_null_assertion": 20,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 8,
+        "missing_return_type": 22
+      },
+      "explanation": "Dominant violation types: missing_return_type (22), non_null_assertion (20)."
+    },
+    {
+      "file": "web/src/pages/OrgChartPage.tsx",
+      "package": "web",
+      "total": 74,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 1,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 22,
+        "missing_return_type": 51
+      },
+      "explanation": "Dominant violation types: missing_return_type (51), untyped_parameter (22)."
     }
   ],
   "delta_from_previous": {
-    "overall": -35,
+    "overall": -47,
     "by_violation_type": {
       "explicit_any": 0,
       "type_assertion_as": 0,
-      "non_null_assertion": -25,
+      "non_null_assertion": 0,
       "ts_comment_directive": 0,
-      "untyped_parameter": 0,
-      "missing_return_type": -10
+      "untyped_parameter": -3,
+      "missing_return_type": -44
     },
     "status_band": "Stable"
   },
