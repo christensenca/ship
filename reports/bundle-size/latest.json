@@ -1,42 +1,48 @@
 {
   "audit": "Bundle Size",
-  "date": "2026-03-10",
+  "date": "2026-03-11",
   "note": "All sizes are \"rendered\" (post-treeshake, pre-minify) matching the treemap visualization. Gzip/brotli are estimated compressed sizes of the rendered output.",
   "summary": {
-    "total_rendered_kb": 4771.2,
-    "total_gzip_kb": 1205.3,
-    "total_brotli_kb": 1027.6,
+    "total_rendered_kb": 4775.5,
+    "total_gzip_kb": 1205.6,
+    "total_brotli_kb": 1027.7,
+    "initial_chunk": "assets/index-CPFdp2yX.js, assets/index-BnsvXXgO.js",
+    "initial_chunk_rendered_kb": 856.9,
+    "initial_chunk_gzip_kb": 201.3,
+    "baseline_date": "2026-03-10",
+    "target_initial_chunk_rendered_kb": 3625.8,
+    "passes_initial_budget": true,
     "largest_chunk": {
-      "name": "assets/index-oqS4spmW.js",
-      "rendered_kb": 4532.3,
-      "gzip_kb": 1102,
-      "brotli_kb": 938.2
+      "name": "assets/editor-core-BFf19B0r.js",
+      "rendered_kb": 1798,
+      "gzip_kb": 464.2,
+      "brotli_kb": 394.1
     },
-    "number_of_chunks": 261,
+    "number_of_chunks": 288,
     "top_dependencies": [
       {
         "name": "app code",
-        "rendered_kb": 1317.5,
-        "gzip_kb": 294.1,
-        "percent": 27.6
+        "rendered_kb": 1321.5,
+        "gzip_kb": 294.5,
+        "percent": 27.7
       },
       {
         "name": "emoji-picker-react@4.18.0_react",
-        "rendered_kb": 480.6,
-        "gzip_kb": 84.7,
+        "rendered_kb": 481.5,
+        "gzip_kb": 84.9,
         "percent": 10.1
       },
       {
         "name": "highlight.js",
-        "rendered_kb": 377.9,
-        "gzip_kb": 118.4,
+        "rendered_kb": 378,
+        "gzip_kb": 118.5,
         "percent": 7.9
       },
       {
         "name": "yjs",
         "rendered_kb": 264.9,
         "gzip_kb": 55.4,
-        "percent": 5.6
+        "percent": 5.5
       },
       {
         "name": "prosemirror-view",
@@ -76,155 +82,156 @@
       }
     ],
     "unused_dependencies": [
-      "@tanstack/query-sync-storage-persister"
+      "@tanstack/query-sync-storage-persister",
+      "@uswds/uswds"
     ]
   },
   "chunks": [
     {
-      "name": "assets/index-oqS4spmW.js",
-      "rendered_kb": 4532.3,
-      "gzip_kb": 1102,
-      "brotli_kb": 938.2
+      "name": "assets/editor-core-BFf19B0r.js",
+      "rendered_kb": 1798,
+      "gzip_kb": 464.2,
+      "brotli_kb": 394.1
     },
     {
-      "name": "assets/ProgramWeeksTab-Cp-MlMWk.js",
+      "name": "assets/index-CPFdp2yX.js",
+      "rendered_kb": 846.2,
+      "gzip_kb": 199.1,
+      "brotli_kb": 171.9
+    },
+    {
+      "name": "assets/emoji-SadDxLjj.js",
+      "rendered_kb": 491.1,
+      "gzip_kb": 87.5,
+      "brotli_kb": 68.6
+    },
+    {
+      "name": "assets/syntax-DyJ9F_wS.js",
+      "rendered_kb": 389.9,
+      "gzip_kb": 121.8,
+      "brotli_kb": 104.6
+    },
+    {
+      "name": "assets/UnifiedDocumentPage-CLeT_5Ue.js",
+      "rendered_kb": 287.6,
+      "gzip_kb": 66.7,
+      "brotli_kb": 57.2
+    },
+    {
+      "name": "assets/useAutoSave-BQ28JpJA.js",
+      "rendered_kb": 158.2,
+      "gzip_kb": 43,
+      "brotli_kb": 37
+    },
+    {
+      "name": "assets/IssuesList-Co0D3izA.js",
+      "rendered_kb": 110.8,
+      "gzip_kb": 23.9,
+      "brotli_kb": 20.9
+    },
+    {
+      "name": "assets/core.esm-jxFSSaSp.js",
+      "rendered_kb": 109.6,
+      "gzip_kb": 23.8,
+      "brotli_kb": 20.4
+    },
+    {
+      "name": "assets/ReviewsPage-CnWXQAkB.js",
+      "rendered_kb": 53.9,
+      "gzip_kb": 9,
+      "brotli_kb": 7.9
+    },
+    {
+      "name": "assets/TeamMode-g8QI60wl.js",
+      "rendered_kb": 44.9,
+      "gzip_kb": 9,
+      "brotli_kb": 8
+    },
+    {
+      "name": "assets/ProgramWeeksTab-CamIVxuv.js",
       "rendered_kb": 32.2,
       "gzip_kb": 8.2,
       "brotli_kb": 7.3
     },
     {
-      "name": "assets/WeekReviewTab-B0xIxR4O.js",
+      "name": "assets/WorkspaceSettings-DaZFndHd.js",
+      "rendered_kb": 30.9,
+      "gzip_kb": 5.1,
+      "brotli_kb": 4.5
+    },
+    {
+      "name": "assets/DocumentListToolbar-C-YGxhI7.js",
+      "rendered_kb": 22.9,
+      "gzip_kb": 5.5,
+      "brotli_kb": 4.9
+    },
+    {
+      "name": "assets/WeekReviewTab-CD7tlwyh.js",
       "rendered_kb": 22.9,
       "gzip_kb": 5.1,
       "brotli_kb": 4.4
     },
     {
-      "name": "assets/ProjectRetroTab-CbVl5wAq.js",
-      "rendered_kb": 16,
-      "gzip_kb": 2.9,
-      "brotli_kb": 2.6
+      "name": "assets/Projects-C72YOIAw.js",
+      "rendered_kb": 22.6,
+      "gzip_kb": 4.9,
+      "brotli_kb": 4.4
     },
     {
-      "name": "assets/StandupFeed-CZW_6gg7.js",
-      "rendered_kb": 15.3,
-      "gzip_kb": 3.2,
-      "brotli_kb": 2.8
+      "name": "assets/OrgChartPage-BrWL9gmn.js",
+      "rendered_kb": 22.4,
+      "gzip_kb": 5.3,
+      "brotli_kb": 4.8
     },
     {
-      "name": "assets/ProjectWeeksTab-DIEyrFGm.js",
-      "rendered_kb": 11.7,
-      "gzip_kb": 2.8,
-      "brotli_kb": 2.5
+      "name": "assets/AdminWorkspaceDetail-CluZGq5_.js",
+      "rendered_kb": 21.9,
+      "gzip_kb": 3.7,
+      "brotli_kb": 3.2
     },
     {
-      "name": "assets/ProgramProjectsTab-C6xm8XTb.js",
-      "rendered_kb": 7,
-      "gzip_kb": 1.8,
-      "brotli_kb": 1.5
+      "name": "assets/Documents-tSC3nrKv.js",
+      "rendered_kb": 20.5,
+      "gzip_kb": 4.9,
+      "brotli_kb": 4.3
     },
     {
-      "name": "assets/ProjectDetailsTab-CaMv7sxU.js",
-      "rendered_kb": 7,
-      "gzip_kb": 1.8,
-      "brotli_kb": 1.6
+      "name": "assets/AdminDashboard-Br_iOvx_.js",
+      "rendered_kb": 18.2,
+      "gzip_kb": 3.3,
+      "brotli_kb": 2.9
     },
     {
-      "name": "assets/WeekPlanningTab-sPyRtQUU.js",
-      "rendered_kb": 4.7,
-      "gzip_kb": 1.7,
-      "brotli_kb": 1.5
-    },
-    {
-      "name": "assets/WeekOverviewTab-Do6eJw6W.js",
-      "rendered_kb": 3.5,
-      "gzip_kb": 1.1,
-      "brotli_kb": 1
-    },
-    {
-      "name": "assets/ProgramOverviewTab-B05pvCv0.js",
-      "rendered_kb": 3.2,
-      "gzip_kb": 1,
-      "brotli_kb": 0.9
-    },
-    {
-      "name": "assets/WeekIssuesTab-CFBZeSYM.js",
-      "rendered_kb": 1.8,
-      "gzip_kb": 0.8,
-      "brotli_kb": 0.7
-    },
-    {
-      "name": "assets/fingerprint-5PPE-sjr.js",
-      "rendered_kb": 1.8,
-      "gzip_kb": 0.9,
-      "brotli_kb": 0.8
-    },
-    {
-      "name": "assets/instagram-CYRSMkQG.js",
-      "rendered_kb": 1.7,
-      "gzip_kb": 0.8,
-      "brotli_kb": 0.7
-    },
-    {
-      "name": "assets/coronavirus-CYBKVzEI.js",
-      "rendered_kb": 1.6,
-      "gzip_kb": 0.6,
-      "brotli_kb": 0.6
-    },
-    {
-      "name": "assets/ProgramIssuesTab-CHbNX0y-.js",
-      "rendered_kb": 1,
-      "gzip_kb": 0.5,
-      "brotli_kb": 0.4
-    },
-    {
-      "name": "assets/language-CbbWVSC-.js",
-      "rendered_kb": 1,
-      "gzip_kb": 0.5,
-      "brotli_kb": 0.5
-    },
-    {
-      "name": "assets/reduce_capacity-B0ZsaeRE.js",
-      "rendered_kb": 1,
-      "gzip_kb": 0.4,
-      "brotli_kb": 0.4
-    },
-    {
-      "name": "assets/pets-v1Lb-4gO.js",
-      "rendered_kb": 0.9,
-      "gzip_kb": 0.4,
-      "brotli_kb": 0.4
-    },
-    {
-      "name": "assets/settings-lSPkjZfd.js",
-      "rendered_kb": 0.9,
-      "gzip_kb": 0.5,
-      "brotli_kb": 0.4
+      "name": "assets/StatusOverviewPage-DSLZTzsM.js",
+      "rendered_kb": 17.1,
+      "gzip_kb": 4.2,
+      "brotli_kb": 3.7
     }
   ],
   "dependency_breakdown": [
     {
       "name": "app code",
-      "rendered_kb": 1317.5,
-      "gzip_kb": 294.1,
-      "percent": 27.6
+      "rendered_kb": 1321.5,
+      "gzip_kb": 294.5,
+      "percent": 27.7
     },
     {
       "name": "emoji-picker-react@4.18.0_react",
-      "rendered_kb": 480.6,
-      "gzip_kb": 84.7,
+      "rendered_kb": 481.5,
+      "gzip_kb": 84.9,
       "percent": 10.1
     },
     {
       "name": "highlight.js",
-      "rendered_kb": 377.9,
-      "gzip_kb": 118.4,
+      "rendered_kb": 378,
+      "gzip_kb": 118.5,
       "percent": 7.9
     },
     {
       "name": "yjs",
       "rendered_kb": 264.9,
       "gzip_kb": 55.4,
-      "percent": 5.6
+      "percent": 5.5
     },
     {
       "name": "prosemirror-view",
@@ -342,20 +349,20 @@
     },
     {
       "name": "@tiptap/react@2.27.2_@tiptap/core@2.27.2_@tiptap/pm@2.27.2__@tiptap/pm",
-      "rendered_kb": 32.5,
+      "rendered_kb": 32.6,
       "gzip_kb": 7.4,
       "percent": 0.7
     },
     {
       "name": "@floating-ui/core",
-      "rendered_kb": 26.8,
+      "rendered_kb": 26.7,
       "gzip_kb": 6.2,
       "percent": 0.6
     },
     {
       "name": "@floating-ui/dom",
-      "rendered_kb": 25.2,
-      "gzip_kb": 6.7,
+      "rendered_kb": 25,
+      "gzip_kb": 6.6,
       "percent": 0.5
     },
     {
@@ -428,7 +435,7 @@
       "name": "@tiptap/suggestion@2.27.2_@tiptap/core@2.27.2_@tiptap/pm@2.27.2__@tiptap/pm",
       "rendered_kb": 11.9,
       "gzip_kb": 3,
-      "percent": 0.3
+      "percent": 0.2
     },
     {
       "name": "lowlight",
@@ -450,7 +457,7 @@
     },
     {
       "name": "@floating-ui/react-dom@2.1.8_react-dom@18.3.1_react@18.3.1__react",
-      "rendered_kb": 9.8,
+      "rendered_kb": 9.7,
       "gzip_kb": 2.6,
       "percent": 0.2
     },
@@ -474,8 +481,8 @@
     },
     {
       "name": "@floating-ui/utils",
-      "rendered_kb": 9,
-      "gzip_kb": 2.8,
+      "rendered_kb": 8.9,
+      "gzip_kb": 2.7,
       "percent": 0.2
     },
     {
@@ -906,12 +913,6 @@
     },
     {
       "name": "get-nonce",
-      "rendered_kb": 0.1,
-      "gzip_kb": 0.1,
-      "percent": 0
-    },
-    {
-      "name": "@tanstack/react-query-devtools@5.91.3_@tanstack/react-query@5.90.21_react@18.3.1__react",
       "rendered_kb": 0.1,
       "gzip_kb": 0.1,
       "percent": 0

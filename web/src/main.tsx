@@ -1,9 +1,8 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter, Routes, Route, Navigate, useParams } from 'react-router-dom';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { queryClient, queryPersister } from '@/lib/queryClient';
 import { WorkspaceProvider } from '@/contexts/WorkspaceContext';
 import { AuthProvider, useAuth } from '@/hooks/useAuth';
@@ -18,25 +17,9 @@ import { CurrentDocumentProvider } from '@/contexts/CurrentDocumentContext';
 import { UploadProvider } from '@/contexts/UploadContext';
 import { LoginPage } from '@/pages/Login';
 import { AppLayout } from '@/pages/App';
-import { DocumentsPage } from '@/pages/Documents';
-import { IssuesPage } from '@/pages/Issues';
-import { ProgramsPage } from '@/pages/Programs';
-import { TeamModePage } from '@/pages/TeamMode';
-import { TeamDirectoryPage } from '@/pages/TeamDirectory';
-import { PersonEditorPage } from '@/pages/PersonEditor';
-import { FeedbackEditorPage } from '@/pages/FeedbackEditor';
 import { PublicFeedbackPage } from '@/pages/PublicFeedback';
-import { ProjectsPage } from '@/pages/Projects';
-import { DashboardPage } from '@/pages/Dashboard';
 import { MyWeekPage } from '@/pages/MyWeekPage';
-import { AdminDashboardPage } from '@/pages/AdminDashboard';
-import { AdminWorkspaceDetailPage } from '@/pages/AdminWorkspaceDetail';
-import { WorkspaceSettingsPage } from '@/pages/WorkspaceSettings';
-import { ConvertedDocumentsPage } from '@/pages/ConvertedDocuments';
-import { UnifiedDocumentPage } from '@/pages/UnifiedDocumentPage';
-import { StatusOverviewPage } from '@/pages/StatusOverviewPage';
-import { ReviewsPage } from '@/pages/ReviewsPage';
-import { OrgChartPage } from '@/pages/OrgChartPage';
+import { DashboardPage } from '@/pages/Dashboard';
 import { ReviewQueueProvider } from '@/contexts/ReviewQueueContext';
 
 import { InviteAcceptPage } from '@/pages/InviteAccept';
@@ -44,6 +27,38 @@ import { SetupPage } from '@/pages/Setup';
 import { ToastProvider } from '@/components/ui/Toast';
 import { MutationErrorToast } from '@/components/MutationErrorToast';
 import './index.css';
+
+const DocumentsPage = React.lazy(() => import('@/pages/Documents').then((m) => ({ default: m.DocumentsPage })));
+const IssuesPage = React.lazy(() => import('@/pages/Issues').then((m) => ({ default: m.IssuesPage })));
+const ProgramsPage = React.lazy(() => import('@/pages/Programs').then((m) => ({ default: m.ProgramsPage })));
+const ProjectsPage = React.lazy(() => import('@/pages/Projects').then((m) => ({ default: m.ProjectsPage })));
+const UnifiedDocumentPage = React.lazy(() => import('@/pages/UnifiedDocumentPage').then((m) => ({ default: m.UnifiedDocumentPage })));
+const TeamModePage = React.lazy(() => import('@/pages/TeamMode').then((m) => ({ default: m.TeamModePage })));
+const TeamDirectoryPage = React.lazy(() => import('@/pages/TeamDirectory').then((m) => ({ default: m.TeamDirectoryPage })));
+const PersonEditorPage = React.lazy(() => import('@/pages/PersonEditor').then((m) => ({ default: m.PersonEditorPage })));
+const FeedbackEditorPage = React.lazy(() => import('@/pages/FeedbackEditor').then((m) => ({ default: m.FeedbackEditorPage })));
+const AdminDashboardPage = React.lazy(() => import('@/pages/AdminDashboard').then((m) => ({ default: m.AdminDashboardPage })));
+const AdminWorkspaceDetailPage = React.lazy(() => import('@/pages/AdminWorkspaceDetail').then((m) => ({ default: m.AdminWorkspaceDetailPage })));
+const WorkspaceSettingsPage = React.lazy(() => import('@/pages/WorkspaceSettings').then((m) => ({ default: m.WorkspaceSettingsPage })));
+const ConvertedDocumentsPage = React.lazy(() => import('@/pages/ConvertedDocuments').then((m) => ({ default: m.ConvertedDocumentsPage })));
+const StatusOverviewPage = React.lazy(() => import('@/pages/StatusOverviewPage').then((m) => ({ default: m.StatusOverviewPage })));
+const ReviewsPage = React.lazy(() => import('@/pages/ReviewsPage').then((m) => ({ default: m.ReviewsPage })));
+const OrgChartPage = React.lazy(() => import('@/pages/OrgChartPage').then((m) => ({ default: m.OrgChartPage })));
+const ReactQueryDevtools = import.meta.env.DEV
+  ? React.lazy(() => import('@tanstack/react-query-devtools').then((m) => ({ default: m.ReactQueryDevtools })))
+  : null;
+
+function RouteFallback() {
+  return (
+    <div className="flex h-full min-h-[200px] items-center justify-center">
+      <div className="text-muted">Loading...</div>
+    </div>
+  );
+}
+
+function withRouteSuspense(element: React.ReactNode) {
+  return <Suspense fallback={<RouteFallback />}>{element}</Suspense>;
+}
 
 /**
  * Redirect component for type-specific routes to canonical /documents/:id
@@ -177,7 +192,7 @@ function AppRoutes() {
         path="/admin"
         element={
           <SuperAdminRoute>
-            <AdminDashboardPage />
+            {withRouteSuspense(<AdminDashboardPage />)}
           </SuperAdminRoute>
         }
       />
@@ -185,7 +200,7 @@ function AppRoutes() {
         path="/admin/workspaces/:id"
         element={
           <SuperAdminRoute>
-            <AdminWorkspaceDetailPage />
+            {withRouteSuspense(<AdminWorkspaceDetailPage />)}
           </SuperAdminRoute>
         }
       />
@@ -214,14 +229,14 @@ function AppRoutes() {
         <Route index element={<Navigate to="/my-week" replace />} />
         <Route path="dashboard" element={<DashboardPage />} />
         <Route path="my-week" element={<MyWeekPage />} />
-        <Route path="docs" element={<DocumentsPage />} />
+        <Route path="docs" element={withRouteSuspense(<DocumentsPage />)} />
         <Route path="docs/:id" element={<DocumentRedirect />} />
-        <Route path="documents/:id/*" element={<UnifiedDocumentPage />} />
-        <Route path="issues" element={<IssuesPage />} />
+        <Route path="documents/:id/*" element={withRouteSuspense(<UnifiedDocumentPage />)} />
+        <Route path="issues" element={withRouteSuspense(<IssuesPage />)} />
         <Route path="issues/:id" element={<DocumentRedirect />} />
-        <Route path="projects" element={<ProjectsPage />} />
+        <Route path="projects" element={withRouteSuspense(<ProjectsPage />)} />
         <Route path="projects/:id" element={<DocumentRedirect />} />
-        <Route path="programs" element={<ProgramsPage />} />
+        <Route path="programs" element={withRouteSuspense(<ProgramsPage />)} />
         <Route path="programs/:programId/sprints/:id" element={<DocumentRedirect />} />
         <Route path="programs/:id/*" element={<ProgramTabRedirect />} />
         <Route path="sprints" element={<Navigate to="/team/allocation" replace />} />
@@ -233,16 +248,16 @@ function AppRoutes() {
         <Route path="sprints/:id/standups" element={<SprintTabRedirect tab="standups" />} />
         <Route path="sprints/:id/review" element={<SprintTabRedirect tab="review" />} />
         <Route path="team" element={<Navigate to="/team/allocation" replace />} />
-        <Route path="team/allocation" element={<TeamModePage />} />
-        <Route path="team/directory" element={<TeamDirectoryPage />} />
-        <Route path="team/status" element={<StatusOverviewPage />} />
-        <Route path="team/reviews" element={<ReviewsPage />} />
-        <Route path="team/org-chart" element={<OrgChartPage />} />
+        <Route path="team/allocation" element={withRouteSuspense(<TeamModePage />)} />
+        <Route path="team/directory" element={withRouteSuspense(<TeamDirectoryPage />)} />
+        <Route path="team/status" element={withRouteSuspense(<StatusOverviewPage />)} />
+        <Route path="team/reviews" element={withRouteSuspense(<ReviewsPage />)} />
+        <Route path="team/org-chart" element={withRouteSuspense(<OrgChartPage />)} />
         {/* Person profile stays in Teams context - no redirect to /documents */}
-        <Route path="team/:id" element={<PersonEditorPage />} />
-        <Route path="feedback/:id" element={<FeedbackEditorPage />} />
-        <Route path="settings" element={<WorkspaceSettingsPage />} />
-        <Route path="settings/conversions" element={<ConvertedDocumentsPage />} />
+        <Route path="team/:id" element={withRouteSuspense(<PersonEditorPage />)} />
+        <Route path="feedback/:id" element={withRouteSuspense(<FeedbackEditorPage />)} />
+        <Route path="settings" element={withRouteSuspense(<WorkspaceSettingsPage />)} />
+        <Route path="settings/conversions" element={withRouteSuspense(<ConvertedDocumentsPage />)} />
       </Route>
     </Routes>
   );
@@ -262,7 +277,11 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
           </ReviewQueueProvider>
         </BrowserRouter>
       </ToastProvider>
-      <ReactQueryDevtools initialIsOpen={false} />
+      {ReactQueryDevtools ? (
+        <Suspense fallback={null}>
+          <ReactQueryDevtools initialIsOpen={false} />
+        </Suspense>
+      ) : null}
     </PersistQueryClientProvider>
   </React.StrictMode>
 );

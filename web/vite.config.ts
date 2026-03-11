@@ -98,5 +98,38 @@ export default defineConfig(({ mode }) => {
       strictPort: true,
       proxy: proxyConfig,
     },
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (!id.includes('node_modules')) return undefined;
+
+            if (
+              id.includes('/@tiptap/') ||
+              id.includes('/prosemirror-') ||
+              id.includes('/yjs/') ||
+              id.includes('/y-websocket/') ||
+              id.includes('/y-indexeddb/') ||
+              id.includes('/lib0/')
+            ) {
+              return 'editor-core';
+            }
+
+            if (
+              id.includes('/lowlight/') ||
+              id.includes('/highlight.js/')
+            ) {
+              return 'syntax';
+            }
+
+            if (id.includes('/emoji-picker-react/')) {
+              return 'emoji';
+            }
+
+            return undefined;
+          },
+        },
+      },
+    },
   };
 });
