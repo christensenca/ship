@@ -35,7 +35,7 @@ const COLUMN_VISIBILITY_KEY = 'documents-column-visibility';
 
 type VisibilityFilter = 'all' | 'workspace' | 'private';
 
-export function DocumentsPage() {
+export function DocumentsPage(): React.JSX.Element {
   const { documents, loading, createDocument, deleteDocument } = useDocuments();
   const [creating, setCreating] = useState(false);
   const [search, setSearch] = useState('');
@@ -75,21 +75,21 @@ export function DocumentsPage() {
     filterParam === 'workspace' || filterParam === 'private' ? filterParam : 'all';
 
   // Filter documents by visibility and search
-  const filteredDocuments = useMemo(() => {
+  const filteredDocuments = useMemo((): WikiDocument[] => {
     let filtered = documents;
 
     // Filter by visibility
     if (visibilityFilter === 'workspace') {
-      filtered = filtered.filter(d => d.visibility !== 'private');
+      filtered = filtered.filter((document): boolean => document.visibility !== 'private');
     } else if (visibilityFilter === 'private') {
-      filtered = filtered.filter(d => d.visibility === 'private');
+      filtered = filtered.filter((document): boolean => document.visibility === 'private');
     }
 
     // Filter by search
     if (search.trim()) {
       const searchLower = search.toLowerCase();
-      filtered = filtered.filter(d =>
-        d.title.toLowerCase().includes(searchLower)
+      filtered = filtered.filter((document): boolean =>
+        document.title.toLowerCase().includes(searchLower)
       );
     }
 
@@ -100,23 +100,23 @@ export function DocumentsPage() {
   const documentTree = useMemo(() => buildDocumentTree(filteredDocuments), [filteredDocuments]);
 
   // Sort documents for list view
-  const sortedDocuments = useMemo(() => {
+  const sortedDocuments = useMemo((): WikiDocument[] => {
     if (viewMode !== 'list') return filteredDocuments;
 
     const sorted = [...filteredDocuments];
     switch (sortBy) {
       case 'title':
-        sorted.sort((a, b) => a.title.localeCompare(b.title));
+        sorted.sort((a: WikiDocument, b: WikiDocument): number => a.title.localeCompare(b.title));
         break;
       case 'created':
-        sorted.sort((a, b) => {
+        sorted.sort((a: WikiDocument, b: WikiDocument): number => {
           const aDate = a.created_at ? new Date(a.created_at).getTime() : 0;
           const bDate = b.created_at ? new Date(b.created_at).getTime() : 0;
           return bDate - aDate; // Newest first
         });
         break;
       case 'updated':
-        sorted.sort((a, b) => {
+        sorted.sort((a: WikiDocument, b: WikiDocument): number => {
           const aDate = a.updated_at ? new Date(a.updated_at).getTime() : 0;
           const bDate = b.updated_at ? new Date(b.updated_at).getTime() : 0;
           return bDate - aDate; // Newest first
@@ -127,11 +127,11 @@ export function DocumentsPage() {
   }, [filteredDocuments, sortBy, viewMode]);
 
   // Render function for document rows in list view
-  const renderDocumentRow = useCallback((doc: WikiDocument, { isSelected }: RowRenderProps) => (
+  const renderDocumentRow = useCallback((doc: WikiDocument, { isSelected }: RowRenderProps): React.JSX.Element => (
     <DocumentRowContent document={doc} visibleColumns={visibleColumns} />
   ), [visibleColumns]);
 
-  async function handleCreateDocument(parentId?: string) {
+  async function handleCreateDocument(parentId?: string): Promise<void> {
     setCreating(true);
     try {
       const doc = await createDocument(parentId);
@@ -143,7 +143,7 @@ export function DocumentsPage() {
     }
   }
 
-  function handleFilterChange(filter: VisibilityFilter) {
+  function handleFilterChange(filter: VisibilityFilter): void {
     if (filter === 'all') {
       searchParams.delete('filter');
     } else {
@@ -153,9 +153,9 @@ export function DocumentsPage() {
   }
 
   // Delete with notification
-  const handleDeleteWithUndo = useCallback(async (id: string) => {
+  const handleDeleteWithUndo = useCallback(async (id: string): Promise<void> => {
     // Find the document before deleting
-    const docToDelete = documents.find(d => d.id === id);
+    const docToDelete = documents.find((document): boolean => document.id === id);
     if (!docToDelete) return;
 
     // Perform the delete
@@ -167,14 +167,14 @@ export function DocumentsPage() {
   }, [documents, deleteDocument, showToast]);
 
   // Bulk delete handler
-  const handleBulkDelete = useCallback(async () => {
+  const handleBulkDelete = useCallback(async (): Promise<void> => {
     const idsToDelete = Array.from(selectedIds);
     if (idsToDelete.length === 0) return;
 
     const count = idsToDelete.length;
 
     // Delete all selected documents
-    await Promise.all(idsToDelete.map(id => deleteDocument(id)));
+    await Promise.all(idsToDelete.map((id): Promise<boolean> => deleteDocument(id)));
 
     // Clear selection and context menu
     setSelectedIds(new Set());
@@ -185,7 +185,7 @@ export function DocumentsPage() {
   }, [selectedIds, deleteDocument, showToast]);
 
   // Context menu handler
-  const handleContextMenu = useCallback((e: React.MouseEvent, _item: WikiDocument, selection: UseSelectionReturn) => {
+  const handleContextMenu = useCallback((e: React.MouseEvent, _item: WikiDocument, selection: UseSelectionReturn): void => {
     e.preventDefault();
     setContextMenu({ x: e.clientX, y: e.clientY, selection });
   }, []);
@@ -200,7 +200,7 @@ export function DocumentsPage() {
       <input
         type="text"
         value={search}
-        onChange={(e) => setSearch(e.target.value)}
+        onChange={(e: React.ChangeEvent<HTMLInputElement>): void => setSearch(e.target.value)}
         placeholder="Search..."
         className={cn(
           'w-full rounded-md border border-border bg-background px-3 py-1.5 text-sm',
@@ -229,7 +229,7 @@ export function DocumentsPage() {
           hiddenCount={hiddenCount}
           showColumnPicker={viewMode === 'list'}
           filterContent={searchFilterContent}
-          createButton={{ label: creating ? 'Creating...' : 'New Document', onClick: () => handleCreateDocument(), disabled: creating }}
+          createButton={{ label: creating ? 'Creating...' : 'New Document', onClick: (): void => { void handleCreateDocument(); }, disabled: creating }}
         />
       </div>
 
@@ -238,7 +238,7 @@ export function DocumentsPage() {
         <DocumentBulkActionBar
           selectedCount={selectedIds.size}
           onDelete={handleBulkDelete}
-          onClearSelection={() => setSelectedIds(new Set())}
+          onClearSelection={(): void => setSelectedIds(new Set())}
         />
       ) : (
         <FilterTabs
@@ -248,7 +248,7 @@ export function DocumentsPage() {
             { id: 'private', label: 'Private', icon: <LockIcon className="h-3.5 w-3.5" /> },
           ]}
           activeId={visibilityFilter}
-          onChange={(id) => handleFilterChange(id as VisibilityFilter)}
+          onChange={(id): void => handleFilterChange(id as VisibilityFilter)}
           ariaLabel="Document visibility filters"
         />
       )}
@@ -261,7 +261,7 @@ export function DocumentsPage() {
               <>
                 <p className="text-muted">No documents yet</p>
                 <button
-                  onClick={() => handleCreateDocument()}
+                  onClick={(): void => { void handleCreateDocument(); }}
                   className="mt-2 text-sm text-accent hover:underline"
                 >
                   Create your first document
@@ -280,7 +280,7 @@ export function DocumentsPage() {
       ) : viewMode === 'tree' ? (
         <div className="flex-1 overflow-auto p-6 pb-20">
           <ul role="tree" aria-label="Documents" className="space-y-0.5">
-            {documentTree.map((doc) => (
+            {documentTree.map((doc): React.JSX.Element => (
               <DocumentTreeItem
                 key={doc.id}
                 document={doc}
@@ -294,19 +294,19 @@ export function DocumentsPage() {
         <div className="flex-1 overflow-auto pb-20">
           <SelectableList
             items={sortedDocuments}
-            getItemId={(doc) => doc.id}
-            renderRow={(doc, props) => renderDocumentRow(doc, props)}
+            getItemId={(doc: WikiDocument): string => doc.id}
+            renderRow={(doc: WikiDocument, props: RowRenderProps): React.JSX.Element => renderDocumentRow(doc, props)}
             columns={columns}
-            onItemClick={(doc) => navigate(`/documents/${doc.id}`)}
+            onItemClick={(doc: WikiDocument): void => { void navigate(`/documents/${doc.id}`); }}
             selectable={true}
-            onSelectionChange={(ids) => setSelectedIds(ids)}
+            onSelectionChange={(ids: Set<string>): void => setSelectedIds(ids)}
             onContextMenu={handleContextMenu}
             ariaLabel="Documents list"
           />
 
           {/* Context menu */}
           {contextMenu && (
-            <ContextMenu x={contextMenu.x} y={contextMenu.y} onClose={() => setContextMenu(null)}>
+            <ContextMenu x={contextMenu.x} y={contextMenu.y} onClose={(): void => setContextMenu(null)}>
               <ContextMenuItem onClick={handleBulkDelete} destructive>
                 <TrashIcon className="h-4 w-4" />
                 Delete {selectedIds.size > 1 ? `${selectedIds.size} documents` : 'document'}
@@ -319,7 +319,7 @@ export function DocumentsPage() {
   );
 }
 
-function LockIcon({ className }: { className?: string }) {
+function LockIcon({ className }: { className?: string }): React.JSX.Element {
   return (
     <svg className={className || 'h-4 w-4'} fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path
@@ -332,7 +332,7 @@ function LockIcon({ className }: { className?: string }) {
   );
 }
 
-function GlobeIcon({ className }: { className?: string }) {
+function GlobeIcon({ className }: { className?: string }): React.JSX.Element {
   return (
     <svg className={className || 'h-4 w-4'} fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path
@@ -345,7 +345,7 @@ function GlobeIcon({ className }: { className?: string }) {
   );
 }
 
-function DocumentRowContent({ document, visibleColumns }: { document: WikiDocument; visibleColumns: Set<string> }) {
+function DocumentRowContent({ document, visibleColumns }: { document: WikiDocument; visibleColumns: Set<string> }): React.JSX.Element {
   return (
     <>
       {/* Title */}
@@ -398,7 +398,7 @@ function DocumentRowContent({ document, visibleColumns }: { document: WikiDocume
   );
 }
 
-function TrashIcon({ className }: { className?: string }) {
+function TrashIcon({ className }: { className?: string }): React.JSX.Element {
   return (
     <svg className={className || 'h-4 w-4'} fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path
@@ -424,7 +424,7 @@ function DocumentBulkActionBar({
   selectedCount,
   onDelete,
   onClearSelection,
-}: DocumentBulkActionBarProps) {
+}: DocumentBulkActionBarProps): React.JSX.Element | null {
   return (
     <div className="flex items-center gap-3 border-b border-border bg-muted/30 px-6 py-2">
       <span className="text-sm text-muted">

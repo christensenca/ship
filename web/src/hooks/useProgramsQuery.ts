@@ -1,6 +1,14 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiGet, apiPost, apiPatch, apiDelete } from '@/lib/api';
 
+type ApiError = Error & { status: number };
+type ProgramsAllKey = readonly ['programs'];
+type ProgramsListKey = readonly ['programs', 'list'];
+type ProgramsFilteredListKey = readonly ['programs', 'list', Record<string, unknown> | undefined];
+type ProgramsDetailsKey = readonly ['programs', 'detail'];
+type ProgramsDetailKey = readonly ['programs', 'detail', string];
+const allProgramKey: ProgramsAllKey = ['programs'];
+
 export interface ProgramOwner {
   id: string;
   name: string;
@@ -20,22 +28,24 @@ export interface Program {
   owner: ProgramOwner | null;
 }
 
+function createApiError(message: string, status: number): ApiError {
+  return Object.assign(new Error(message), { status });
+}
+
 // Query keys
 export const programKeys = {
-  all: ['programs'] as const,
-  lists: () => [...programKeys.all, 'list'] as const,
-  list: (filters?: Record<string, unknown>) => [...programKeys.lists(), filters] as const,
-  details: () => [...programKeys.all, 'detail'] as const,
-  detail: (id: string) => [...programKeys.details(), id] as const,
+  all: allProgramKey,
+  lists: (): ProgramsListKey => ['programs', 'list'],
+  list: (filters?: Record<string, unknown>): ProgramsFilteredListKey => ['programs', 'list', filters],
+  details: (): ProgramsDetailsKey => ['programs', 'detail'],
+  detail: (id: string): ProgramsDetailKey => ['programs', 'detail', id],
 };
 
 // Fetch programs
 async function fetchPrograms(): Promise<Program[]> {
   const res = await apiGet('/api/programs');
   if (!res.ok) {
-    const error = new Error('Failed to fetch programs') as Error & { status: number };
-    error.status = res.status;
-    throw error;
+    throw createApiError('Failed to fetch programs', res.status);
   }
   return res.json();
 }
@@ -44,9 +54,7 @@ async function fetchPrograms(): Promise<Program[]> {
 async function createProgramApi(data: { title: string }): Promise<Program> {
   const res = await apiPost('/api/programs', data);
   if (!res.ok) {
-    const error = new Error('Failed to create program') as Error & { status: number };
-    error.status = res.status;
-    throw error;
+    throw createApiError('Failed to create program', res.status);
   }
   return res.json();
 }
@@ -55,9 +63,7 @@ async function createProgramApi(data: { title: string }): Promise<Program> {
 async function updateProgramApi(id: string, updates: Record<string, unknown>): Promise<Program> {
   const res = await apiPatch(`/api/programs/${id}`, updates);
   if (!res.ok) {
-    const error = new Error('Failed to update program') as Error & { status: number };
-    error.status = res.status;
-    throw error;
+    throw createApiError('Failed to update program', res.status);
   }
   return res.json();
 }
@@ -66,9 +72,7 @@ async function updateProgramApi(id: string, updates: Record<string, unknown>): P
 async function deleteProgramApi(id: string): Promise<void> {
   const res = await apiDelete(`/api/programs/${id}`);
   if (!res.ok) {
-    const error = new Error('Failed to delete program') as Error & { status: number };
-    error.status = res.status;
-    throw error;
+    throw createApiError('Failed to delete program', res.status);
   }
 }
 

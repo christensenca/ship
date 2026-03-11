@@ -14,8 +14,21 @@ const router: RouterType = Router();
 // Inferred project status type
 type InferredProjectStatus = 'active' | 'planned' | 'completed' | 'backlog' | 'archived';
 
+type RequestContext = {
+  userId: string;
+  workspaceId: string;
+};
+
+function getRequestContext(req: Request): RequestContext {
+  const { userId, workspaceId } = req;
+  if (!userId || !workspaceId) {
+    throw new Error('Missing authenticated request context');
+  }
+  return { userId, workspaceId };
+}
+
 // Helper to extract project from row with computed ice_score
-function extractProjectFromRow(row: any) {
+function extractProjectFromRow(row: any): Record<string, unknown> {
   const props = row.properties || {};
   // ICE values can be null (not yet set) - don't default to 3
   const impact = props.impact !== undefined ? props.impact : null;
@@ -120,16 +133,16 @@ const projectRetroSchema = z.object({
 });
 
 // Helper to generate pre-filled retro content for a project
-async function generatePrefilledRetroContent(projectData: any, sprints: any[], issues: any[]) {
+async function generatePrefilledRetroContent(projectData: any, sprints: any[], issues: any[]): Promise<Record<string, unknown>> {
   const props = projectData.properties || {};
 
   // Categorize issues by state
-  const completedIssues = issues.filter(i => i.state === 'done');
-  const cancelledIssues = issues.filter(i => i.state === 'cancelled');
-  const activeIssues = issues.filter(i => !['done', 'cancelled'].includes(i.state));
+  const completedIssues = issues.filter((i): boolean => i.state === 'done');
+  const cancelledIssues = issues.filter((i): boolean => i.state === 'cancelled');
+  const activeIssues = issues.filter((i): boolean => !['done', 'cancelled'].includes(i.state));
 
   // Build TipTap content
-  const content: any = {
+  const content: Record<string, unknown> & { content: unknown[] } = {
     type: 'doc',
     content: [
       {
@@ -154,8 +167,8 @@ async function generatePrefilledRetroContent(projectData: any, sprints: any[], i
     ? impact * confidence * ease
     : null;
 
-  const formatIceValue = (val: number | null) => val !== null ? `${val}/5` : 'Not set';
-  const formatIceScore = (val: number | null) => val !== null ? String(val) : 'Not set';
+  const formatIceValue = (val: number | null): string => val !== null ? `${val}/5` : 'Not set';
+  const formatIceScore = (val: number | null): string => val !== null ? String(val) : 'Not set';
 
   content.content.push({
     type: 'heading',
@@ -201,7 +214,7 @@ async function generatePrefilledRetroContent(projectData: any, sprints: any[], i
     });
     content.content.push({
       type: 'bulletList',
-      content: sprints.map(s => ({
+      content: sprints.map((s) => ({
         type: 'listItem',
         content: [{
           type: 'paragraph',
@@ -220,7 +233,7 @@ async function generatePrefilledRetroContent(projectData: any, sprints: any[], i
     });
     content.content.push({
       type: 'bulletList',
-      content: completedIssues.map(i => ({
+      content: completedIssues.map((i) => ({
         type: 'listItem',
         content: [{ type: 'paragraph', content: [{ type: 'text', text: i.title }] }],
       })),
@@ -236,7 +249,7 @@ async function generatePrefilledRetroContent(projectData: any, sprints: any[], i
     });
     content.content.push({
       type: 'bulletList',
-      content: activeIssues.map(i => ({
+      content: activeIssues.map((i) => ({
         type: 'listItem',
         content: [{ type: 'paragraph', content: [{ type: 'text', text: `${i.title} (${i.state})` }] }],
       })),
@@ -252,7 +265,7 @@ async function generatePrefilledRetroContent(projectData: any, sprints: any[], i
     });
     content.content.push({
       type: 'bulletList',
-      content: cancelledIssues.map(i => ({
+      content: cancelledIssues.map((i) => ({
         type: 'listItem',
         content: [{ type: 'paragraph', content: [{ type: 'text', text: i.title }] }],
       })),
@@ -310,13 +323,12 @@ async function generatePrefilledRetroContent(projectData: any, sprints: any[], i
 const VALID_SORT_FIELDS = ['ice_score', 'impact', 'confidence', 'ease', 'title', 'updated_at', 'created_at'];
 
 // List projects (documents with document_type = 'project')
-router.get('/', authMiddleware, async (req: Request, res: Response) => {
+router.get('/', authMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
     const includeArchived = req.query.archived === 'true';
     const sortField = (req.query.sort as string) || 'ice_score';
     const sortDir = (req.query.dir as string) === 'asc' ? 'ASC' : 'DESC';
-    const userId = req.userId!;
-    const workspaceId = req.workspaceId!;
+    const { userId, workspaceId } = getRequestContext(req);
 
     // Validate sort field to prevent SQL injection
     if (!VALID_SORT_FIELDS.includes(sortField)) {
@@ -417,11 +429,10 @@ router.get('/', authMiddleware, async (req: Request, res: Response) => {
 });
 
 // Get single project
-router.get('/:id', authMiddleware, async (req: Request, res: Response) => {
+router.get('/:id', authMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const userId = req.userId!;
-    const workspaceId = req.workspaceId!;
+    const { userId, workspaceId } = getRequestContext(req);
 
     // Get visibility context for filtering
     const { isAdmin } = await getVisibilityContext(userId, workspaceId);
@@ -515,8 +526,9 @@ router.get('/:id', authMiddleware, async (req: Request, res: Response) => {
 });
 
 // Create project (creates a document with document_type = 'project')
-router.post('/', authMiddleware, async (req: Request, res: Response) => {
+router.post('/', authMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
+    const { userId, workspaceId } = getRequestContext(req);
     const parsed = createProjectSchema.safeParse(req.body);
     if (!parsed.success) {
       res.status(400).json({ error: 'Invalid input', details: parsed.error.errors });
@@ -555,7 +567,7 @@ router.post('/', authMiddleware, async (req: Request, res: Response) => {
       `INSERT INTO documents (workspace_id, document_type, title, properties, created_by)
        VALUES ($1, 'project', $2, $3, $4)
        RETURNING id, title, properties, archived_at, created_at, updated_at`,
-      [req.workspaceId, title, JSON.stringify(properties), req.userId]
+      [workspaceId, title, JSON.stringify(properties), userId]
     );
 
     // Create program association in junction table (mirrors PATCH behavior)
@@ -598,11 +610,10 @@ router.post('/', authMiddleware, async (req: Request, res: Response) => {
 });
 
 // Update project
-router.patch('/:id', authMiddleware, async (req: Request, res: Response) => {
+router.patch('/:id', authMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const userId = req.userId!;
-    const workspaceId = req.workspaceId!;
+    const { userId, workspaceId } = getRequestContext(req);
 
     const parsed = updateProjectSchema.safeParse(req.body);
     if (!parsed.success) {
@@ -752,7 +763,7 @@ router.patch('/:id', authMiddleware, async (req: Request, res: Response) => {
       await pool.query(
         `UPDATE documents SET ${updates.join(', ')}
          WHERE id = $${paramIndex} AND workspace_id = $${paramIndex + 1} AND document_type = 'project'`,
-        [...values, id, req.workspaceId]
+        [...values, id, workspaceId]
       );
     }
 

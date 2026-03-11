@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="500" viewBox="0 0 1280 500">
+  <rect width="100%" height="100%" fill="white" />
+  <text x="72" y="34" font-family="ui-sans-serif, system-ui, sans-serif" font-size="28" font-weight="700" fill="#111827">baseline vs current-25pct: Totals</text>
+  <text x="72" y="58" font-family="ui-sans-serif, system-ui, sans-serif" font-size="14" fill="#6b7280">Paired bars for overall, production-only, and test-only violations.</text>
+  <g transform="translate(1030, 28)">
+    
+    <g font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#111827">
+      <rect x="0" y="0" width="12" height="12" rx="2" fill="#9ca3af" />
+      <text x="18" y="10">Baseline</text>
+      <rect x="96" y="0" width="12" height="12" rx="2" fill="#2563eb" />
+      <text x="114" y="10">Current</text>
+    </g>
+  
+  </g>
+  <line x1="72" y1="370" x2="1248" y2="370" stroke="#6b7280" />
+  
+      <line x1="72" y1="370" x2="1248" y2="370" stroke="#e5e7eb" />
+      <text x="62" y="374" text-anchor="end" font-size="12" fill="#6b7280">0</text>
+    
+      <line x1="72" y1="312.8" x2="1248" y2="312.8" stroke="#e5e7eb" />
+      <text x="62" y="316.8" text-anchor="end" font-size="12" fill="#6b7280">1,440</text>
+    
+      <line x1="72" y1="255.6" x2="1248" y2="255.6" stroke="#e5e7eb" />
+      <text x="62" y="259.6" text-anchor="end" font-size="12" fill="#6b7280">2,880</text>
+    
+      <line x1="72" y1="198.39999999999998" x2="1248" y2="198.39999999999998" stroke="#e5e7eb" />
+      <text x="62" y="202.39999999999998" text-anchor="end" font-size="12" fill="#6b7280">4,321</text>
+    
+      <line x1="72" y1="141.2" x2="1248" y2="141.2" stroke="#e5e7eb" />
+      <text x="62" y="145.2" text-anchor="end" font-size="12" fill="#6b7280">5,761</text>
+    
+      <line x1="72" y1="84" x2="1248" y2="84" stroke="#e5e7eb" />
+      <text x="62" y="88" text-anchor="end" font-size="12" fill="#6b7280">7,201</text>
+    
+  
+      <g font-family="ui-sans-serif, system-ui, sans-serif">
+        <rect x="224" y="84" width="40" height="286" rx="4" fill="#9ca3af" />
+        <rect x="272" y="139.00763782807942" width="40" height="230.99236217192058" rx="4" fill="#2563eb" />
+        <text x="244" y="76" text-anchor="middle" font-size="11" fill="#6b7280">7,201</text>
+        <text x="292" y="131.00763782807942" text-anchor="middle" font-size="11" fill="#6b7280">5,816</text>
+        <text x="268" y="394" text-anchor="middle" font-size="12" fill="#111827">overall</text>
+        <text x="268" y="414" text-anchor="middle" font-size="11" fill="#047857">delta -1,385</text>
+      </g>
+    
+      <g font-family="ui-sans-serif, system-ui, sans-serif">
+        <rect x="616" y="149.96944868768227" width="40" height="220.03055131231773" rx="4" fill="#9ca3af" />
+        <rect x="664" y="204.9770865157617" width="40" height="165.0229134842383" rx="4" fill="#2563eb" />
+        <text x="636" y="141.96944868768227" text-anchor="middle" font-size="11" fill="#6b7280">5,540</text>
+        <text x="684" y="196.9770865157617" text-anchor="middle" font-size="11" fill="#6b7280">4,155</text>
+        <text x="660" y="394" text-anchor="middle" font-size="12" fill="#111827">production_only</text>
+        <text x="660" y="414" text-anchor="middle" font-size="11" fill="#047857">delta -1,385</text>
+      </g>
+    
+      <g font-family="ui-sans-serif, system-ui, sans-serif">
+        <rect x="1008" y="304.03055131231775" width="40" height="65.96944868768226" rx="4" fill="#9ca3af" />
+        <rect x="1056" y="304.03055131231775" width="40" height="65.96944868768226" rx="4" fill="#2563eb" />
+        <text x="1028" y="296.03055131231775" text-anchor="middle" font-size="11" fill="#6b7280">1,661</text>
+        <text x="1076" y="296.03055131231775" text-anchor="middle" font-size="11" fill="#6b7280">1,661</text>
+        <text x="1052" y="394" text-anchor="middle" font-size="12" fill="#111827">tests_only</text>
+        <text x="1052" y="414" text-anchor="middle" font-size="11" fill="#047857">delta 0</text>
+      </g>
+    
+</svg>

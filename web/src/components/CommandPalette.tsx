@@ -31,7 +31,7 @@ interface CommandPaletteProps {
   onConvertDocument?: (newType: ConvertibleDocumentType) => void;
 }
 
-export function CommandPalette({ open, onOpenChange, currentDocument, onConvertDocument }: CommandPaletteProps) {
+export function CommandPalette({ open, onOpenChange, currentDocument, onConvertDocument }: CommandPaletteProps): React.JSX.Element | null {
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [documents, setDocuments] = useState<SearchableDocument[]>([]);
@@ -39,26 +39,26 @@ export function CommandPalette({ open, onOpenChange, currentDocument, onConvertD
   const dialogRef = useRef<HTMLDivElement>(null);
 
   // Focus trap implementation for WCAG 2.4.3 Focus Order
-  useEffect(() => {
+  useEffect((): (() => void) | void => {
     if (!open) return;
 
     const dialog = dialogRef.current;
     if (!dialog) return;
 
     // Get focusable elements within dialog
-    const getFocusableElements = () => {
+    const getFocusableElements = (): HTMLElement[] => {
       // Query for all focusable elements, including cmdk items
       const elements = Array.from(dialog.querySelectorAll<HTMLElement>(
         'input:not([disabled]), button:not([disabled]), [tabindex]:not([tabindex="-1"]), a[href], [role="option"]'
-      )).filter(el => {
+      )).filter((element): boolean => {
         // Filter out hidden elements
-        const style = window.getComputedStyle(el);
+        const style = window.getComputedStyle(element);
         return style.display !== 'none' && style.visibility !== 'hidden';
       });
       return elements;
     };
 
-    const handleKeyDown = (e: KeyboardEvent) => {
+    const handleKeyDown = (e: KeyboardEvent): void => {
       if (e.key !== 'Tab') return;
 
       // ALWAYS prevent default Tab behavior and manually handle focus
@@ -82,7 +82,7 @@ export function CommandPalette({ open, onOpenChange, currentDocument, onConvertD
     };
 
     // Fallback: if focus escapes to anywhere outside dialog, bring it back immediately
-    const handleFocusIn = (e: FocusEvent) => {
+    const handleFocusIn = (e: FocusEvent): void => {
       if (!dialog.contains(e.target as Node)) {
         const focusableElements = getFocusableElements();
         if (focusableElements.length > 0) {
@@ -100,12 +100,12 @@ export function CommandPalette({ open, onOpenChange, currentDocument, onConvertD
     };
   }, [open]);
 
-  const runCommand = useCallback((command: () => void) => {
+  const runCommand = useCallback((command: () => void): void => {
     onOpenChange(false);
     command();
   }, [onOpenChange]);
 
-  const createIssue = async () => {
+  const createIssue = async (): Promise<void> => {
     try {
       // Get the first program to create the issue in
       const programsRes = await apiGet('/api/programs');
@@ -122,12 +122,12 @@ export function CommandPalette({ open, onOpenChange, currentDocument, onConvertD
         const issue = await res.json();
         navigate(`/documents/${issue.id}`);
       }
-    } catch (err) {
-      console.error('Failed to create issue:', err);
+    } catch (error) {
+      console.error('Failed to create issue:', error);
     }
   };
 
-  const createDocument = async () => {
+  const createDocument = async (): Promise<void> => {
     try {
       const res = await apiPost('/api/documents', { title: 'Untitled', document_type: 'wiki' });
 
@@ -135,19 +135,19 @@ export function CommandPalette({ open, onOpenChange, currentDocument, onConvertD
         const doc = await res.json();
         navigate(`/documents/${doc.id}`);
       }
-    } catch (err) {
-      console.error('Failed to create document:', err);
+    } catch (error) {
+      console.error('Failed to create document:', error);
     }
   };
 
   // Fetch documents when palette opens
-  useEffect(() => {
+  useEffect((): void => {
     if (!open) {
       setSearch('');
       return;
     }
 
-    const fetchDocuments = async () => {
+    const fetchDocuments = async (): Promise<void> => {
       setLoading(true);
       try {
         const res = await apiGet('/api/documents');
@@ -155,8 +155,8 @@ export function CommandPalette({ open, onOpenChange, currentDocument, onConvertD
           const data = await res.json();
           setDocuments(data);
         }
-      } catch (err) {
-        console.error('Failed to fetch documents:', err);
+      } catch (error) {
+        console.error('Failed to fetch documents:', error);
       } finally {
         setLoading(false);
       }
@@ -166,7 +166,7 @@ export function CommandPalette({ open, onOpenChange, currentDocument, onConvertD
   }, [open]);
 
   // Group documents by type for display
-  const groupedDocuments = useMemo(() => {
+  const groupedDocuments = useMemo((): Record<string, SearchableDocument[]> => {
     const groups: Record<string, SearchableDocument[]> = {
       issue: [],
       wiki: [],
@@ -186,7 +186,7 @@ export function CommandPalette({ open, onOpenChange, currentDocument, onConvertD
   }, [documents]);
 
   // Get route for document type
-  const getDocumentRoute = useCallback((doc: SearchableDocument) => {
+  const getDocumentRoute = useCallback((doc: SearchableDocument): string => {
     switch (doc.document_type) {
       case 'wiki':
         return `/docs/${doc.id}`;
@@ -206,7 +206,7 @@ export function CommandPalette({ open, onOpenChange, currentDocument, onConvertD
   }, []);
 
   // Format document title for display (includes ticket number for issues)
-  const formatDocumentTitle = useCallback((doc: SearchableDocument) => {
+  const formatDocumentTitle = useCallback((doc: SearchableDocument): string => {
     if (doc.document_type === 'issue' && doc.ticket_number) {
       return `#${doc.ticket_number}: ${doc.title}`;
     }
@@ -220,7 +220,7 @@ export function CommandPalette({ open, onOpenChange, currentDocument, onConvertD
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/50"
-        onClick={() => onOpenChange(false)}
+        onClick={(): void => onOpenChange(false)}
       />
 
       {/* Command dialog */}
@@ -235,7 +235,7 @@ export function CommandPalette({ open, onOpenChange, currentDocument, onConvertD
         <Tooltip content="Close">
           <button
             type="button"
-            onClick={() => onOpenChange(false)}
+            onClick={(): void => onOpenChange(false)}
             aria-label="Close dialog"
             className="absolute right-2 top-2 z-10 rounded p-1 text-muted hover:bg-border hover:text-foreground transition-colors"
           >
@@ -246,7 +246,7 @@ export function CommandPalette({ open, onOpenChange, currentDocument, onConvertD
         </Tooltip>
         <Command
           className="rounded-lg border border-border bg-background shadow-2xl"
-          onKeyDown={(e) => {
+          onKeyDown={(e: React.KeyboardEvent): void => {
             if (e.key === 'Escape') onOpenChange(false);
           }}
         >
@@ -268,10 +268,10 @@ export function CommandPalette({ open, onOpenChange, currentDocument, onConvertD
             {/* Issues */}
             {groupedDocuments.issue.length > 0 && (
               <Command.Group heading="Issues" className="[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted">
-                {groupedDocuments.issue.map((doc) => (
+                {groupedDocuments.issue.map((doc): React.JSX.Element => (
                   <CommandItem
                     key={doc.id}
-                    onSelect={() => runCommand(() => navigate(getDocumentRoute(doc)))}
+                    onSelect={(): void => runCommand((): void => { void navigate(getDocumentRoute(doc)); })}
                     value={formatDocumentTitle(doc)}
                   >
                     <IssueIcon />
@@ -284,10 +284,10 @@ export function CommandPalette({ open, onOpenChange, currentDocument, onConvertD
             {/* Documents (Wiki) */}
             {groupedDocuments.wiki.length > 0 && (
               <Command.Group heading="Documents" className="[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted">
-                {groupedDocuments.wiki.map((doc) => (
+                {groupedDocuments.wiki.map((doc): React.JSX.Element => (
                   <CommandItem
                     key={doc.id}
-                    onSelect={() => runCommand(() => navigate(getDocumentRoute(doc)))}
+                    onSelect={(): void => runCommand((): void => { void navigate(getDocumentRoute(doc)); })}
                     value={doc.title}
                   >
                     <DocIcon />
@@ -300,10 +300,10 @@ export function CommandPalette({ open, onOpenChange, currentDocument, onConvertD
             {/* Programs */}
             {groupedDocuments.program.length > 0 && (
               <Command.Group heading="Programs" className="[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted">
-                {groupedDocuments.program.map((doc) => (
+                {groupedDocuments.program.map((doc): React.JSX.Element => (
                   <CommandItem
                     key={doc.id}
-                    onSelect={() => runCommand(() => navigate(getDocumentRoute(doc)))}
+                    onSelect={(): void => runCommand((): void => { void navigate(getDocumentRoute(doc)); })}
                     value={doc.title}
                   >
                     <ProgramIcon />
@@ -316,10 +316,10 @@ export function CommandPalette({ open, onOpenChange, currentDocument, onConvertD
             {/* Weeks */}
             {groupedDocuments.sprint.length > 0 && (
               <Command.Group heading="Weeks" className="[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted">
-                {groupedDocuments.sprint.map((doc) => (
+                {groupedDocuments.sprint.map((doc): React.JSX.Element => (
                   <CommandItem
                     key={doc.id}
-                    onSelect={() => runCommand(() => navigate(getDocumentRoute(doc)))}
+                    onSelect={(): void => runCommand((): void => { void navigate(getDocumentRoute(doc)); })}
                     value={doc.title}
                   >
                     <SprintIcon />
@@ -332,10 +332,10 @@ export function CommandPalette({ open, onOpenChange, currentDocument, onConvertD
             {/* People */}
             {groupedDocuments.person.length > 0 && (
               <Command.Group heading="People" className="[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted">
-                {groupedDocuments.person.map((doc) => (
+                {groupedDocuments.person.map((doc): React.JSX.Element => (
                   <CommandItem
                     key={doc.id}
-                    onSelect={() => runCommand(() => navigate(getDocumentRoute(doc)))}
+                    onSelect={(): void => runCommand((): void => { void navigate(getDocumentRoute(doc)); })}
                     value={doc.title}
                   >
                     <PersonIcon />
@@ -349,25 +349,25 @@ export function CommandPalette({ open, onOpenChange, currentDocument, onConvertD
             {currentDocument && onConvertDocument && ['wiki', 'issue', 'project', 'sprint'].includes(currentDocument.type) && (
               <Command.Group heading="Convert" className="[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted">
                 {currentDocument.type !== 'wiki' && (
-                  <CommandItem onSelect={() => runCommand(() => onConvertDocument('wiki'))}>
+                  <CommandItem onSelect={(): void => runCommand((): void => onConvertDocument('wiki'))}>
                     <ConvertIcon />
                     <span>Convert to Wiki</span>
                   </CommandItem>
                 )}
                 {currentDocument.type !== 'issue' && (
-                  <CommandItem onSelect={() => runCommand(() => onConvertDocument('issue'))}>
+                  <CommandItem onSelect={(): void => runCommand((): void => onConvertDocument('issue'))}>
                     <ConvertIcon />
                     <span>Convert to Issue</span>
                   </CommandItem>
                 )}
                 {currentDocument.type !== 'project' && (
-                  <CommandItem onSelect={() => runCommand(() => onConvertDocument('project'))}>
+                  <CommandItem onSelect={(): void => runCommand((): void => onConvertDocument('project'))}>
                     <ConvertIcon />
                     <span>Convert to Project</span>
                   </CommandItem>
                 )}
                 {currentDocument.type !== 'sprint' && (
-                  <CommandItem onSelect={() => runCommand(() => onConvertDocument('sprint'))}>
+                  <CommandItem onSelect={(): void => runCommand((): void => onConvertDocument('sprint'))}>
                     <ConvertIcon />
                     <span>Convert to Week</span>
                   </CommandItem>
@@ -377,11 +377,11 @@ export function CommandPalette({ open, onOpenChange, currentDocument, onConvertD
 
             {/* Create Actions */}
             <Command.Group heading="Create" className="[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted">
-              <CommandItem onSelect={() => runCommand(createIssue)}>
+              <CommandItem onSelect={(): void => runCommand((): void => { void createIssue(); })}>
                 <PlusIcon />
                 <span>Create Issue</span>
               </CommandItem>
-              <CommandItem onSelect={() => runCommand(createDocument)}>
+              <CommandItem onSelect={(): void => runCommand((): void => { void createDocument(); })}>
                 <DocIcon />
                 <span>Create Document</span>
               </CommandItem>
@@ -389,19 +389,19 @@ export function CommandPalette({ open, onOpenChange, currentDocument, onConvertD
 
             {/* Navigation */}
             <Command.Group heading="Navigate" className="[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted">
-              <CommandItem onSelect={() => runCommand(() => navigate('/docs'))}>
+              <CommandItem onSelect={(): void => runCommand((): void => { void navigate('/docs'); })}>
                 <DocIcon />
                 <span>Go to Documents</span>
               </CommandItem>
-              <CommandItem onSelect={() => runCommand(() => navigate('/issues'))}>
+              <CommandItem onSelect={(): void => runCommand((): void => { void navigate('/issues'); })}>
                 <IssueIcon />
                 <span>Go to Issues</span>
               </CommandItem>
-              <CommandItem onSelect={() => runCommand(() => navigate('/programs'))}>
+              <CommandItem onSelect={(): void => runCommand((): void => { void navigate('/programs'); })}>
                 <ProgramIcon />
                 <span>Go to Programs</span>
               </CommandItem>
-              <CommandItem onSelect={() => runCommand(() => navigate('/team'))}>
+              <CommandItem onSelect={(): void => runCommand((): void => { void navigate('/team'); })}>
                 <TeamIcon />
                 <span>Go to Team</span>
               </CommandItem>
@@ -422,7 +422,7 @@ export function CommandPalette({ open, onOpenChange, currentDocument, onConvertD
   );
 }
 
-function CommandItem({ children, onSelect, value }: { children: React.ReactNode; onSelect: () => void; value?: string }) {
+function CommandItem({ children, onSelect, value }: { children: React.ReactNode; onSelect: () => void; value?: string }): React.JSX.Element {
   return (
     <Command.Item
       onSelect={onSelect}
@@ -437,7 +437,7 @@ function CommandItem({ children, onSelect, value }: { children: React.ReactNode;
   );
 }
 
-function PlusIcon() {
+function PlusIcon(): React.JSX.Element {
   return (
     <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -445,7 +445,7 @@ function PlusIcon() {
   );
 }
 
-function DocIcon() {
+function DocIcon(): React.JSX.Element {
   return (
     <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -453,7 +453,7 @@ function DocIcon() {
   );
 }
 
-function IssueIcon() {
+function IssueIcon(): React.JSX.Element {
   return (
     <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
@@ -461,7 +461,7 @@ function IssueIcon() {
   );
 }
 
-function ProgramIcon() {
+function ProgramIcon(): React.JSX.Element {
   return (
     <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
@@ -469,7 +469,7 @@ function ProgramIcon() {
   );
 }
 
-function TeamIcon() {
+function TeamIcon(): React.JSX.Element {
   return (
     <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
@@ -477,7 +477,7 @@ function TeamIcon() {
   );
 }
 
-function SprintIcon() {
+function SprintIcon(): React.JSX.Element {
   return (
     <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -485,7 +485,7 @@ function SprintIcon() {
   );
 }
 
-function PersonIcon() {
+function PersonIcon(): React.JSX.Element {
   return (
     <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -493,7 +493,7 @@ function PersonIcon() {
   );
 }
 
-function ConvertIcon() {
+function ConvertIcon(): React.JSX.Element {
   return (
     <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />

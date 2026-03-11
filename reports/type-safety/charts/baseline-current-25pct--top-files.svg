@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="544" viewBox="0 0 1400 544">
+  <rect width="100%" height="100%" fill="white" />
+  <text x="420" y="34" font-family="ui-sans-serif, system-ui, sans-serif" font-size="28" font-weight="700" fill="#111827">baseline vs current-25pct: Top 10 Files by Baseline Severity</text>
+  <text x="420" y="58" font-family="ui-sans-serif, system-ui, sans-serif" font-size="14" fill="#6b7280">Production files only. Ordered by baseline violation count.</text>
+  <g transform="translate(1140, 28)">
+    
+    <g font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#111827">
+      <rect x="0" y="0" width="12" height="12" rx="2" fill="#9ca3af" />
+      <text x="18" y="10">Baseline</text>
+      <rect x="96" y="0" width="12" height="12" rx="2" fill="#2563eb" />
+      <text x="114" y="10">Current</text>
+    </g>
+  
+  </g>
+  
+      <line x1="420" y1="82" x2="420" y2="510" stroke="#e5e7eb" />
+      <text x="420" y="76" text-anchor="middle" font-size="12" fill="#6b7280">0</text>
+    
+      <line x1="601.6" y1="82" x2="601.6" y2="510" stroke="#e5e7eb" />
+      <text x="601.6" y="76" text-anchor="middle" font-size="12" fill="#6b7280">38</text>
+    
+      <line x1="783.2" y1="82" x2="783.2" y2="510" stroke="#e5e7eb" />
+      <text x="783.2" y="76" text-anchor="middle" font-size="12" fill="#6b7280">76</text>
+    
+      <line x1="964.8" y1="82" x2="964.8" y2="510" stroke="#e5e7eb" />
+      <text x="964.8" y="76" text-anchor="middle" font-size="12" fill="#6b7280">113</text>
+    
+      <line x1="1146.4" y1="82" x2="1146.4" y2="510" stroke="#e5e7eb" />
+      <text x="1146.4" y="76" text-anchor="middle" font-size="12" fill="#6b7280">151</text>
+    
+      <line x1="1328" y1="82" x2="1328" y2="510" stroke="#e5e7eb" />
+      <text x="1328" y="76" text-anchor="middle" font-size="12" fill="#6b7280">189</text>
+    
+  
+      <g font-family="ui-sans-serif, system-ui, sans-serif">
+        <text x="408" y="104" text-anchor="end" font-size="12" fill="#111827">web/src/components/IssuesList.tsx</text>
+        <rect x="420" y="90" width="908" height="12" rx="3" fill="#9ca3af" />
+        <rect x="420" y="106" width="326.6878306878307" height="12" rx="3" fill="#2563eb" />
+        <text x="1336" y="100" font-size="11" fill="#6b7280">189</text>
+        <text x="754.6878306878307" y="116" font-size="11" fill="#6b7280">68</text>
+        <text x="1336" y="108" font-size="11" fill="#047857">-121</text>
+      </g>
+    
+      <g font-family="ui-sans-serif, system-ui, sans-serif">
+        <text x="408" y="146" text-anchor="end" font-size="12" fill="#111827">web/src/pages/App.tsx</text>
+        <rect x="420" y="132" width="864.7619047619047" height="12" rx="3" fill="#9ca3af" />
+        <rect x="420" y="148" width="259.4285714285714" height="12" rx="3" fill="#2563eb" />
+        <text x="1292.7619047619046" y="142" font-size="11" fill="#6b7280">180</text>
+        <text x="687.4285714285713" y="158" font-size="11" fill="#6b7280">54</text>
+        <text x="1336" y="150" font-size="11" fill="#047857">-126</text>
+      </g>
+    
+      <g font-family="ui-sans-serif, system-ui, sans-serif">
+        <text x="408" y="188" text-anchor="end" font-size="12" fill="#111827">api/src/routes/weeks.ts</text>
+        <rect x="420" y="174" width="763.8730158730159" height="12" rx="3" fill="#9ca3af" />
+        <rect x="420" y="190" width="398.75132275132273" height="12" rx="3" fill="#2563eb" />
+        <text x="1191.873015873016" y="184" font-size="11" fill="#6b7280">159</text>
+        <text x="826.7513227513227" y="200" font-size="11" fill="#6b7280">83</text>
+        <text x="1336" y="192" font-size="11" fill="#047857">-76</text>
+      </g>
+    
+      <g font-family="ui-sans-serif, system-ui, sans-serif">
+        <text x="408" y="230" text-anchor="end" font-size="12" fill="#111827">web/src/pages/ReviewsPage.tsx</text>
+        <rect x="420" y="216" width="720.6349206349206" height="12" rx="3" fill="#9ca3af" />
+        <rect x="420" y="232" width="38.43386243386243" height="12" rx="3" fill="#2563eb" />
+        <text x="1148.6349206349205" y="226" font-size="11" fill="#6b7280">150</text>
+        <text x="466.43386243386243" y="242" font-size="11" fill="#6b7280">8</text>
+        <text x="1336" y="234" font-size="11" fill="#047857">-142</text>
+      </g>
+    
+      <g font-family="ui-sans-serif, system-ui, sans-serif">
+        <text x="408" y="272" text-anchor="end" font-size="12" fill="#111827">api/src/routes/issues.ts</text>
+        <rect x="420" y="258" width="586.1164021164021" height="12" rx="3" fill="#9ca3af" />
+        <rect x="420" y="274" width="326.6878306878307" height="12" rx="3" fill="#2563eb" />
+        <text x="1014.1164021164021" y="268" font-size="11" fill="#6b7280">122</text>
+        <text x="754.6878306878307" y="284" font-size="11" fill="#6b7280">68</text>
+        <text x="1336" y="276" font-size="11" fill="#047857">-54</text>
+      </g>
+    
+      <g font-family="ui-sans-serif, system-ui, sans-serif">
+        <text x="408" y="314" text-anchor="end" font-size="12" fill="#111827">web/src/components/Editor.tsx</text>
+        <rect x="420" y="300" width="547.6825396825396" height="12" rx="3" fill="#9ca3af" />
+        <rect x="420" y="316" width="105.69312169312168" height="12" rx="3" fill="#2563eb" />
+        <text x="975.6825396825396" y="310" font-size="11" fill="#6b7280">114</text>
+        <text x="533.6931216931217" y="326" font-size="11" fill="#6b7280">22</text>
+        <text x="1336" y="318" font-size="11" fill="#047857">-92</text>
+      </g>
+    
+      <g font-family="ui-sans-serif, system-ui, sans-serif">
+        <text x="408" y="356" text-anchor="end" font-size="12" fill="#111827">web/src/pages/TeamMode.tsx</text>
+        <rect x="420" y="342" width="518.8571428571428" height="12" rx="3" fill="#9ca3af" />
+        <rect x="420" y="358" width="4.804232804232804" height="12" rx="3" fill="#2563eb" />
+        <text x="946.8571428571428" y="352" font-size="11" fill="#6b7280">108</text>
+        <text x="432.8042328042328" y="368" font-size="11" fill="#6b7280">1</text>
+        <text x="1336" y="360" font-size="11" fill="#047857">-107</text>
+      </g>
+    
+      <g font-family="ui-sans-serif, system-ui, sans-serif">
+        <text x="408" y="398" text-anchor="end" font-size="12" fill="#111827">web/src/hooks/useWeeksQuery.ts</text>
+        <rect x="420" y="384" width="485.22751322751327" height="12" rx="3" fill="#9ca3af" />
+        <rect x="420" y="400" width="67.25925925925925" height="12" rx="3" fill="#2563eb" />
+        <text x="913.2275132275133" y="394" font-size="11" fill="#6b7280">101</text>
+        <text x="495.25925925925924" y="410" font-size="11" fill="#6b7280">14</text>
+        <text x="1336" y="402" font-size="11" fill="#047857">-87</text>
+      </g>
+    
+      <g font-family="ui-sans-serif, system-ui, sans-serif">
+        <text x="408" y="440" text-anchor="end" font-size="12" fill="#111827">api/src/routes/projects.ts</text>
+        <rect x="420" y="426" width="441.989417989418" height="12" rx="3" fill="#9ca3af" />
+        <rect x="420" y="442" width="355.5132275132275" height="12" rx="3" fill="#2563eb" />
+        <text x="869.9894179894179" y="436" font-size="11" fill="#6b7280">92</text>
+        <text x="783.5132275132275" y="452" font-size="11" fill="#6b7280">74</text>
+        <text x="1336" y="444" font-size="11" fill="#047857">-18</text>
+      </g>
+    
+      <g font-family="ui-sans-serif, system-ui, sans-serif">
+        <text x="408" y="482" text-anchor="end" font-size="12" fill="#111827">web/src/pages/UnifiedDocumentPage.tsx</text>
+        <rect x="420" y="468" width="441.989417989418" height="12" rx="3" fill="#9ca3af" />
+        <rect x="420" y="484" width="273.8412698412698" height="12" rx="3" fill="#2563eb" />
+        <text x="869.9894179894179" y="478" font-size="11" fill="#6b7280">92</text>
+        <text x="701.8412698412699" y="494" font-size="11" fill="#6b7280">57</text>
+        <text x="1336" y="486" font-size="11" fill="#047857">-35</text>
+      </g>
+    
+</svg>

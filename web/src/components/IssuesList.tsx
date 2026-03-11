@@ -226,7 +226,7 @@ export function IssuesList({
   enableInlineSprintAssignment = false,
   showBacklogPicker = false,
   allowShowAllIssues = false,
-}: IssuesListProps) {
+}: IssuesListProps): React.JSX.Element {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const bulkUpdate = useBulkUpdateIssues();
@@ -238,9 +238,9 @@ export function IssuesList({
 
   // Fetch sprints when program context is available (for bulk actions and inline assignment)
   const { data: sprintsData } = useSprintsQuery(lockedProgramId);
-  const availableSprints = useMemo(() => {
+  const availableSprints = useMemo((): { id: string; name: string }[] => {
     if (!sprintsData?.weeks) return [];
-    return sprintsData.weeks.map(s => ({ id: s.id, name: s.name }));
+    return sprintsData.weeks.map((s): { id: string; name: string } => ({ id: s.id, name: s.name }));
   }, [sprintsData]);
 
   // Determine if we should self-fetch based on locked filters
@@ -269,7 +269,7 @@ export function IssuesList({
   const createIssueMutation = useCreateIssue();
 
   // Compute effective context for issue creation (from inheritedContext or locked filters)
-  const effectiveContext = useMemo(() => {
+  const effectiveContext = useMemo((): NonNullable<IssuesListProps['inheritedContext']> => {
     // Prefer explicit inheritedContext over locked filters
     const projectId = inheritedContext?.projectId ?? lockedProjectId;
     const sprintId = inheritedContext?.sprintId ?? lockedSprintId;
@@ -277,7 +277,7 @@ export function IssuesList({
 
     // Infer program from project if project is set and program isn't
     if (projectId && !programId) {
-      const project = projects.find(p => p.id === projectId);
+      const project = projects.find((p): boolean => p.id === projectId);
       if (project?.program_id) {
         programId = project.program_id;
       }
@@ -311,17 +311,17 @@ export function IssuesList({
   const loading = shouldSelfFetch ? (isFetchingIssues || (showAllIssues && isLoadingAllIssues)) : loadingProp;
 
   // Create set of in-context issue IDs for quick lookup
-  const inContextIds = useMemo(() => {
-    return new Set(inContextIssues.map(i => i.id));
+  const inContextIds = useMemo((): Set<string> => {
+    return new Set(inContextIssues.map((i): string => i.id));
   }, [inContextIssues]);
 
   // Combine in-context and out-of-context issues when showAllIssues toggle is enabled
-  const issues = useMemo(() => {
+  const issues = useMemo((): Issue[] => {
     if (!showAllIssues || !allIssuesData) {
       return inContextIssues;
     }
     // Get out-of-context issues (not already in the in-context set)
-    const outOfContextIssues = allIssuesData.filter(issue => !inContextIds.has(issue.id));
+    const outOfContextIssues = allIssuesData.filter((issue): boolean => !inContextIds.has(issue.id));
     // Return in-context first, then out-of-context
     return [...inContextIssues, ...outOfContextIssues];
   }, [showAllIssues, inContextIssues, allIssuesData, inContextIds]);
@@ -343,7 +343,7 @@ export function IssuesList({
   const stateUrlParam = urlParamPrefix ? `${urlParamPrefix}_state` : null;
 
   // Initialize state from URL if URL sync is enabled, otherwise use prop
-  const getInitialStateFilter = () => {
+  const getInitialStateFilter = (): string => {
     if (stateUrlParam) {
       return searchParams.get(stateUrlParam) ?? initialStateFilter;
     }
@@ -375,7 +375,7 @@ export function IssuesList({
   const undoTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Clear undo state helper
-  const clearUndoState = useCallback(() => {
+  const clearUndoState = useCallback((): void => {
     if (undoTimeoutRef.current) {
       clearTimeout(undoTimeoutRef.current);
       undoTimeoutRef.current = null;
@@ -384,16 +384,16 @@ export function IssuesList({
   }, []);
 
   // Set undo state with 30s timeout
-  const setUndoWithTimeout = useCallback((state: UndoState) => {
+  const setUndoWithTimeout = useCallback((state: UndoState): void => {
     clearUndoState();
     undoStateRef.current = state;
-    undoTimeoutRef.current = setTimeout(() => {
+    undoTimeoutRef.current = setTimeout((): void => {
       undoStateRef.current = null;
     }, 30000);
   }, [clearUndoState]);
 
   // Execute undo action
-  const executeUndo = useCallback(() => {
+  const executeUndo = useCallback((): void => {
     const undoState = undoStateRef.current;
     if (!undoState) return;
 
@@ -401,7 +401,7 @@ export function IssuesList({
 
     // Group issues by their previous values for efficient batch updates
     const updatesByValue = new Map<string, string[]>();
-    ids.forEach(id => {
+    ids.forEach((id): void => {
       const prev = previousValues.get(id);
       if (!prev) return;
 
@@ -428,7 +428,7 @@ export function IssuesList({
     });
 
     // Execute each group of updates
-    updatesByValue.forEach((issueIds, key) => {
+    updatesByValue.forEach((issueIds, key): void => {
       const [type, value] = key.split(':');
       const actualValue = value === 'null' ? null : value;
 
@@ -453,8 +453,8 @@ export function IssuesList({
   }, [bulkUpdate, showToast, clearUndoState]);
 
   // Cleanup timeout on unmount
-  useEffect(() => {
-    return () => {
+  useEffect((): (() => void) => {
+    return (): void => {
       if (undoTimeoutRef.current) {
         clearTimeout(undoTimeoutRef.current);
       }
@@ -480,7 +480,7 @@ export function IssuesList({
   const [, forceUpdate] = useState(0);
 
   // Persist selection changes to context
-  useEffect(() => {
+  useEffect((): void => {
     if (selectionPersistenceKey && selectionPersistence) {
       selectionPersistence.setSelection(selectionPersistenceKey, {
         selectedIds,
@@ -490,14 +490,14 @@ export function IssuesList({
   }, [selectedIds, selectionPersistenceKey, selectionPersistence]);
 
   // Sync state filter with external state (when not using URL sync)
-  useEffect(() => {
+  useEffect((): void => {
     if (!stateUrlParam) {
       setStateFilter(initialStateFilter);
     }
   }, [initialStateFilter, stateUrlParam]);
 
   // Sync state filter from URL (when using URL sync)
-  useEffect(() => {
+  useEffect((): void => {
     if (stateUrlParam) {
       const urlValue = searchParams.get(stateUrlParam) ?? '';
       if (urlValue !== stateFilter) {
@@ -507,9 +507,9 @@ export function IssuesList({
   }, [searchParams, stateUrlParam, stateFilter]);
 
   // Compute unique programs from issues for the filter dropdown
-  const programOptions = useMemo(() => {
+  const programOptions = useMemo((): Array<{ value: string; label: string }> => {
     const programMap = new Map<string, string>();
-    issues.forEach(issue => {
+    issues.forEach((issue): void => {
       const programId = getProgramId(issue);
       const programName = getProgramTitle(issue);
       if (programId && programName) {
@@ -517,14 +517,14 @@ export function IssuesList({
       }
     });
     return Array.from(programMap.entries())
-      .map(([id, name]) => ({ value: id, label: name }))
-      .sort((a, b) => a.label.localeCompare(b.label));
+      .map(([id, name]): { value: string; label: string } => ({ value: id, label: name }))
+      .sort((a, b): number => a.label.localeCompare(b.label));
   }, [issues]);
 
   // Compute unique projects from issues for the filter dropdown
-  const projectOptions = useMemo(() => {
+  const projectOptions = useMemo((): Array<{ value: string; label: string }> => {
     const projectMap = new Map<string, string>();
-    issues.forEach(issue => {
+    issues.forEach((issue): void => {
       const projectId = getProjectId(issue);
       const projectName = getProjectTitle(issue);
       if (projectId && projectName) {
@@ -532,14 +532,14 @@ export function IssuesList({
       }
     });
     return Array.from(projectMap.entries())
-      .map(([id, name]) => ({ value: id, label: name }))
-      .sort((a, b) => a.label.localeCompare(b.label));
+      .map(([id, name]): { value: string; label: string } => ({ value: id, label: name }))
+      .sort((a, b): number => a.label.localeCompare(b.label));
   }, [issues]);
 
   // Compute unique sprints from issues for the filter dropdown
-  const sprintOptions = useMemo(() => {
+  const sprintOptions = useMemo((): Array<{ value: string; label: string }> => {
     const sprintMap = new Map<string, string>();
-    issues.forEach(issue => {
+    issues.forEach((issue): void => {
       const sprintId = getSprintId(issue);
       const sprintName = getSprintTitle(issue);
       if (sprintId && sprintName) {
@@ -547,42 +547,42 @@ export function IssuesList({
       }
     });
     return Array.from(sprintMap.entries())
-      .map(([id, name]) => ({ value: id, label: name }))
-      .sort((a, b) => a.label.localeCompare(b.label));
+      .map(([id, name]): { value: string; label: string } => ({ value: id, label: name }))
+      .sort((a, b): number => a.label.localeCompare(b.label));
   }, [issues]);
 
   // Filter issues based on state filter AND program/project/sprint filters
-  const filteredIssues = useMemo(() => {
+  const filteredIssues = useMemo((): Issue[] => {
     let result = issues;
 
     // Apply program filter
     if (programFilter) {
-      result = result.filter(issue => getProgramId(issue) === programFilter);
+      result = result.filter((issue): boolean => getProgramId(issue) === programFilter);
     }
 
     // Apply project filter
     if (projectFilter) {
-      result = result.filter(issue => getProjectId(issue) === projectFilter);
+      result = result.filter((issue): boolean => getProjectId(issue) === projectFilter);
     }
 
     // Apply sprint filter
     if (sprintFilter) {
-      result = result.filter(issue => getSprintId(issue) === sprintFilter);
+      result = result.filter((issue): boolean => getSprintId(issue) === sprintFilter);
     }
 
     // Apply state filter (or special filters)
     if (stateFilter === '__no_project__') {
       // Special filter: show issues without a project association
-      result = result.filter(issue => !getProjectId(issue));
+      result = result.filter((issue): boolean => !getProjectId(issue));
     } else if (stateFilter) {
       const states = stateFilter.split(',');
-      result = result.filter(issue => states.includes(issue.state));
+      result = result.filter((issue): boolean => states.includes(issue.state));
     }
 
     return result;
   }, [issues, stateFilter, programFilter, projectFilter, sprintFilter]);
 
-  const handleCreateIssue = useCallback(async () => {
+  const handleCreateIssue = useCallback(async (): Promise<void> => {
     // When self-fetching with context, use internal creation
     if (shouldSelfFetch) {
       const belongs_to = buildBelongsTo();
@@ -601,18 +601,18 @@ export function IssuesList({
   }, [shouldSelfFetch, buildBelongsTo, createIssueMutation, onCreateIssue, navigate]);
 
   // Handler for adding an out-of-context issue to the current context (inline '+' button)
-  const handleAddIssueToContext = useCallback(async (issue: Issue) => {
+  const handleAddIssueToContext = useCallback(async (issue: Issue): Promise<void> => {
     const existingBelongsTo = issue.belongs_to || [];
     const newBelongsTo = [...existingBelongsTo];
 
     // Add context associations that aren't already present
-    if (effectiveContext.sprintId && !existingBelongsTo.some(b => b.id === effectiveContext.sprintId)) {
+    if (effectiveContext.sprintId && !existingBelongsTo.some((b): boolean => b.id === effectiveContext.sprintId)) {
       newBelongsTo.push({ id: effectiveContext.sprintId, type: 'sprint' });
     }
-    if (effectiveContext.projectId && !existingBelongsTo.some(b => b.id === effectiveContext.projectId)) {
+    if (effectiveContext.projectId && !existingBelongsTo.some((b): boolean => b.id === effectiveContext.projectId)) {
       newBelongsTo.push({ id: effectiveContext.projectId, type: 'project' });
     }
-    if (effectiveContext.programId && !existingBelongsTo.some(b => b.id === effectiveContext.programId)) {
+    if (effectiveContext.programId && !existingBelongsTo.some((b): boolean => b.id === effectiveContext.programId)) {
       newBelongsTo.push({ id: effectiveContext.programId, type: 'program' });
     }
 
@@ -636,11 +636,11 @@ export function IssuesList({
     }
   }, [effectiveContext, queryClient, showToast]);
 
-  const handleFilterChange = useCallback((newFilter: string) => {
+  const handleFilterChange = useCallback((newFilter: string): void => {
     setStateFilter(newFilter);
     // Update URL if URL sync is enabled
     if (stateUrlParam) {
-      setSearchParams((prev) => {
+      setSearchParams((prev): URLSearchParams => {
         if (newFilter) {
           prev.set(stateUrlParam, newFilter);
         } else {
@@ -653,14 +653,14 @@ export function IssuesList({
     onStateFilterChange?.(newFilter);
   }, [onStateFilterChange, stateUrlParam, setSearchParams]);
 
-  const handleUpdateIssue = useCallback(async (id: string, updates: { state: string }) => {
+  const handleUpdateIssue = useCallback(async (id: string, updates: { state: string }): Promise<void> => {
     if (onUpdateIssue) {
       await onUpdateIssue(id, updates);
     }
   }, [onUpdateIssue]);
 
   // Clear selection helper
-  const clearSelection = useCallback(() => {
+  const clearSelection = useCallback((): void => {
     setSelectedIds(new Set());
     selectionRef.current?.clearSelection();
     setContextMenu(null);
@@ -668,7 +668,7 @@ export function IssuesList({
 
   // Clear selection when filter changes (but not on initial mount to preserve persisted selection)
   const prevStateFilterRef = useRef(stateFilter);
-  useEffect(() => {
+  useEffect((): void => {
     if (prevStateFilterRef.current !== stateFilter) {
       clearSelection();
       prevStateFilterRef.current = stateFilter;
@@ -676,7 +676,7 @@ export function IssuesList({
   }, [stateFilter, clearSelection]);
 
   // Bulk action handlers
-  const handleBulkArchive = useCallback(() => {
+  const handleBulkArchive = useCallback((): void => {
     const ids = Array.from(selectedIds);
     if (ids.length === 0) return;
     const count = ids.length;
@@ -689,7 +689,7 @@ export function IssuesList({
           5000,
           {
             label: 'Undo',
-            onClick: () => {
+            onClick: (): void => {
               bulkUpdate.mutate({ ids, action: 'restore' }, {
                 onSuccess: () => {
                   showToast('Archive undone', 'info');
@@ -700,12 +700,12 @@ export function IssuesList({
           }
         );
       },
-      onError: () => showToast('Failed to archive issues', 'error'),
+      onError: (): void => showToast('Failed to archive issues', 'error'),
     });
     clearSelection();
   }, [selectedIds, bulkUpdate, showToast, clearSelection, onRefreshIssues]);
 
-  const handleBulkDelete = useCallback(() => {
+  const handleBulkDelete = useCallback((): void => {
     const ids = Array.from(selectedIds);
     if (ids.length === 0) return;
     const count = ids.length;
@@ -718,24 +718,24 @@ export function IssuesList({
           5000,
           {
             label: 'Undo',
-            onClick: () => {
+            onClick: (): void => {
               bulkUpdate.mutate({ ids, action: 'restore' }, {
                 onSuccess: () => {
                   showToast('Delete undone', 'info');
                   onRefreshIssues?.();
                 },
-                onError: () => showToast('Failed to undo delete', 'error'),
+                onError: (): void => showToast('Failed to undo delete', 'error'),
               });
             },
           }
         );
       },
-      onError: () => showToast('Failed to delete issues', 'error'),
+      onError: (): void => showToast('Failed to delete issues', 'error'),
     });
     clearSelection();
   }, [selectedIds, bulkUpdate, showToast, clearSelection, onRefreshIssues]);
 
-  const handleBulkMoveToSprint = useCallback((sprintId: string | null) => {
+  const handleBulkMoveToSprint = useCallback((sprintId: string | null): void => {
     const ids = Array.from(selectedIds);
     if (ids.length === 0) return;
     const count = ids.length;
@@ -744,15 +744,15 @@ export function IssuesList({
 
     // Save previous values for undo
     const previousValues = new Map<string, { sprint_id: string | null }>();
-    ids.forEach(id => {
-      const issue = issues.find(i => i.id === id);
+    ids.forEach((id): void => {
+      const issue = issues.find((i): boolean => i.id === id);
       if (issue) {
         previousValues.set(id, { sprint_id: getSprintId(issue) ?? null });
       }
     });
 
     bulkUpdate.mutate({ ids, action: 'update', updates: { sprint_id: sprintId } }, {
-      onSuccess: () => {
+      onSuccess: (): void => {
         // Set up undo state
         setUndoWithTimeout({
           action: 'sprint',
@@ -762,7 +762,7 @@ export function IssuesList({
         });
 
         const sprintName = sprintId
-          ? availableSprints.find(s => s.id === sprintId)?.name || 'week'
+          ? availableSprints.find((s): boolean => s.id === sprintId)?.name || 'week'
           : 'No Week';
         const message = movingOutOfView
           ? `${count} issue${count === 1 ? '' : 's'} moved out of this view`
@@ -772,12 +772,12 @@ export function IssuesList({
           onClick: executeUndo,
         });
       },
-      onError: () => showToast('Failed to move issues', 'error'),
+      onError: (): void => showToast('Failed to move issues', 'error'),
     });
     clearSelection();
   }, [selectedIds, issues, bulkUpdate, showToast, clearSelection, lockedSprintId, setUndoWithTimeout, executeUndo, availableSprints]);
 
-  const handleBulkChangeStatus = useCallback((status: string) => {
+  const handleBulkChangeStatus = useCallback((status: string): void => {
     const ids = Array.from(selectedIds);
     if (ids.length === 0) return;
     const count = ids.length;
@@ -785,15 +785,15 @@ export function IssuesList({
 
     // Save previous values for undo
     const previousValues = new Map<string, { state: string }>();
-    ids.forEach(id => {
-      const issue = issues.find(i => i.id === id);
+    ids.forEach((id): void => {
+      const issue = issues.find((i): boolean => i.id === id);
       if (issue) {
         previousValues.set(id, { state: issue.state });
       }
     });
 
     bulkUpdate.mutate({ ids, action: 'update', updates: { state: status } }, {
-      onSuccess: () => {
+      onSuccess: (): void => {
         // Set up undo state
         setUndoWithTimeout({
           action: 'status',
@@ -807,30 +807,30 @@ export function IssuesList({
           onClick: executeUndo,
         });
       },
-      onError: () => showToast('Failed to update issues', 'error'),
+      onError: (): void => showToast('Failed to update issues', 'error'),
     });
     clearSelection();
   }, [selectedIds, issues, bulkUpdate, showToast, clearSelection, setUndoWithTimeout, executeUndo]);
 
-  const handleBulkAssign = useCallback((assigneeId: string | null) => {
+  const handleBulkAssign = useCallback((assigneeId: string | null): void => {
     const ids = Array.from(selectedIds);
     if (ids.length === 0) return;
     const count = ids.length;
-    const teamMember = assigneeId ? teamMembers.find(m => m.id === assigneeId) : null;
+    const teamMember = assigneeId ? teamMembers.find((m): boolean => m.id === assigneeId) : null;
     const assigneeName = teamMember?.name || 'Unassigned';
     const userId = teamMember?.user_id || null;
 
     // Save previous values for undo
     const previousValues = new Map<string, { assignee_id: string | null }>();
-    ids.forEach(id => {
-      const issue = issues.find(i => i.id === id);
+    ids.forEach((id): void => {
+      const issue = issues.find((i): boolean => i.id === id);
       if (issue) {
         previousValues.set(id, { assignee_id: issue.assignee_id ?? null });
       }
     });
 
     bulkUpdate.mutate({ ids, action: 'update', updates: { assignee_id: userId } }, {
-      onSuccess: () => {
+      onSuccess: (): void => {
         // Set up undo state
         setUndoWithTimeout({
           action: 'assign',
@@ -844,31 +844,31 @@ export function IssuesList({
           onClick: executeUndo,
         });
       },
-      onError: () => showToast('Failed to assign issues', 'error'),
+      onError: (): void => showToast('Failed to assign issues', 'error'),
     });
     clearSelection();
   }, [selectedIds, issues, teamMembers, bulkUpdate, showToast, clearSelection, setUndoWithTimeout, executeUndo]);
 
-  const handleBulkAssignProject = useCallback((projectId: string | null) => {
+  const handleBulkAssignProject = useCallback((projectId: string | null): void => {
     const ids = Array.from(selectedIds);
     if (ids.length === 0) return;
     const count = ids.length;
-    const project = projectId ? projects.find(p => p.id === projectId) : null;
+    const project = projectId ? projects.find((p): boolean => p.id === projectId) : null;
     const projectName = project?.title || 'No Project';
     // Check if moving issues out of the current locked context
     const movingOutOfView = lockedProjectId && projectId !== lockedProjectId;
 
     // Save previous values for undo
     const previousValues = new Map<string, { project_id: string | null }>();
-    ids.forEach(id => {
-      const issue = issues.find(i => i.id === id);
+    ids.forEach((id): void => {
+      const issue = issues.find((i): boolean => i.id === id);
       if (issue) {
         previousValues.set(id, { project_id: getProjectId(issue) ?? null });
       }
     });
 
     bulkUpdate.mutate({ ids, action: 'update', updates: { project_id: projectId } }, {
-      onSuccess: () => {
+      onSuccess: (): void => {
         // Set up undo state
         setUndoWithTimeout({
           action: 'project',
@@ -885,19 +885,19 @@ export function IssuesList({
           onClick: executeUndo,
         });
       },
-      onError: () => showToast('Failed to assign issues to project', 'error'),
+      onError: (): void => showToast('Failed to assign issues to project', 'error'),
     });
     clearSelection();
   }, [selectedIds, issues, projects, bulkUpdate, showToast, clearSelection, lockedProjectId, setUndoWithTimeout, executeUndo]);
 
   // Handle promote to project
-  const handlePromoteToProject = useCallback((issue: Issue) => {
+  const handlePromoteToProject = useCallback((issue: Issue): void => {
     setConvertingIssue(issue);
     setContextMenu(null);
   }, []);
 
   // Execute the conversion to project
-  const executeConversion = useCallback(async () => {
+  const executeConversion = useCallback(async (): Promise<void> => {
     if (!convertingIssue) return;
     setIsConverting(true);
     try {
@@ -916,8 +916,8 @@ export function IssuesList({
         setIsConverting(false);
         setConvertingIssue(null);
       }
-    } catch (err) {
-      console.error('Failed to convert issue:', err);
+    } catch (error) {
+      console.error('Failed to convert issue:', error);
       showToast('Failed to convert issue to project', 'error');
       setIsConverting(false);
       setConvertingIssue(null);
@@ -925,10 +925,10 @@ export function IssuesList({
   }, [convertingIssue, navigate, showToast, queryClient]);
 
   // Selection change handler
-  const handleSelectionChange = useCallback((newSelectedIds: Set<string>, newSelection: UseSelectionReturn) => {
+  const handleSelectionChange = useCallback((newSelectedIds: Set<string>, newSelection: UseSelectionReturn): void => {
     setSelectedIds(newSelectedIds);
     selectionRef.current = newSelection;
-    forceUpdate(n => n + 1);
+    forceUpdate((count: number): number => count + 1);
   }, []);
 
   // Global keyboard navigation for j/k and Enter
@@ -936,14 +936,14 @@ export function IssuesList({
     selection: selectionRef.current,
     selectionRef: selectionRef,
     enabled: enableKeyboardNavigation && viewMode === 'list',
-    onEnter: useCallback((focusedId: string) => {
+    onEnter: useCallback((focusedId: string): void => {
       navigate(`/documents/${focusedId}`);
     }, [navigate]),
   });
 
   // Kanban checkbox click handler
-  const handleKanbanCheckboxClick = useCallback((id: string, e: React.MouseEvent) => {
-    setSelectedIds(prev => {
+  const handleKanbanCheckboxClick = useCallback((id: string, _e: React.MouseEvent): void => {
+    setSelectedIds((prev): Set<string> => {
       const newSet = new Set(prev);
       if (newSet.has(id)) {
         newSet.delete(id);
@@ -955,7 +955,7 @@ export function IssuesList({
   }, []);
 
   // Kanban context menu handler
-  const handleKanbanContextMenu = useCallback((event: { x: number; y: number; issueId: string }) => {
+  const handleKanbanContextMenu = useCallback((event: { x: number; y: number; issueId: string }): void => {
     if (!selectedIds.has(event.issueId)) {
       setSelectedIds(new Set([event.issueId]));
     }
@@ -970,20 +970,20 @@ export function IssuesList({
       toggleSelection: () => {},
       toggleInGroup: () => {},
       selectAll: () => {},
-      clearSelection: () => setSelectedIds(new Set()),
-      selectRange: () => {},
-      setFocusedId: () => {},
-      moveFocus: () => {},
-      extendSelection: () => {},
-      handleClick: () => {},
-      handleKeyDown: () => {},
+      clearSelection: (): void => setSelectedIds(new Set()),
+      selectRange: (): void => {},
+      setFocusedId: (): void => {},
+      moveFocus: (): void => {},
+      extendSelection: (): void => {},
+      handleClick: (): void => {},
+      handleKeyDown: (): void => {},
     };
     selectionRef.current = mockSelection;
     setContextMenu({ x: event.x, y: event.y, selection: mockSelection });
   }, [selectedIds]);
 
   // Context menu handler for SelectableList
-  const handleContextMenu = useCallback((e: React.MouseEvent, _item: Issue, selection: UseSelectionReturn) => {
+  const handleContextMenu = useCallback((e: React.MouseEvent, _item: Issue, selection: UseSelectionReturn): void => {
     selectionRef.current = selection;
     setContextMenu({ x: e.clientX, y: e.clientY, selection });
   }, []);
@@ -994,7 +994,7 @@ export function IssuesList({
 
   // Global keyboard shortcuts
   useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
+    const handler = (e: KeyboardEvent): void => {
       const target = e.target as HTMLElement;
       if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) {
         return;
@@ -1019,17 +1019,17 @@ export function IssuesList({
   }, [handleCreateIssue, canCreateIssue, executeUndo]);
 
   // Handler for inline sprint assignment changes
-  const handleInlineSprintChange = useCallback((issueId: string, sprintId: string | null) => {
+  const handleInlineSprintChange = useCallback((issueId: string, sprintId: string | null): void => {
     updateIssueMutation.mutate(
       { id: issueId, updates: { sprint_id: sprintId } as Partial<Issue> },
       {
-        onSuccess: () => {
+        onSuccess: (): void => {
           const sprintName = sprintId
-            ? availableSprints.find(s => s.id === sprintId)?.name || 'week'
+            ? availableSprints.find((s): boolean => s.id === sprintId)?.name || 'week'
             : 'No Week';
           showToast(`Issue moved to ${sprintName}`, 'success');
         },
-        onError: () => {
+        onError: (): void => {
           showToast('Failed to update week', 'error');
         },
       }
@@ -1037,7 +1037,7 @@ export function IssuesList({
   }, [updateIssueMutation, availableSprints, showToast]);
 
   // Render function for issue rows
-  const renderIssueRow = useCallback((issue: Issue, { isSelected }: RowRenderProps) => {
+  const renderIssueRow = useCallback((issue: Issue, { isSelected }: RowRenderProps): React.JSX.Element => {
     const isOutOfContext = allowShowAllIssues && showAllIssues && !inContextIds.has(issue.id);
     return (
       <IssueRowContent
@@ -1053,7 +1053,7 @@ export function IssuesList({
   }, [visibleColumns, enableInlineSprintAssignment, availableSprints, handleInlineSprintChange, allowShowAllIssues, showAllIssues, inContextIds, handleAddIssueToContext]);
 
   // Default empty state
-  const defaultEmptyState = useMemo(() => (
+  const defaultEmptyState = useMemo((): React.JSX.Element => (
     <div className="text-center">
       <p className="text-muted">No issues found</p>
       {canCreateIssue && (
@@ -1155,7 +1155,7 @@ export function IssuesList({
               {/* Add from Backlog button - text collapses on small screens */}
               {showBacklogPicker && (effectiveContext.sprintId || effectiveContext.projectId || effectiveContext.programId) && (
                 <button
-                  onClick={() => setIsBacklogPickerOpen(true)}
+                  onClick={(): void => setIsBacklogPickerOpen(true)}
                   className="rounded-md border border-border px-2 py-1.5 text-sm text-muted hover:text-foreground hover:bg-border/30 transition-colors flex items-center gap-1.5 flex-shrink-0"
                   title="Add from Backlog"
                 >
@@ -1168,7 +1168,7 @@ export function IssuesList({
               {/* Show All Issues toggle - text collapses on small screens */}
               {allowShowAllIssues && shouldSelfFetch && (
                 <button
-                  onClick={() => setShowAllIssues(!showAllIssues)}
+                  onClick={(): void => setShowAllIssues(!showAllIssues)}
                   className={cn(
                     "rounded-md border px-2 py-1.5 text-sm transition-colors flex items-center gap-1.5 flex-shrink-0",
                     showAllIssues
@@ -1245,7 +1245,7 @@ export function IssuesList({
             renderRow={renderIssueRow}
             columns={columns}
             emptyState={emptyState || defaultEmptyState}
-            onItemClick={(issue) => navigate(`/documents/${issue.id}`)}
+            onItemClick={(issue: Issue): void => { void navigate(`/documents/${issue.id}`); }}
             onSelectionChange={handleSelectionChange}
             onContextMenu={handleContextMenu}
             ariaLabel="Issues list"
@@ -1256,7 +1256,7 @@ export function IssuesList({
 
       {/* Context Menu */}
       {contextMenu && (
-        <ContextMenu x={contextMenu.x} y={contextMenu.y} onClose={() => setContextMenu(null)}>
+        <ContextMenu x={contextMenu.x} y={contextMenu.y} onClose={(): void => setContextMenu(null)}>
           <div className="px-3 py-1.5 text-xs text-muted border-b border-border mb-1">
             {Math.max(1, contextMenu.selection.selectedCount)} selected
           </div>
@@ -1265,20 +1265,20 @@ export function IssuesList({
             Archive
           </ContextMenuItem>
           <ContextMenuSubmenu label="Change Status">
-            <ContextMenuItem onClick={() => handleBulkChangeStatus('backlog')}>Backlog</ContextMenuItem>
-            <ContextMenuItem onClick={() => handleBulkChangeStatus('todo')}>Todo</ContextMenuItem>
-            <ContextMenuItem onClick={() => handleBulkChangeStatus('in_progress')}>In Progress</ContextMenuItem>
-            <ContextMenuItem onClick={() => handleBulkChangeStatus('done')}>Done</ContextMenuItem>
+            <ContextMenuItem onClick={(): void => handleBulkChangeStatus('backlog')}>Backlog</ContextMenuItem>
+            <ContextMenuItem onClick={(): void => handleBulkChangeStatus('todo')}>Todo</ContextMenuItem>
+            <ContextMenuItem onClick={(): void => handleBulkChangeStatus('in_progress')}>In Progress</ContextMenuItem>
+            <ContextMenuItem onClick={(): void => handleBulkChangeStatus('done')}>Done</ContextMenuItem>
           </ContextMenuSubmenu>
           <ContextMenuSubmenu label="Move to Week">
-            <ContextMenuItem onClick={() => handleBulkMoveToSprint(null)}>No Week</ContextMenuItem>
+            <ContextMenuItem onClick={(): void => handleBulkMoveToSprint(null)}>No Week</ContextMenuItem>
           </ContextMenuSubmenu>
           {showPromoteToProject && contextMenu.selection.selectedCount === 1 && (
             <>
               <ContextMenuSeparator />
               <ContextMenuItem onClick={() => {
                 const selectedId = Array.from(contextMenu.selection.selectedIds)[0];
-                const issue = filteredIssues.find(i => i.id === selectedId);
+                const issue = filteredIssues.find((i): boolean => i.id === selectedId);
                 if (issue) handlePromoteToProject(issue);
               }}>
                 <ArrowUpRightIcon className="h-4 w-4" />
@@ -1298,7 +1298,7 @@ export function IssuesList({
       {convertingIssue && (
         <ConversionDialog
           isOpen={!!convertingIssue}
-          onClose={() => setConvertingIssue(null)}
+          onClose={(): void => setConvertingIssue(null)}
           onConvert={executeConversion}
           sourceType="issue"
           title={convertingIssue.title}
@@ -1310,13 +1310,13 @@ export function IssuesList({
       {showBacklogPicker && (
         <BacklogPickerModal
           isOpen={isBacklogPickerOpen}
-          onClose={() => setIsBacklogPickerOpen(false)}
+          onClose={(): void => setIsBacklogPickerOpen(false)}
           context={{
             sprintId: effectiveContext.sprintId,
             projectId: effectiveContext.projectId,
             programId: effectiveContext.programId,
           }}
-          onIssuesAdded={() => {
+          onIssuesAdded={(): void => {
             // Invalidate queries to refresh the issues list
             queryClient.invalidateQueries({ queryKey: issueKeys.all });
             if (effectiveContext.sprintId) {
@@ -1347,7 +1347,7 @@ interface IssueRowContentProps {
   onAddToContext?: () => void;
 }
 
-function IssueRowContent({ issue, visibleColumns, sprints, onSprintChange, isOutOfContext, onAddToContext }: IssueRowContentProps) {
+function IssueRowContent({ issue, visibleColumns, sprints, onSprintChange, isOutOfContext, onAddToContext }: IssueRowContentProps): React.JSX.Element {
   // Apply reduced opacity to out-of-context issues
   const cellClass = isOutOfContext ? 'opacity-50' : '';
 
@@ -1364,7 +1364,7 @@ function IssueRowContent({ issue, visibleColumns, sprints, onSprintChange, isOut
             <span className="truncate">{issue.title}</span>
             {isOutOfContext && onAddToContext && (
               <button
-                onClick={(e) => {
+                onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                   e.stopPropagation();
                   onAddToContext();
                 }}
@@ -1401,7 +1401,7 @@ function IssueRowContent({ issue, visibleColumns, sprints, onSprintChange, isOut
             <InlineWeekSelector
               value={getSprintId(issue)}
               sprints={sprints}
-              onChange={(sprintId) => onSprintChange(issue.id, sprintId)}
+              onChange={(sprintId: string | null) => onSprintChange(issue.id, sprintId)}
             />
           ) : (
             getSprintTitle(issue) || '—'
@@ -1432,7 +1432,7 @@ function IssueRowContent({ issue, visibleColumns, sprints, onSprintChange, isOut
 }
 
 // Badge components
-export function StatusBadge({ state }: { state: string }) {
+export function StatusBadge({ state }: { state: string }): React.JSX.Element {
   const label = STATE_LABELS[state] || state;
   return (
     <span

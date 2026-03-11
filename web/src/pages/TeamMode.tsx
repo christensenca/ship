@@ -53,7 +53,7 @@ interface ProgramGroup {
   users: User[];
 }
 
-export function TeamModePage() {
+export function TeamModePage(): React.JSX.Element {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [data, setData] = useState<TeamGridData | null>(null);
@@ -63,12 +63,12 @@ export function TeamModePage() {
   const [loadingMore, setLoadingMore] = useState<'left' | 'right' | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [showArchived, setShowArchived] = useState(false);
-  const [showPastWeeks, setShowPastWeeks] = useState(() => {
+  const [showPastWeeks, setShowPastWeeks] = useState((): boolean => {
     try {
       return localStorage.getItem('ship:allocation-show-past-weeks') === 'true';
     } catch { return false; }
   });
-  const [filterMode, setFilterMode] = useState<'my-team' | 'everyone' | null>(() => {
+  const [filterMode, setFilterMode] = useState<'my-team' | 'everyone' | null>((): 'my-team' | 'everyone' | null => {
     try {
       const stored = localStorage.getItem('ship:allocation-filter-mode');
       if (stored === 'my-team' || stored === 'everyone') return stored;
@@ -86,46 +86,46 @@ export function TeamModePage() {
   const currentSprintNumber = data?.currentSprintNumber ?? null;
 
   // Filter weeks to hide past weeks when showPastWeeks is false
-  const visibleWeeks = useMemo(() => {
+  const visibleWeeks = useMemo((): Sprint[] => {
     if (!data) return [];
     if (showPastWeeks || currentSprintNumber === null) return data.weeks;
-    return data.weeks.filter(s => s.number >= currentSprintNumber);
+    return data.weeks.filter((s: Sprint): boolean => s.number >= currentSprintNumber);
   }, [data, showPastWeeks, currentSprintNumber]);
 
   // Smart default: if user has direct reports, default to "my-team"
-  const hasDirectReports = useMemo(() => {
+  const hasDirectReports = useMemo((): boolean => {
     if (!data || !user?.id) return false;
-    return data.users.some(u => u.reportsTo === user.id);
+    return data.users.some((u: User): boolean => u.reportsTo === user.id);
   }, [data, user?.id]);
 
   // Set smart default when data first loads (only if no stored value)
-  useEffect(() => {
+  useEffect((): void => {
     if (data && filterMode === null) {
       setFilterMode(hasDirectReports ? 'my-team' : 'everyone');
     }
   }, [data, filterMode, hasDirectReports]);
 
   // Persist filter mode and past-weeks visibility to localStorage
-  useEffect(() => {
+  useEffect((): void => {
     if (filterMode !== null) {
       localStorage.setItem('ship:allocation-filter-mode', filterMode);
     }
   }, [filterMode]);
 
-  useEffect(() => {
+  useEffect((): void => {
     localStorage.setItem('ship:allocation-show-past-weeks', String(showPastWeeks));
   }, [showPastWeeks]);
 
   // Filter users based on filter mode and name search
-  const filteredUsers = useMemo(() => {
+  const filteredUsers = useMemo((): User[] => {
     if (!data) return [];
     let users = data.users;
     if (filterMode === 'my-team' && user?.id) {
-      users = users.filter(u => u.reportsTo === user.id);
+      users = users.filter((u: User): boolean => u.reportsTo === user.id);
     }
     if (nameFilter.trim()) {
       const query = nameFilter.trim().toLowerCase();
-      users = users.filter(u => u.name.toLowerCase().includes(query));
+      users = users.filter((u: User): boolean => u.name.toLowerCase().includes(query));
     }
     return users;
   }, [data, filterMode, user?.id, nameFilter]);
@@ -160,7 +160,7 @@ export function TeamModePage() {
     }
 
     // Sort groups: alphabetically by name, with Unassigned last
-    const sortedGroups = Array.from(groups.values()).sort((a, b) => {
+    const sortedGroups = Array.from(groups.values()).sort((a: ProgramGroup, b: ProgramGroup): number => {
       if (a.programId === null) return 1;
       if (b.programId === null) return -1;
       return a.programName.localeCompare(b.programName);
@@ -168,16 +168,16 @@ export function TeamModePage() {
 
     // Sort users within each group alphabetically
     for (const group of sortedGroups) {
-      group.users.sort((a, b) => a.name.localeCompare(b.name));
+      group.users.sort((a: User, b: User): number => a.name.localeCompare(b.name));
     }
 
     return sortedGroups;
   }, [data, filteredUsers, assignments, groupingSprintNumber]);
 
   // Toggle program group collapse
-  const toggleProgramCollapse = useCallback((programId: string | null) => {
+  const toggleProgramCollapse = useCallback((programId: string | null): void => {
     const key = programId || '__unassigned__';
-    setCollapsedPrograms(prev => {
+    setCollapsedPrograms((prev: Set<string>): Set<string> => {
       const next = new Set(prev);
       if (next.has(key)) {
         next.delete(key);
@@ -199,28 +199,28 @@ export function TeamModePage() {
   const [operationLoading, setOperationLoading] = useState<string | null>(null);
 
   // Initial load
-  useEffect(() => {
-    Promise.all([
+  useEffect((): void => {
+    void Promise.all([
       fetchTeamGrid(undefined, undefined, showArchived),
       fetchProjects(),
       fetchAssignments(),
-    ]).finally(() => setLoading(false));
+    ]).finally((): void => setLoading(false));
   }, []);
 
   // Refetch when showArchived changes
-  useEffect(() => {
+  useEffect((): void => {
     // Skip initial render
     if (loading) return;
-    fetchTeamGrid(sprintRange?.min, sprintRange?.max, showArchived);
+    void fetchTeamGrid(sprintRange?.min, sprintRange?.max, showArchived);
   }, [showArchived]);
 
   // Scroll to current sprint on initial load (only when past weeks are shown)
-  useEffect(() => {
+  useEffect((): void => {
     if (!showPastWeeks) return; // No need to scroll when past weeks are hidden
     if (data && scrollContainerRef.current && !hasScrolledToCurrentRef.current) {
-      const currentSprintIndex = data.weeks.findIndex(s => s.isCurrent);
+      const currentSprintIndex = data.weeks.findIndex((s: Sprint): boolean => s.isCurrent);
       if (currentSprintIndex >= 0) {
-        requestAnimationFrame(() => {
+        requestAnimationFrame((): void => {
           if (scrollContainerRef.current) {
             const columnWidth = 180; // matches w-[180px] on sprint columns
             const scrollPosition = currentSprintIndex * columnWidth;
@@ -232,7 +232,7 @@ export function TeamModePage() {
     }
   }, [data, showPastWeeks]);
 
-  async function fetchTeamGrid(fromSprint?: number, toSprint?: number, includeArchived = false) {
+  async function fetchTeamGrid(fromSprint?: number, toSprint?: number, includeArchived: boolean = false): Promise<void> {
     try {
       const params = new URLSearchParams();
       if (fromSprint !== undefined) params.set('fromSprint', String(fromSprint));
@@ -257,7 +257,7 @@ export function TeamModePage() {
     }
   }
 
-  async function fetchProjects() {
+  async function fetchProjects(): Promise<void> {
     try {
       const res = await apiGet(`/api/team/projects`);
       if (res.ok) {
@@ -269,7 +269,7 @@ export function TeamModePage() {
     }
   }
 
-  async function fetchAssignments() {
+  async function fetchAssignments(): Promise<void> {
     try {
       const res = await apiGet(`/api/team/assignments`);
       if (res.ok) {
@@ -281,13 +281,13 @@ export function TeamModePage() {
     }
   }
 
-  const handleAssign = async (personId: string, projectId: string, sprintNumber: number) => {
-    const project = projects.find(p => p.id === projectId);
+  const handleAssign = async (personId: string, projectId: string, sprintNumber: number): Promise<void> => {
+    const project = projects.find((p: Project): boolean => p.id === projectId);
     if (!project) return;
 
     // Optimistic update - update UI immediately
     const previousAssignment = assignments[personId]?.[sprintNumber];
-    setAssignments(prev => ({
+    setAssignments((prev: Record<string, Record<number, Assignment>>): Record<string, Record<number, Assignment>> => ({
       ...prev,
       [personId]: {
         ...prev[personId],
@@ -310,7 +310,7 @@ export function TeamModePage() {
 
       if (!res.ok) {
         // Rollback optimistic update
-        setAssignments(prev => {
+        setAssignments((prev: Record<string, Record<number, Assignment>>): Record<string, Record<number, Assignment>> => {
           const newAssignments = { ...prev };
           if (previousAssignment) {
             newAssignments[personId] = { ...newAssignments[personId], [sprintNumber]: previousAssignment };
@@ -325,7 +325,7 @@ export function TeamModePage() {
       }
     } catch (err) {
       // Rollback optimistic update
-      setAssignments(prev => {
+      setAssignments((prev: Record<string, Record<number, Assignment>>): Record<string, Record<number, Assignment>> => {
         const newAssignments = { ...prev };
         if (previousAssignment) {
           newAssignments[personId] = { ...newAssignments[personId], [sprintNumber]: previousAssignment };
@@ -339,10 +339,10 @@ export function TeamModePage() {
     }
   };
 
-  const handleUnassign = async (personId: string, sprintNumber: number, skipConfirmation = false) => {
+  const handleUnassign = async (personId: string, sprintNumber: number, skipConfirmation: boolean = false): Promise<void> => {
     // Optimistic update - remove from UI immediately
     const previousAssignment = assignments[personId]?.[sprintNumber];
-    setAssignments(prev => {
+    setAssignments((prev: Record<string, Record<number, Assignment>>): Record<string, Record<number, Assignment>> => {
       const newAssignments = { ...prev };
       if (newAssignments[personId]) {
         const { [sprintNumber]: _, ...rest } = newAssignments[personId];
@@ -359,7 +359,7 @@ export function TeamModePage() {
       if (!res.ok) {
         // Rollback optimistic update
         if (previousAssignment) {
-          setAssignments(prev => ({
+          setAssignments((prev: Record<string, Record<number, Assignment>>): Record<string, Record<number, Assignment>> => ({
             ...prev,
             [personId]: {
               ...prev[personId],
@@ -378,7 +378,7 @@ export function TeamModePage() {
     } catch (err) {
       // Rollback optimistic update
       if (previousAssignment) {
-        setAssignments(prev => ({
+        setAssignments((prev: Record<string, Record<number, Assignment>>): Record<string, Record<number, Assignment>> => ({
           ...prev,
           [personId]: {
             ...prev[personId],
@@ -397,7 +397,7 @@ export function TeamModePage() {
     sprintName: string,
     newProjectId: string | null,
     currentAssignment: Assignment | null
-  ) => {
+  ): void => {
     // Same project - no change
     if (newProjectId === currentAssignment?.projectId) {
       return;
@@ -417,7 +417,7 @@ export function TeamModePage() {
   }, [projects]);
 
   // Fetch more sprints
-  const fetchMoreSprints = useCallback(async (direction: 'left' | 'right') => {
+  const fetchMoreSprints = useCallback(async (direction: 'left' | 'right'): Promise<void> => {
     if (!data || !sprintRange || loadingMore) return;
 
     const fromSprint = direction === 'left'
@@ -446,7 +446,7 @@ export function TeamModePage() {
       const prevScrollLeft = scrollContainer?.scrollLeft || 0;
       const prevScrollWidth = scrollContainer?.scrollWidth || 0;
 
-      setData(prev => {
+      setData((prev: TeamGridData | null): TeamGridData => {
         if (!prev) return newData;
         const mergedSprints = direction === 'left'
           ? [...newData.weeks, ...prev.weeks]
@@ -454,7 +454,7 @@ export function TeamModePage() {
         return { ...prev, weeks: mergedSprints };
       });
 
-      setSprintRange(prev => {
+      setSprintRange((prev: { min: number; max: number } | null): { min: number; max: number } => {
         if (!prev) return { min: fromSprint, max: toSprint };
         return {
           min: direction === 'left' ? fromSprint : prev.min,
@@ -463,7 +463,7 @@ export function TeamModePage() {
       });
 
       if (direction === 'left' && scrollContainer) {
-        requestAnimationFrame(() => {
+        requestAnimationFrame((): void => {
           const newScrollWidth = scrollContainer.scrollWidth;
           const addedWidth = newScrollWidth - prevScrollWidth;
           scrollContainer.scrollLeft = prevScrollLeft + addedWidth;
@@ -476,44 +476,44 @@ export function TeamModePage() {
     }
   }, [data, sprintRange, loadingMore, showArchived]);
 
-  const handleScroll = useCallback(() => {
+  const handleScroll = useCallback((): void => {
     const container = scrollContainerRef.current;
     if (!container || loadingMore) return;
 
     const { scrollLeft, scrollWidth, clientWidth } = container;
 
     if (showPastWeeks && scrollLeft < SCROLL_THRESHOLD && sprintRange && sprintRange.min > 1) {
-      fetchMoreSprints('left');
+      void fetchMoreSprints('left');
     }
 
     if (scrollWidth - scrollLeft - clientWidth < SCROLL_THRESHOLD) {
-      fetchMoreSprints('right');
+      void fetchMoreSprints('right');
     }
   }, [fetchMoreSprints, loadingMore, sprintRange, showPastWeeks]);
 
-  useEffect(() => {
+  useEffect((): (() => void) | void => {
     const container = scrollContainerRef.current;
     if (!container) return;
 
     container.addEventListener('scroll', handleScroll);
-    return () => container.removeEventListener('scroll', handleScroll);
+    return (): void => container.removeEventListener('scroll', handleScroll);
   }, [handleScroll]);
 
   // Escape key clears view-as mode
-  useEffect(() => {
+  useEffect((): (() => void) | void => {
     if (viewAsSprintNumber === null) return;
-    const handleKeyDown = (e: KeyboardEvent) => {
+    const handleKeyDown = (e: KeyboardEvent): void => {
       if (e.key === 'Escape') setViewAsSprintNumber(null);
     };
     document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
+    return (): void => document.removeEventListener('keydown', handleKeyDown);
   }, [viewAsSprintNumber]);
 
   // Clear error after 3 seconds
-  useEffect(() => {
+  useEffect((): (() => void) | void => {
     if (error) {
-      const timer = setTimeout(() => setError(null), 3000);
-      return () => clearTimeout(timer);
+      const timer = setTimeout((): void => setError(null), 3000);
+      return (): void => clearTimeout(timer);
     }
   }, [error]);
 
@@ -549,7 +549,7 @@ export function TeamModePage() {
           {hasDirectReports && (
             <div className="flex rounded-md border border-border text-xs">
               <button
-                onClick={() => setFilterMode('my-team')}
+                onClick={(): void => setFilterMode('my-team')}
                 className={cn(
                   'px-2 py-0.5 transition-colors',
                   filterMode === 'my-team'
@@ -560,7 +560,7 @@ export function TeamModePage() {
                 My Team
               </button>
               <button
-                onClick={() => setFilterMode('everyone')}
+                onClick={(): void => setFilterMode('everyone')}
                 className={cn(
                   'px-2 py-0.5 transition-colors',
                   filterMode === 'everyone'
@@ -576,13 +576,13 @@ export function TeamModePage() {
             <input
               type="text"
               value={nameFilter}
-              onChange={(e) => setNameFilter(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>): void => setNameFilter(e.target.value)}
               placeholder="Filter by name..."
               className="h-6 w-36 rounded border border-border bg-transparent px-2 text-xs text-foreground placeholder:text-muted focus:border-accent focus:outline-none"
             />
             {nameFilter && (
               <button
-                onClick={() => setNameFilter('')}
+                onClick={(): void => setNameFilter('')}
                 className="absolute right-1 top-1/2 -translate-y-1/2 rounded p-0.5 text-muted hover:text-foreground"
               >
                 <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -593,9 +593,9 @@ export function TeamModePage() {
           </div>
           {viewAsSprintNumber !== null && (
             <div className="flex items-center gap-1.5 rounded-md border border-accent/30 bg-accent/10 px-2 py-0.5 text-xs text-accent">
-              <span>Viewing as {data.weeks.find(w => w.number === viewAsSprintNumber)?.name ?? `Week ${viewAsSprintNumber}`}</span>
+              <span>Viewing as {data.weeks.find((w: Sprint): boolean => w.number === viewAsSprintNumber)?.name ?? `Week ${viewAsSprintNumber}`}</span>
               <button
-                onClick={() => setViewAsSprintNumber(null)}
+                onClick={(): void => setViewAsSprintNumber(null)}
                 className="ml-0.5 rounded p-0.5 hover:bg-accent/20"
                 title="Return to current week"
               >
@@ -608,7 +608,7 @@ export function TeamModePage() {
         </div>
         <div className="flex items-center gap-4">
           <button
-            onClick={() => setShowPastWeeks(prev => !prev)}
+            onClick={(): void => setShowPastWeeks((prev: boolean): boolean => !prev)}
             className={cn(
               'flex items-center gap-1 rounded-md border border-border px-2 py-0.5 text-xs transition-colors',
               showPastWeeks
@@ -625,7 +625,7 @@ export function TeamModePage() {
             <input
               type="checkbox"
               checked={showArchived}
-              onChange={(e) => setShowArchived(e.target.checked)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>): void => setShowArchived(e.target.checked)}
               className="h-3.5 w-3.5 rounded border-border text-accent focus:ring-accent/50"
             />
             <span className="text-xs text-muted">Show archived</span>
@@ -650,7 +650,7 @@ export function TeamModePage() {
               </div>
 
               {/* Program groups with users */}
-              {programGroups.map((group) => {
+              {programGroups.map((group: ProgramGroup): React.JSX.Element => {
                 const groupKey = group.programId || '__unassigned__';
                 const isCollapsed = collapsedPrograms.has(groupKey);
 
@@ -658,7 +658,7 @@ export function TeamModePage() {
                   <div key={groupKey}>
                     {/* Program group header */}
                     <button
-                      onClick={() => toggleProgramCollapse(group.programId)}
+                      onClick={(): void => toggleProgramCollapse(group.programId)}
                       className="flex h-8 w-[180px] items-center gap-2 border-b border-border bg-border/30 px-3 hover:bg-border/50 transition-colors cursor-pointer"
                     >
                       <ChevronIcon
@@ -690,7 +690,7 @@ export function TeamModePage() {
                     </button>
 
                     {/* Users in this group */}
-                    {!isCollapsed && group.users.map((user, idx) => (
+                    {!isCollapsed && group.users.map((user: User, idx: number): React.JSX.Element => (
                       <div
                         key={user.id ?? `pending-${idx}`}
                         className={cn(
@@ -732,7 +732,7 @@ export function TeamModePage() {
                 </div>
               )}
 
-              {visibleWeeks.map((sprint) => {
+              {visibleWeeks.map((sprint: Sprint): React.JSX.Element => {
                 const isActiveViewAs = sprint.number === viewAsSprintNumber;
                 const isDefaultCurrent = sprint.isCurrent && viewAsSprintNumber === null;
                 const showViewAsButton = !isActiveViewAs && !isDefaultCurrent;
@@ -758,7 +758,7 @@ export function TeamModePage() {
                     </span>
                     {showViewAsButton && (
                       <button
-                        onClick={() => setViewAsSprintNumber(sprint.number)}
+                        onClick={(): void => setViewAsSprintNumber(sprint.number)}
                         title="View as current week"
                         className="absolute right-1 top-1/2 -translate-y-1/2 rounded p-0.5 text-muted opacity-0 transition-opacity hover:bg-border/50 hover:text-foreground group-hover:opacity-100"
                       >
@@ -768,7 +768,7 @@ export function TeamModePage() {
                   </div>
 
                   {/* Sprint cells grouped by program */}
-                  {programGroups.map((group) => {
+                  {programGroups.map((group: ProgramGroup): React.JSX.Element => {
                     const groupKey = group.programId || '__unassigned__';
                     const isCollapsed = collapsedPrograms.has(groupKey);
 
@@ -783,7 +783,7 @@ export function TeamModePage() {
                         />
 
                         {/* Cells for users in this group */}
-                        {!isCollapsed && group.users.map((user) => {
+                        {!isCollapsed && group.users.map((user: User): React.JSX.Element => {
                           const isPending = user.isPending || !user.id;
                           const assignment = assignments[user.personId]?.[sprint.number];
                           const previousWeekAssignment = assignments[user.personId]?.[sprint.number - 1];
@@ -799,7 +799,7 @@ export function TeamModePage() {
                               isCurrent={sprint.isCurrent}
                               loading={isLoading}
                               isPending={isPending}
-                              onChange={(projectId) => {
+                              onChange={(projectId: string | null): void => {
                                 handleCellChange(
                                   user.personId,
                                   user.name,
@@ -809,7 +809,7 @@ export function TeamModePage() {
                                   assignment || null
                                 );
                               }}
-                              onNavigate={(projectId) => navigate(`/documents/${projectId}`)}
+                              onNavigate={(projectId: string): void => { void navigate(`/documents/${projectId}`); }}
                             />
                           );
                         })}
@@ -832,7 +832,7 @@ export function TeamModePage() {
         </div>
 
       {/* Last Person Dialog */}
-      <Dialog.Root open={lastPersonDialog?.open || false} onOpenChange={(open: boolean) => !open && setLastPersonDialog(null)}>
+      <Dialog.Root open={lastPersonDialog?.open || false} onOpenChange={(open: boolean): void => { if (!open) setLastPersonDialog(null); }}>
         <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0 z-50 bg-black/50" />
           <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-full max-w-md -translate-x-1/2 -translate-y-1/2 rounded-lg border border-border bg-background p-6 shadow-xl">
@@ -849,7 +849,7 @@ export function TeamModePage() {
                   {lastPersonDialog.issuesOrphaned.length} issues will be moved to backlog:
                 </p>
                 <ul className="mt-2 max-h-[150px] overflow-auto rounded border border-border p-2">
-                  {lastPersonDialog.issuesOrphaned.map((issue) => (
+                  {lastPersonDialog.issuesOrphaned.map((issue: { id: string; title: string }): React.JSX.Element => (
                     <li key={issue.id} className="text-sm text-muted truncate">
                       {issue.title}
                     </li>
@@ -865,7 +865,7 @@ export function TeamModePage() {
                 </button>
               </Dialog.Close>
               <button
-                onClick={() => {
+                onClick={(): void => {
                   lastPersonDialog?.onConfirm();
                   setLastPersonDialog(null);
                 }}
@@ -899,7 +899,7 @@ function SprintCell({
   isPending?: boolean;
   onChange: (projectId: string | null) => void;
   onNavigate: (projectId: string) => void;
-}) {
+}): React.JSX.Element {
   // Convert previous week assignment to Project format for the quick select
   const previousWeekProject: Project | null =
     previousWeekAssignment?.projectId && previousWeekAssignment?.projectName
@@ -941,7 +941,7 @@ function SprintCell({
   );
 }
 
-function ChevronIcon({ className }: { className?: string }) {
+function ChevronIcon({ className }: { className?: string }): React.JSX.Element {
   return (
     <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -949,7 +949,7 @@ function ChevronIcon({ className }: { className?: string }) {
   );
 }
 
-function ViewAsIcon({ className }: { className?: string }) {
+function ViewAsIcon({ className }: { className?: string }): React.JSX.Element {
   return (
     <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -957,4 +957,3 @@ function ViewAsIcon({ className }: { className?: string }) {
     </svg>
   );
 }
-

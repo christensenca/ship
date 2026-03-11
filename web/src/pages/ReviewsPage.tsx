@@ -106,6 +106,17 @@ interface ProgramGroup {
   people: ReviewPerson[];
 }
 
+interface ReviewRow {
+  type: 'program' | 'person';
+  id: string;
+  name: string;
+  color?: string | null;
+  personId?: string;
+  peopleCount?: number;
+}
+
+type WeekReviewCounts = Record<number, { plans: number; retros: number }>;
+
 /** Determine the review status color for a plan cell */
 function getPlanStatus(cell: ReviewCell | undefined, weekIsPast: boolean): ReviewStatus {
   if (!cell || !cell.sprintId) return 'empty';
@@ -157,7 +168,7 @@ interface BatchMode {
   currentIndex: number;
 }
 
-export function ReviewsPage() {
+export function ReviewsPage(): React.JSX.Element | null {
   const navigate = useNavigate();
   const { user } = useAuth();
   const reviewQueue = useReviewQueue();
@@ -174,42 +185,42 @@ export function ReviewsPage() {
   const hasScrolledToCurrentRef = useRef(false);
 
   // Smart default: if user has direct reports, default to "my-team"
-  const hasDirectReports = useMemo(() => {
+  const hasDirectReports = useMemo((): boolean => {
     if (!data || !user?.id) return false;
-    return data.people.some(p => p.reportsTo === user.id);
+    return data.people.some((p: ReviewPerson): boolean => p.reportsTo === user.id);
   }, [data, user?.id]);
 
-  useEffect(() => {
+  useEffect((): void => {
     if (data && filterMode === null) {
       setFilterMode(hasDirectReports ? 'my-team' : 'everyone');
     }
   }, [data, filterMode, hasDirectReports]);
 
   // Filter people based on filter mode
-  const filteredPeople = useMemo(() => {
+  const filteredPeople = useMemo((): ReviewPerson[] => {
     if (!data) return [];
     if (filterMode === 'my-team' && user?.id) {
-      return data.people.filter(p => p.reportsTo === user.id);
+      return data.people.filter((p: ReviewPerson): boolean => p.reportsTo === user.id);
     }
     return data.people;
   }, [data, filterMode, user?.id]);
 
   // Recalculate manager action defaults when switching review scope.
-  useEffect(() => {
+  useEffect((): void => {
     setSelectedPlanWeek(null);
     setSelectedRetroWeek(null);
   }, [filterMode]);
 
-  useEffect(() => {
+  useEffect((): void => {
     fetchReviews();
   }, []);
 
   // Approve a plan optimistically
-  const approvePlan = useCallback(async (personId: string, weekNumber: number, sprintId: string, comment?: string) => {
+  const approvePlan = useCallback(async (personId: string, weekNumber: number, sprintId: string, comment?: string): Promise<void> => {
     if (!data) return;
 
     // Optimistic update
-    setData(prev => {
+    setData((prev: ReviewsData | null): ReviewsData | null => {
       if (!prev) return prev;
       const updated = { ...prev, reviews: { ...prev.reviews } };
       updated.reviews[personId] = { ...updated.reviews[personId] };
@@ -235,14 +246,20 @@ export function ReviewsPage() {
   }, [data]);
 
   // Request changes on a plan or retro
-  const requestChanges = useCallback(async (personId: string, weekNumber: number, sprintId: string, type: 'plan' | 'retro', feedback: string) => {
+  const requestChanges = useCallback(async (
+    personId: string,
+    weekNumber: number,
+    sprintId: string,
+    type: 'plan' | 'retro',
+    feedback: string,
+  ): Promise<void> => {
     if (!data) return;
 
     const endpoint = type === 'plan' ? 'request-plan-changes' : 'request-retro-changes';
     const approvalField = type === 'plan' ? 'planApproval' : 'reviewApproval';
 
     // Optimistic update
-    setData(prev => {
+    setData((prev: ReviewsData | null): ReviewsData | null => {
       if (!prev) return prev;
       const updated = { ...prev, reviews: { ...prev.reviews } };
       updated.reviews[personId] = { ...updated.reviews[personId] };
@@ -263,11 +280,17 @@ export function ReviewsPage() {
   }, [data]);
 
   // Rate a retro (also approves it)
-  const rateRetro = useCallback(async (personId: string, weekNumber: number, sprintId: string, rating: number, comment?: string) => {
+  const rateRetro = useCallback(async (
+    personId: string,
+    weekNumber: number,
+    sprintId: string,
+    rating: number,
+    comment?: string,
+  ): Promise<void> => {
     if (!data) return;
 
     // Optimistic update
-    setData(prev => {
+    setData((prev: ReviewsData | null): ReviewsData | null => {
       if (!prev) return prev;
       const updated = { ...prev, reviews: { ...prev.reviews } };
       updated.reviews[personId] = { ...updated.reviews[personId] };
@@ -293,12 +316,12 @@ export function ReviewsPage() {
     }
   }, [data]);
 
-  async function fetchReviews() {
+  async function fetchReviews(): Promise<void> {
     try {
       setLoading(true);
       const res = await apiGet(`/api/team/reviews?sprint_count=8`);
       if (!res.ok) throw new Error(`Failed to fetch: ${res.status}`);
-      const json = await res.json();
+      const json: ReviewsData = await res.json();
       setData(json);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load reviews');
@@ -326,32 +349,28 @@ export function ReviewsPage() {
         });
       }
 
-      groups.get(groupKey)!.people.push(person);
+      const group = groups.get(groupKey);
+      if (group) {
+        group.people.push(person);
+      }
     }
 
-    const sorted = Array.from(groups.values()).sort((a, b) => {
+    const sorted = Array.from(groups.values()).sort((a: ProgramGroup, b: ProgramGroup): number => {
       if (a.programId === null) return 1;
       if (b.programId === null) return -1;
       return a.programName.localeCompare(b.programName);
     });
 
     for (const group of sorted) {
-      group.people.sort((a, b) => a.name.localeCompare(b.name));
+      group.people.sort((a: ReviewPerson, b: ReviewPerson): number => a.name.localeCompare(b.name));
     }
 
     return sorted;
   }, [data, filteredPeople]);
 
   // Build row structure for synchronized scrolling
-  const rowStructure = useMemo(() => {
-    const rows: Array<{
-      type: 'program' | 'person';
-      id: string;
-      name: string;
-      color?: string | null;
-      personId?: string;
-      peopleCount?: number;
-    }> = [];
+  const rowStructure = useMemo((): ReviewRow[] => {
+    const rows: ReviewRow[] = [];
 
     for (const group of programGroups) {
       const groupKey = group.programId || '__unassigned__';
@@ -381,8 +400,8 @@ export function ReviewsPage() {
   }, [programGroups, collapsedPrograms]);
 
   // Per-week actionable review counts for manager actions
-  const weekReviewCounts = useMemo((): Record<number, { plans: number; retros: number }> => {
-    const counts: Record<number, { plans: number; retros: number }> = {};
+  const weekReviewCounts = useMemo((): WeekReviewCounts => {
+    const counts: WeekReviewCounts = {};
     if (!data) return counts;
 
     for (const week of data.weeks) {
@@ -400,12 +419,12 @@ export function ReviewsPage() {
     return counts;
   }, [data, filteredPeople]);
 
-  const weeksDescending = useMemo(() => {
+  const weeksDescending = useMemo((): Week[] => {
     if (!data) return [];
-    return [...data.weeks].sort((a, b) => b.number - a.number);
+    return [...data.weeks].sort((a: Week, b: Week): number => b.number - a.number);
   }, [data]);
 
-  const defaultPlanWeek = useMemo(() => {
+  const defaultPlanWeek = useMemo((): number | null => {
     if (!data) return null;
 
     const currentWeekNumber = data.currentSprintNumber;
@@ -413,11 +432,11 @@ export function ReviewsPage() {
       return currentWeekNumber;
     }
 
-    const latestWithPendingPlans = weeksDescending.find(week => (weekReviewCounts[week.number]?.plans ?? 0) > 0);
+    const latestWithPendingPlans = weeksDescending.find((week: Week): boolean => (weekReviewCounts[week.number]?.plans ?? 0) > 0);
     return latestWithPendingPlans?.number ?? currentWeekNumber;
   }, [data, weekReviewCounts, weeksDescending]);
 
-  const defaultRetroWeek = useMemo(() => {
+  const defaultRetroWeek = useMemo((): number | null => {
     if (!data) return null;
 
     const currentWeekNumber = data.currentSprintNumber;
@@ -428,29 +447,29 @@ export function ReviewsPage() {
       return previousWeekNumber;
     }
 
-    const latestWithPendingRetros = weeksDescending.find(week => (weekReviewCounts[week.number]?.retros ?? 0) > 0);
+    const latestWithPendingRetros = weeksDescending.find((week: Week): boolean => (weekReviewCounts[week.number]?.retros ?? 0) > 0);
     if (latestWithPendingRetros) {
       return latestWithPendingRetros.number;
     }
 
-    if (previousWeekNumber >= 1 && data.weeks.some(week => week.number === previousWeekNumber)) {
+    if (previousWeekNumber >= 1 && data.weeks.some((week: Week): boolean => week.number === previousWeekNumber)) {
       return previousWeekNumber;
     }
 
     return currentWeekNumber;
   }, [data, weekReviewCounts, weeksDescending]);
 
-  useEffect(() => {
+  useEffect((): void => {
     if (!data || defaultPlanWeek === null) return;
-    const selectedExists = selectedPlanWeek !== null && data.weeks.some(week => week.number === selectedPlanWeek);
+    const selectedExists = selectedPlanWeek !== null && data.weeks.some((week: Week): boolean => week.number === selectedPlanWeek);
     if (!selectedExists) {
       setSelectedPlanWeek(defaultPlanWeek);
     }
   }, [data, defaultPlanWeek, selectedPlanWeek]);
 
-  useEffect(() => {
+  useEffect((): void => {
     if (!data || defaultRetroWeek === null) return;
-    const selectedExists = selectedRetroWeek !== null && data.weeks.some(week => week.number === selectedRetroWeek);
+    const selectedExists = selectedRetroWeek !== null && data.weeks.some((week: Week): boolean => week.number === selectedRetroWeek);
     if (!selectedExists) {
       setSelectedRetroWeek(defaultRetroWeek);
     }
@@ -460,13 +479,13 @@ export function ReviewsPage() {
   const effectiveRetroWeek = selectedRetroWeek ?? defaultRetroWeek ?? data?.currentSprintNumber ?? 1;
   const selectedPlanPendingCount = weekReviewCounts[effectivePlanWeek]?.plans ?? 0;
   const selectedRetroPendingCount = weekReviewCounts[effectiveRetroWeek]?.retros ?? 0;
-  const selectedPlanWeekLabel = data?.weeks.find(week => week.number === effectivePlanWeek)?.name ?? `Week ${effectivePlanWeek}`;
-  const selectedRetroWeekLabel = data?.weeks.find(week => week.number === effectiveRetroWeek)?.name ?? `Week ${effectiveRetroWeek}`;
+  const selectedPlanWeekLabel = data?.weeks.find((week: Week): boolean => week.number === effectivePlanWeek)?.name ?? `Week ${effectivePlanWeek}`;
+  const selectedRetroWeekLabel = data?.weeks.find((week: Week): boolean => week.number === effectiveRetroWeek)?.name ?? `Week ${effectiveRetroWeek}`;
 
   // Build batch review queue for selected week data
   const buildBatchQueue = useCallback((type: 'plans' | 'retros', weekNumber: number): SelectedCell[] => {
     if (!data) return [];
-    const selectedWeek = data.weeks.find(w => w.number === weekNumber);
+    const selectedWeek = data.weeks.find((w: Week): boolean => w.number === weekNumber);
     if (!selectedWeek) return [];
 
     const queue: SelectedCell[] = [];
@@ -503,13 +522,13 @@ export function ReviewsPage() {
   }, [data, programGroups]);
 
   // Start batch review via queue context (navigates to documents)
-  function startBatchReview(type: 'plans' | 'retros', weekNumber: number) {
+  function startBatchReview(type: 'plans' | 'retros', weekNumber: number): void {
     if (!reviewQueue || !data) return;
     const selectedCells = buildBatchQueue(type, weekNumber);
     if (selectedCells.length === 0) return;
 
     const queueItems: QueueItem[] = selectedCells
-      .map(sc => {
+      .map((sc: SelectedCell): QueueItem | null => {
         const docId = sc.type === 'plan' ? sc.cell.planDocId : sc.cell.retroDocId;
         if (!docId) return null;
         return {
@@ -522,7 +541,7 @@ export function ReviewsPage() {
           docId,
         };
       })
-      .filter((item): item is QueueItem => item !== null);
+      .filter((item: QueueItem | null): item is QueueItem => item !== null);
 
     if (queueItems.length > 0) {
       reviewQueue.start(queueItems);
@@ -530,7 +549,7 @@ export function ReviewsPage() {
   }
 
   // Advance to next item in batch mode
-  function advanceBatch() {
+  function advanceBatch(): void {
     if (!batchMode) return;
     const nextIndex = batchMode.currentIndex + 1;
     if (nextIndex >= batchMode.queue.length) {
@@ -539,7 +558,10 @@ export function ReviewsPage() {
       setSelectedCell(null);
     } else {
       // Refresh the cell data from the latest state
-      const nextItem = batchMode.queue[nextIndex]!;
+      const nextItem = batchMode.queue[nextIndex];
+      if (!nextItem) {
+        return;
+      }
       const freshCell = data?.reviews[nextItem.personId]?.[nextItem.weekNumber];
       const updatedItem = freshCell ? { ...nextItem, cell: freshCell } : nextItem;
       setBatchMode({ ...batchMode, currentIndex: nextIndex });
@@ -548,17 +570,17 @@ export function ReviewsPage() {
   }
 
   // Exit batch mode
-  function exitBatchMode() {
+  function exitBatchMode(): void {
     setBatchMode(null);
     setSelectedCell(null);
   }
 
   // Scroll to current week on first render
-  useEffect(() => {
+  useEffect((): void => {
     if (data && scrollContainerRef.current && !hasScrolledToCurrentRef.current) {
-      const currentWeekIndex = data.weeks.findIndex(w => w.isCurrent);
+      const currentWeekIndex = data.weeks.findIndex((w: Week): boolean => w.isCurrent);
       if (currentWeekIndex >= 0) {
-        requestAnimationFrame(() => {
+        requestAnimationFrame((): void => {
           if (scrollContainerRef.current) {
             const columnWidth = 100;
             const scrollPosition = Math.max(0, (currentWeekIndex - 2) * columnWidth);
@@ -571,8 +593,8 @@ export function ReviewsPage() {
   }, [data]);
 
   // Handle Escape to close panel / exit batch mode (must be before ALL early returns)
-  useEffect(() => {
-    function handleKeyDown(e: KeyboardEvent) {
+  useEffect((): (() => void) => {
+    function handleKeyDown(e: KeyboardEvent): void {
       if (e.key === 'Escape') {
         if (batchMode) {
           exitBatchMode();
@@ -582,12 +604,12 @@ export function ReviewsPage() {
       }
     }
     document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
+    return (): void => document.removeEventListener('keydown', handleKeyDown);
   }, [selectedCell, batchMode]);
 
-  function toggleProgram(programId: string | null) {
+  function toggleProgram(programId: string | null): void {
     const key = programId || '__unassigned__';
-    setCollapsedPrograms(prev => {
+    setCollapsedPrograms((prev: Set<string>): Set<string> => {
       const next = new Set(prev);
       if (next.has(key)) {
         next.delete(key);
@@ -634,7 +656,7 @@ export function ReviewsPage() {
           <>
             <div className="flex rounded-md border border-border">
               <button
-                onClick={() => setFilterMode('my-team')}
+                onClick={(): void => setFilterMode('my-team')}
                 className={cn(
                   'px-2 py-0.5 transition-colors',
                   filterMode === 'my-team'
@@ -645,7 +667,7 @@ export function ReviewsPage() {
                 My Team
               </button>
               <button
-                onClick={() => setFilterMode('everyone')}
+                onClick={(): void => setFilterMode('everyone')}
                 className={cn(
                   'px-2 py-0.5 transition-colors',
                   filterMode === 'everyone'
@@ -698,10 +720,10 @@ export function ReviewsPage() {
             <select
               id="plans-week-select"
               value={String(effectivePlanWeek)}
-              onChange={e => setSelectedPlanWeek(Number(e.target.value))}
+              onChange={(e: React.ChangeEvent<HTMLSelectElement>): void => setSelectedPlanWeek(Number(e.target.value))}
               className="h-7 rounded border border-border bg-background px-2 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-accent"
             >
-              {weeksDescending.map(week => {
+              {weeksDescending.map((week: Week): React.JSX.Element => {
                 const count = weekReviewCounts[week.number]?.plans ?? 0;
                 return (
                   <option key={`plan-week-${week.number}`} value={week.number}>
@@ -711,7 +733,7 @@ export function ReviewsPage() {
               })}
             </select>
             <button
-              onClick={() => startBatchReview('plans', effectivePlanWeek)}
+              onClick={(): void => startBatchReview('plans', effectivePlanWeek)}
               disabled={selectedPlanPendingCount === 0}
               aria-label={`Review Plans for ${selectedPlanWeekLabel} (${selectedPlanPendingCount} pending)`}
               title={`Review Plans for ${selectedPlanWeekLabel} (${selectedPlanPendingCount} pending)`}
@@ -731,10 +753,10 @@ export function ReviewsPage() {
             <select
               id="retros-week-select"
               value={String(effectiveRetroWeek)}
-              onChange={e => setSelectedRetroWeek(Number(e.target.value))}
+              onChange={(e: React.ChangeEvent<HTMLSelectElement>): void => setSelectedRetroWeek(Number(e.target.value))}
               className="h-7 rounded border border-border bg-background px-2 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-accent"
             >
-              {weeksDescending.map(week => {
+              {weeksDescending.map((week: Week): React.JSX.Element => {
                 const count = weekReviewCounts[week.number]?.retros ?? 0;
                 return (
                   <option key={`retro-week-${week.number}`} value={week.number}>
@@ -744,7 +766,7 @@ export function ReviewsPage() {
               })}
             </select>
             <button
-              onClick={() => startBatchReview('retros', effectiveRetroWeek)}
+              onClick={(): void => startBatchReview('retros', effectiveRetroWeek)}
               disabled={selectedRetroPendingCount === 0}
               aria-label={`Review Retros for ${selectedRetroWeekLabel} (${selectedRetroPendingCount} pending)`}
               title={`Review Retros for ${selectedRetroWeekLabel} (${selectedRetroPendingCount} pending)`}
@@ -776,12 +798,12 @@ export function ReviewsPage() {
             </div>
 
             {/* Rows */}
-            {rowStructure.map((row, index) => {
+            {rowStructure.map((row: ReviewRow, index: number): React.JSX.Element => {
               if (row.type === 'program') {
                 return (
                   <button
                     key={`program-${row.id}`}
-                    onClick={() => toggleProgram(row.id === '__unassigned__' ? null : row.id)}
+                    onClick={(): void => toggleProgram(row.id === '__unassigned__' ? null : row.id)}
                     className="flex h-10 w-[240px] items-center gap-2 border-b border-border bg-border/30 px-3 hover:bg-border/50 text-left"
                   >
                     <svg
@@ -824,7 +846,7 @@ export function ReviewsPage() {
 
           {/* Week columns */}
           <div className="flex">
-            {data.weeks.map(week => {
+            {data.weeks.map((week: Week): React.JSX.Element => {
               const weekIsPast = week.number < data.currentSprintNumber;
 
               return (
@@ -845,7 +867,7 @@ export function ReviewsPage() {
                   </div>
 
                   {/* Cells for each row */}
-                  {rowStructure.map((row, index) => {
+                  {rowStructure.map((row: ReviewRow, index: number): React.JSX.Element => {
                     if (row.type === 'program') {
                       return (
                         <div
@@ -887,7 +909,7 @@ export function ReviewsPage() {
                       >
                         {/* Plan status (left half) */}
                         <button
-                          onClick={() => {
+                          onClick={(): void => {
                             if (cell.hasPlan && cell.planDocId) {
                               navigate(`/documents/${cell.planDocId}?review=true&sprintId=${cell.sprintId}`);
                             }
@@ -902,7 +924,7 @@ export function ReviewsPage() {
                         />
                         {/* Retro status (right half) */}
                         <button
-                          onClick={() => {
+                          onClick={(): void => {
                             if (cell.hasRetro && cell.retroDocId) {
                               navigate(`/documents/${cell.retroDocId}?review=true&sprintId=${cell.sprintId}`);
                             }
@@ -931,10 +953,10 @@ export function ReviewsPage() {
         <ReviewPanel
           selectedCell={selectedCell}
           batchMode={batchMode}
-          onClose={() => batchMode ? exitBatchMode() : setSelectedCell(null)}
-          onApprovePlan={(personId, weekNumber, sprintId, comment) => {
+          onClose={(): void => batchMode ? exitBatchMode() : setSelectedCell(null)}
+          onApprovePlan={(personId: string, weekNumber: number, sprintId: string, comment?: string): void => {
             approvePlan(personId, weekNumber, sprintId, comment);
-            setSelectedCell(prev => prev ? {
+            setSelectedCell((prev: SelectedCell | null): SelectedCell | null => prev ? {
               ...prev,
               cell: {
                 ...prev.cell,
@@ -949,9 +971,9 @@ export function ReviewsPage() {
             // Auto-advance in batch mode
             if (batchMode) setTimeout(advanceBatch, 300);
           }}
-          onRateRetro={(personId, weekNumber, sprintId, rating, comment) => {
+          onRateRetro={(personId: string, weekNumber: number, sprintId: string, rating: number, comment?: string): void => {
             rateRetro(personId, weekNumber, sprintId, rating, comment);
-            setSelectedCell(prev => prev ? {
+            setSelectedCell((prev: SelectedCell | null): SelectedCell | null => prev ? {
               ...prev,
               cell: {
                 ...prev.cell,
@@ -967,10 +989,16 @@ export function ReviewsPage() {
             // Auto-advance in batch mode
             if (batchMode) setTimeout(advanceBatch, 300);
           }}
-          onRequestChanges={(personId, weekNumber, sprintId, type, feedback) => {
+          onRequestChanges={(
+            personId: string,
+            weekNumber: number,
+            sprintId: string,
+            type: 'plan' | 'retro',
+            feedback: string,
+          ): void => {
             requestChanges(personId, weekNumber, sprintId, type, feedback);
             const approvalField = type === 'plan' ? 'planApproval' : 'reviewApproval';
-            setSelectedCell(prev => prev ? {
+            setSelectedCell((prev: SelectedCell | null): SelectedCell | null => prev ? {
               ...prev,
               cell: {
                 ...prev.cell,
@@ -1029,7 +1057,7 @@ function ReviewPanel({
   onRateRetro: (personId: string, weekNumber: number, sprintId: string, rating: number, comment?: string) => void;
   onRequestChanges: (personId: string, weekNumber: number, sprintId: string, type: 'plan' | 'retro', feedback: string) => void;
   onSkip?: () => void;
-}) {
+}): React.JSX.Element {
   const [planDoc, setPlanDoc] = useState<WeeklyDoc | null>(null);
   const [retroDoc, setRetroDoc] = useState<WeeklyDoc | null>(null);
   const [loadingDocs, setLoadingDocs] = useState(true);
@@ -1039,7 +1067,7 @@ function ReviewPanel({
   const [feedbackText, setFeedbackText] = useState('');
 
   // Fetch plan/retro content when selection changes
-  useEffect(() => {
+  useEffect((): void => {
     setLoadingDocs(true);
     setPlanDoc(null);
     setRetroDoc(null);
@@ -1051,7 +1079,7 @@ function ReviewPanel({
     setShowFeedbackInput(false);
     setFeedbackText('');
 
-    const fetchDocs = async () => {
+    const fetchDocs = async (): Promise<void> => {
       try {
         const params = new URLSearchParams({
           person_id: selectedCell.personId,
@@ -1065,11 +1093,11 @@ function ReviewPanel({
         ]);
 
         if (planRes.ok) {
-          const plans = await planRes.json();
+          const plans: WeeklyDoc[] = await planRes.json();
           if (plans.length > 0) setPlanDoc(plans[0]);
         }
         if (retroRes.ok) {
-          const retros = await retroRes.json();
+          const retros: WeeklyDoc[] = await retroRes.json();
           if (retros.length > 0) setRetroDoc(retros[0]);
         }
       } catch (err) {
@@ -1194,7 +1222,7 @@ function ReviewPanel({
             <div className="text-xs text-muted mb-2">What needs to change?</div>
             <textarea
               value={feedbackText}
-              onChange={e => setFeedbackText(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>): void => setFeedbackText(e.target.value)}
               placeholder="Explain what needs to be revised..."
               rows={3}
               className="w-full rounded border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted resize-none focus:outline-none focus:ring-1 focus:ring-purple-500"
@@ -1202,7 +1230,7 @@ function ReviewPanel({
             />
             <div className="flex gap-2 mt-2">
               <button
-                onClick={() => {
+                onClick={(): void => {
                   if (feedbackText.trim()) {
                     onRequestChanges(
                       selectedCell.personId,
@@ -1226,7 +1254,7 @@ function ReviewPanel({
                 Submit Request
               </button>
               <button
-                onClick={() => { setShowFeedbackInput(false); setFeedbackText(''); }}
+                onClick={(): void => { setShowFeedbackInput(false); setFeedbackText(''); }}
                 className="rounded px-3 py-2 text-sm text-muted hover:text-foreground hover:bg-border/50"
               >
                 Cancel
@@ -1238,10 +1266,10 @@ function ReviewPanel({
           <div>
             <div className="text-xs text-muted mb-2">Performance Rating</div>
             <div className="flex gap-1 mb-3">
-              {OPM_RATINGS.map(r => (
+              {OPM_RATINGS.map((r: typeof OPM_RATINGS[number]): React.JSX.Element => (
                 <button
                   key={r.value}
-                  onClick={() => setSelectedRating(r.value)}
+                  onClick={(): void => setSelectedRating(r.value)}
                   className={cn(
                     'flex-1 flex flex-col items-center gap-0.5 rounded py-1.5 text-xs transition-all',
                     selectedRating === r.value
@@ -1258,14 +1286,14 @@ function ReviewPanel({
             <label className="text-xs text-muted mb-1 block">Approval Note (optional)</label>
             <textarea
               value={approvalComment}
-              onChange={e => setApprovalComment(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>): void => setApprovalComment(e.target.value)}
               placeholder="Add context for this decision..."
               rows={3}
               className="w-full rounded border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted resize-none focus:outline-none focus:ring-1 focus:ring-accent mb-3"
             />
             <div className="flex gap-2">
               <button
-                onClick={() => {
+                onClick={(): void => {
                   if (selectedRating) {
                     onRateRetro(
                       selectedCell.personId,
@@ -1288,7 +1316,7 @@ function ReviewPanel({
               </button>
               {retroDoc && (
                 <button
-                  onClick={() => setShowFeedbackInput(true)}
+                  onClick={(): void => setShowFeedbackInput(true)}
                   className="rounded px-3 py-2 text-sm font-medium text-purple-400 hover:bg-purple-500/10 transition-colors"
                 >
                   Request Changes
@@ -1302,14 +1330,14 @@ function ReviewPanel({
             <label className="text-xs text-muted mb-1 block">Approval Note (optional)</label>
             <textarea
               value={approvalComment}
-              onChange={e => setApprovalComment(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>): void => setApprovalComment(e.target.value)}
               placeholder="Add context for this decision..."
               rows={3}
               className="w-full rounded border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted resize-none focus:outline-none focus:ring-1 focus:ring-accent mb-3"
             />
             <div className="flex gap-2">
               <button
-                onClick={() => onApprovePlan(selectedCell.personId, selectedCell.weekNumber, selectedCell.sprintId, approvalComment)}
+                onClick={(): void => onApprovePlan(selectedCell.personId, selectedCell.weekNumber, selectedCell.sprintId, approvalComment)}
                 disabled={!canApprove}
                 className={cn(
                   'flex-1 rounded py-2 text-sm font-medium transition-colors',
@@ -1330,7 +1358,7 @@ function ReviewPanel({
               </button>
               {canApprove && (
                 <button
-                  onClick={() => setShowFeedbackInput(true)}
+                  onClick={(): void => setShowFeedbackInput(true)}
                   className="rounded px-3 py-2 text-sm font-medium text-purple-400 hover:bg-purple-500/10 transition-colors"
                 >
                   Request Changes
@@ -1345,7 +1373,7 @@ function ReviewPanel({
 }
 
 /** Renders TipTap JSON content as simple HTML */
-function TipTapContent({ content }: { content: unknown }) {
+function TipTapContent({ content }: { content: unknown }): React.JSX.Element {
   if (!content || typeof content !== 'object') {
     return <p className="text-sm text-muted italic">Empty</p>;
   }
@@ -1357,14 +1385,14 @@ function TipTapContent({ content }: { content: unknown }) {
 
   return (
     <div className="text-sm text-foreground space-y-2">
-      {doc.content.map((node, i) => (
+      {doc.content.map((node: unknown, i: number): React.JSX.Element => (
         <TipTapNode key={i} node={node} />
       ))}
     </div>
   );
 }
 
-function TipTapNode({ node }: { node: unknown }) {
+function TipTapNode({ node }: { node: unknown }): React.ReactNode {
   if (!node || typeof node !== 'object') return null;
   const n = node as { type?: string; content?: unknown[]; text?: string; attrs?: Record<string, unknown>; marks?: Array<{ type: string }> };
 
@@ -1379,7 +1407,7 @@ function TipTapNode({ node }: { node: unknown }) {
     return text;
   }
 
-  const children = n.content?.map((child, i) => <TipTapNode key={i} node={child} />) ?? null;
+  const children = n.content?.map((child: unknown, i: number): React.JSX.Element => <TipTapNode key={i} node={child} />) ?? null;
 
   switch (n.type) {
     case 'heading': {

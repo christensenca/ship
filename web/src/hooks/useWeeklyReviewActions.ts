@@ -30,6 +30,55 @@ interface ApprovalData {
   comment?: string | null;
 }
 
+interface ReviewRatingData {
+  value?: number;
+}
+
+interface DocumentTitleResponse {
+  title: string;
+}
+
+interface SprintLookupResponse {
+  id: string;
+}
+
+interface LookupPersonResponse {
+  title: string;
+}
+
+interface SprintApprovalResponse {
+  id: string;
+  properties?: Record<string, unknown>;
+  approverName?: string;
+}
+
+interface ApprovalMutationResponse {
+  approval?: ApprovalData;
+  review_rating?: ReviewRatingData | null;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null;
+}
+
+function getApprovalData(value: unknown): ApprovalData | null {
+  if (!isRecord(value)) return null;
+  return {
+    state: typeof value.state === 'string' ? value.state : undefined,
+    approved_by: typeof value.approved_by === 'string' ? value.approved_by : undefined,
+    approved_at: typeof value.approved_at === 'string' ? value.approved_at : undefined,
+    feedback: typeof value.feedback === 'string' || value.feedback === null ? value.feedback : undefined,
+    comment: typeof value.comment === 'string' || value.comment === null ? value.comment : undefined,
+  };
+}
+
+function getReviewRatingData(value: unknown): ReviewRatingData | null {
+  if (!isRecord(value)) return null;
+  return {
+    value: typeof value.value === 'number' ? value.value : undefined,
+  };
+}
+
 export interface WeeklyReviewActionsState {
   isReviewMode: boolean;
   isRetro: boolean;
@@ -77,7 +126,7 @@ export function useWeeklyReviewActions(
   const [localApprovalOverride, setLocalApprovalOverride] = useState<ApprovalDetails | null>(null);
 
   // Fetch person name
-  const { data: personDoc } = useQuery<{ title: string }>({
+  const { data: personDoc } = useQuery<DocumentTitleResponse>({
     queryKey: ['document', personId],
     queryFn: async () => {
       const res = await apiGet(`/api/documents/${personId}`);
@@ -88,7 +137,7 @@ export function useWeeklyReviewActions(
   });
 
   // Fetch project name
-  const { data: projectDoc } = useQuery<{ title: string }>({
+  const { data: projectDoc } = useQuery<DocumentTitleResponse>({
     queryKey: ['document', projectId],
     queryFn: async () => {
       const res = await apiGet(`/api/documents/${projectId}`);
@@ -99,31 +148,31 @@ export function useWeeklyReviewActions(
   });
 
   // Fetch sprint data with approval state + approver name in a single query
-  const { data: sprintData } = useQuery<{ id: string; properties: Record<string, unknown>; approverName?: string }>({
+  const { data: sprintData } = useQuery<SprintApprovalResponse>({
     queryKey: ['sprint-approval-v2', sprintIdFromQuery || `lookup-${projectId}-${weekNumber}`, isRetro],
     queryFn: async () => {
       let sid = sprintIdFromQuery;
       if (!sid) {
         const lookupRes = await apiGet(`/api/weeks/lookup?project_id=${projectId}&sprint_number=${weekNumber}`);
         if (!lookupRes.ok) throw new Error('Sprint not found');
-        const lookup = await lookupRes.json();
-        sid = lookup.id as string;
+        const lookup: SprintLookupResponse = await lookupRes.json();
+        sid = lookup.id;
       }
 
       const res = await apiGet(`/api/documents/${sid}`);
       if (!res.ok) throw new Error('Failed to fetch sprint');
-      const data = await res.json();
+      const data: SprintApprovalResponse = await res.json();
 
       // Resolve approver name if there's an approval
-      const props = (data.properties || {}) as Record<string, unknown>;
-      const approval = (isRetro ? props.review_approval : props.plan_approval) as ApprovalData | undefined;
+      const props = data.properties ?? {};
+      const approval = getApprovalData(isRetro ? props.review_approval : props.plan_approval);
       if (approval?.approved_by) {
         const personRes = await fetch(
           `${import.meta.env.VITE_API_URL ?? ''}/api/weeks/lookup-person?user_id=${approval.approved_by}`,
           { credentials: 'include' }
         );
         if (personRes.ok) {
-          const person = await personRes.json();
+          const person: LookupPersonResponse = await personRes.json();
           data.approverName = person.title;
         }
       }
@@ -140,10 +189,10 @@ export function useWeeklyReviewActions(
   }, [weeklyDocument?.id, effectiveSprintId]);
 
   // Derive approval state from sprint data (or local override after action)
-  const sprintProps = (sprintData?.properties || {}) as Record<string, unknown>;
-  const planApproval = (sprintProps.plan_approval as ApprovalData | null) ?? null;
-  const reviewApproval = (sprintProps.review_approval as ApprovalData | null) ?? null;
-  const reviewRating = (sprintProps.review_rating as { value?: number } | null) ?? null;
+  const sprintProps = sprintData?.properties ?? {};
+  const planApproval = getApprovalData(sprintProps.plan_approval);
+  const reviewApproval = getApprovalData(sprintProps.review_approval);
+  const reviewRating = getReviewRatingData(sprintProps.review_rating);
   const activeApproval = isRetro ? reviewApproval : planApproval;
 
   const approvalState = localApprovalOverride !== null
@@ -186,8 +235,8 @@ export function useWeeklyReviewActions(
         return false;
       }
 
-      const data = await res.json().catch(() => ({}));
-      const approval = data?.approval as ApprovalData | undefined;
+      const data: ApprovalMutationResponse = await res.json().catch((): ApprovalMutationResponse => ({}));
+      const approval = data.approval;
       setLocalApprovalOverride({
         state: approval?.state ?? 'approved',
         approvedAt: approval?.approved_at ?? new Date().toISOString(),
@@ -222,8 +271,8 @@ export function useWeeklyReviewActions(
         return false;
       }
 
-      const data = await res.json().catch(() => ({}));
-      const approval = data?.approval as ApprovalData | undefined;
+      const data: ApprovalMutationResponse = await res.json().catch((): ApprovalMutationResponse => ({}));
+      const approval = data.approval;
       setLocalApprovalOverride({
         state: approval?.state ?? 'changes_requested',
         approvedAt: approval?.approved_at ?? new Date().toISOString(),
@@ -257,9 +306,9 @@ export function useWeeklyReviewActions(
         return false;
       }
 
-      const data = await res.json().catch(() => ({}));
-      const approval = data?.approval as ApprovalData | undefined;
-      const nextRating = (data?.review_rating as { value?: number } | null)?.value ?? rating;
+      const data: ApprovalMutationResponse = await res.json().catch((): ApprovalMutationResponse => ({}));
+      const approval = data.approval;
+      const nextRating = data.review_rating?.value ?? rating;
       setLocalApprovalOverride({
         state: approval?.state ?? 'approved',
         approvedAt: approval?.approved_at ?? new Date().toISOString(),

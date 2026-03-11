@@ -106,7 +106,7 @@ function stringToColor(str: string): string {
 function extractDocumentMentionIds(content: JSONContent): string[] {
   const mentionIds: string[] = [];
 
-  function traverse(node: JSONContent) {
+  function traverse(node: JSONContent): void {
     if (node.type === 'mention' && node.attrs?.mentionType === 'document' && node.attrs?.id) {
       mentionIds.push(node.attrs.id);
     }
@@ -125,11 +125,11 @@ function extractDocumentMentionIds(content: JSONContent): string[] {
 function extractHypothesisText(content: JSONContent): string | null {
   let hypothesisText: string | null = null;
 
-  function traverse(node: JSONContent) {
+  function traverse(node: JSONContent): void {
     if (node.type === 'hypothesisBlock') {
       // Extract plain text from hypothesis block content
       const textParts: string[] = [];
-      const extractText = (n: JSONContent) => {
+      const extractText = (n: JSONContent): void => {
         if (n.type === 'text' && n.text) {
           textParts.push(n.text);
         }
@@ -183,7 +183,7 @@ export function Editor({
   onContentChange,
   aiScoringAnalysis,
   titleSuffix,
-}: EditorProps) {
+}: EditorProps): React.JSX.Element {
   const [title, setTitle] = useState(initialTitle === 'Untitled' ? '' : initialTitle);
   const titleInputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -195,11 +195,11 @@ export function Editor({
   // This ensures the Y.Doc is atomically recreated when documentId changes,
   // preventing race conditions where the WebSocket provider might use a stale Y.Doc
   // that contains content from a different document (cross-document contamination bug)
-  const ydoc = useMemo(() => new Y.Doc(), [documentId]);
+  const ydoc = useMemo((): Y.Doc => new Y.Doc(), [documentId]);
 
   // Sync title when initialTitle prop changes (e.g., from context update)
   // Only update if user hasn't made local changes (prevents stale responses from overwriting)
-  useEffect(() => {
+  useEffect((): void => {
     const newTitle = initialTitle === 'Untitled' ? '' : initialTitle;
     // Only update if this is a genuinely new value from server
     // AND user hasn't made local changes since
@@ -210,7 +210,7 @@ export function Editor({
   }, [initialTitle]);
 
   // Reset local changes flag after save completes (parent will update initialTitle)
-  useEffect(() => {
+  useEffect((): void => {
     if (initialTitle === title || (initialTitle === 'Untitled' && title === '')) {
       hasLocalChangesRef.current = false;
       lastSyncedTitleRef.current = initialTitle;
@@ -218,7 +218,7 @@ export function Editor({
   }, [initialTitle, title]);
 
   // Auto-resize title textarea when title changes or on mount
-  useEffect(() => {
+  useEffect((): void => {
     const el = titleInputRef.current;
     if (el) {
       el.style.height = 'auto';
@@ -229,7 +229,7 @@ export function Editor({
   const [syncStatus, setSyncStatus] = useState<SyncStatus>('connecting');
   const [isBrowserOnline, setIsBrowserOnline] = useState(navigator.onLine);
   const [connectedUsers, setConnectedUsers] = useState<{ name: string; color: string }[]>([]);
-  const [rightSidebarCollapsed, setRightSidebarCollapsed] = useState(() => {
+  const [rightSidebarCollapsed, setRightSidebarCollapsed] = useState<boolean>(() => {
     return localStorage.getItem('ship:rightSidebarCollapsed') === 'true';
   });
   const [portalTarget, setPortalTarget] = useState<HTMLElement | null>(null);
@@ -239,20 +239,20 @@ export function Editor({
   const imageUploadAbortRef = useRef<AbortController>(new AbortController());
 
   // Find portal target for properties sidebar (for proper landmark order)
-  useLayoutEffect(() => {
+  useLayoutEffect((): void => {
     const target = document.getElementById('properties-portal');
     setPortalTarget(target);
   }, []);
 
   // Persist right sidebar state
-  useEffect(() => {
+  useEffect((): void => {
     localStorage.setItem('ship:rightSidebarCollapsed', String(rightSidebarCollapsed));
   }, [rightSidebarCollapsed]);
 
   // Track browser online status for sync indicator using native browser events
-  useEffect(() => {
-    const handleOnline = () => setIsBrowserOnline(true);
-    const handleOffline = () => setIsBrowserOnline(false);
+  useEffect((): (() => void) => {
+    const handleOnline = (): void => setIsBrowserOnline(true);
+    const handleOffline = (): void => setIsBrowserOnline(false);
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
     return () => {
@@ -267,12 +267,12 @@ export function Editor({
   // Uses double requestAnimationFrame to run AFTER useFocusOnNavigate's
   // requestAnimationFrame (which focuses #main-content for accessibility).
   // This ensures title gets focus for new docs while preserving a11y flow.
-  useEffect(() => {
+  useEffect((): void => {
     if (!title || title === 'Untitled') {
       // First rAF: queued alongside useFocusOnNavigate's rAF
       // Second rAF: runs after useFocusOnNavigate completes
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
+      requestAnimationFrame((): void => {
+        requestAnimationFrame((): void => {
           if (titleInputRef.current) {
             titleInputRef.current.focus();
             titleInputRef.current.select();
@@ -283,7 +283,7 @@ export function Editor({
   }, []);
 
   // Setup IndexedDB persistence and WebSocket provider
-  useEffect(() => {
+  useEffect((): (() => void) => {
     let wsProvider: WebsocketProvider | null = null;
     let hasCachedContent = false;
     let cancelled = false;
@@ -296,7 +296,7 @@ export function Editor({
 
     // Wait for IndexedDB to load cached content (with timeout)
     // This ensures cached content shows instantly before WebSocket syncs
-    const waitForCache = new Promise<void>((resolve) => {
+    const waitForCache = new Promise<void>((resolve: () => void) => {
       // Resolve immediately if already synced
       if (indexeddbProvider.synced) {
         hasCachedContent = true;
@@ -306,23 +306,23 @@ export function Editor({
       }
 
       // Wait for sync event
-      const onSynced = () => {
+      const onSynced = (): void => {
         hasCachedContent = true;
-        setSyncStatus((prev) => prev === 'connecting' ? 'cached' : prev);
+        setSyncStatus((prev): SyncStatus => prev === 'connecting' ? 'cached' : prev);
         console.log(`[Editor] IndexedDB synced for ${roomPrefix}:${documentId}`);
         resolve();
       };
       indexeddbProvider.on('synced', onSynced);
 
       // Timeout after 300ms - don't block forever if no cache exists
-      setTimeout(() => {
+      setTimeout((): void => {
         indexeddbProvider.off('synced', onSynced);
         resolve();
       }, 300);
     });
 
     // Connect WebSocket AFTER cache loads (or timeout)
-    waitForCache.then(() => {
+    waitForCache.then((): void => {
       if (cancelled) return;
 
       // In production, use current host with wss:// (through CloudFront)
@@ -336,14 +336,14 @@ export function Editor({
       // This is sent when the server loaded content fresh from JSON (API update/create)
       // We need to clear IndexedDB to prevent stale cached content from merging
       const MESSAGE_TYPE_CLEAR_CACHE = 3;
-      const handleRawMessage = (event: MessageEvent) => {
+      const handleRawMessage = (event: MessageEvent): void => {
         if (cancelled) return;
         try {
           const data = new Uint8Array(event.data);
           if (data.length > 0 && data[0] === MESSAGE_TYPE_CLEAR_CACHE) {
             console.log(`[Editor] Received cache clear signal for ${documentId}, clearing IndexedDB`);
             // Clear the Y.Doc to remove any cached content before server sync
-            ydoc.transact(() => {
+            ydoc.transact((): void => {
               const fragment = ydoc.getXmlFragment('default');
               // Delete all content from the fragment
               while (fragment.length > 0) {
@@ -351,10 +351,10 @@ export function Editor({
               }
             });
             // Also clear IndexedDB for future visits
-            indexeddbProvider.clearData().then(() => {
+            indexeddbProvider.clearData().then((): void => {
               console.log(`[Editor] IndexedDB cache cleared for ${documentId} (fresh from JSON)`);
               hasCachedContent = false;
-            }).catch((err) => {
+            }).catch((err: unknown) => {
               console.error(`[Editor] Failed to clear IndexedDB cache for ${documentId}:`, err);
             });
           }
@@ -371,7 +371,7 @@ export function Editor({
       // Add raw message listener before connecting
       // y-websocket creates its own WebSocket, we need to hook into it
       const originalConnect = wsProvider.connect.bind(wsProvider);
-      wsProvider.connect = () => {
+      wsProvider.connect = (): void => {
         originalConnect();
         // Add listener to the new WebSocket
         if (wsProvider?.ws) {
@@ -382,7 +382,7 @@ export function Editor({
       // Now connect
       wsProvider.connect();
 
-      wsProvider.on('status', (event: { status: string }) => {
+      wsProvider.on('status', (event: { status: string }): void => {
         if (cancelled) return; // Don't update state if effect was cleaned up
         console.log(`[Editor] WebSocket status: ${event.status} for ${roomPrefix}:${documentId}`);
         if (event.status === 'connected') {
@@ -394,7 +394,7 @@ export function Editor({
       });
 
       // Handle WebSocket close events to detect access revoked, document converted, or content updated
-      wsProvider.on('connection-close', (event: CloseEvent | null) => {
+      wsProvider.on('connection-close', (event: CloseEvent | null): void => {
         if (cancelled) return; // Don't process if effect was cleaned up
         if (event?.code === 4403) {
           console.log(`[Editor] Access revoked for document ${documentId}`);
@@ -427,17 +427,17 @@ export function Editor({
           // Content updated via API - clear IndexedDB cache to prevent stale content merge
           console.log(`[Editor] Content updated via API for ${documentId}, clearing IndexedDB cache`);
           // Clear the IndexedDB cache so stale content doesn't merge with new content
-          indexeddbProvider.clearData().then(() => {
+          indexeddbProvider.clearData().then((): void => {
             console.log(`[Editor] IndexedDB cache cleared for ${documentId}`);
             hasCachedContent = false;
-          }).catch((err) => {
+          }).catch((err: unknown) => {
             console.error(`[Editor] Failed to clear IndexedDB cache for ${documentId}:`, err);
           });
           // y-websocket will auto-reconnect, now with fresh state from server
         }
       });
 
-      wsProvider.on('sync', (isSynced: boolean) => {
+      wsProvider.on('sync', (isSynced: boolean): void => {
         if (cancelled) return; // Don't update state if effect was cleaned up
         console.log(`[Editor] WebSocket sync: ${isSynced} for ${roomPrefix}:${documentId}`);
         if (isSynced) {
@@ -454,11 +454,11 @@ export function Editor({
       // Track connected users - store callback reference for proper cleanup
       // Deduplicate by user name to handle race conditions where stale awareness
       // states exist briefly during page refresh (before old connection cleanup)
-      updateUsersCallback = () => {
+      updateUsersCallback = (): void => {
         if (cancelled) return; // Don't update state if effect was cleaned up
         const users: { name: string; color: string }[] = [];
         const seenNames = new Set<string>();
-        wsProvider!.awareness.getStates().forEach((state) => {
+        wsProvider!.awareness.getStates().forEach((state: { user?: { name: string; color: string } }) => {
           if (state.user && !seenNames.has(state.user.name)) {
             seenNames.add(state.user.name);
             users.push(state.user);
@@ -504,7 +504,7 @@ export function Editor({
 
   // Create slash commands extension (memoized to avoid recreation)
   // documentId is in deps to ensure fresh AbortSignal when switching documents
-  const slashCommandsExtension = useMemo(() => {
+  const slashCommandsExtension = useMemo((): ReturnType<typeof createSlashCommands> => {
     return createSlashCommands({
       onCreateSubDocument,
       onNavigateToDocument,
@@ -516,13 +516,13 @@ export function Editor({
   // Create mention extension (memoized to avoid recreation)
   const mentionExtension = useMemo(() => {
     return createMentionExtension({
-      onNavigate: (type, id) => {
+      onNavigate: (type: string, id: string): void => {
         // Navigate to the mentioned entity
         if (type === 'person') {
-          onNavigateToDocument?.(`/people/${id}`);
-        } else {
           onNavigateToDocument?.(id);
+          return;
         }
+        onNavigateToDocument?.(id);
       },
     });
   }, [onNavigateToDocument]);
@@ -534,7 +534,7 @@ export function Editor({
   const [pendingCommentId, setPendingCommentId] = useState<string | null>(null);
 
   // Handle adding a new comment (called from keyboard shortcut, bubble menu, context menu)
-  const handleAddComment = useCallback((commentId: string) => {
+  const handleAddComment = useCallback((commentId: string): void => {
     setPendingCommentId(commentId);
   }, []);
 
@@ -585,9 +585,9 @@ export function Editor({
       },
     }),
     ImageUploadExtension.configure({
-      onUploadStart: () => {},
-      onUploadComplete: () => {},
-      onUploadError: (error) => console.error('Upload error:', error),
+      onUploadStart: (): void => {},
+      onUploadComplete: (): void => {},
+      onUploadError: (error: unknown): void => console.error('Upload error:', error),
       abortController: imageUploadAbortRef.current,
     }),
     FileAttachmentExtension,
@@ -635,23 +635,23 @@ export function Editor({
   updateCommentRef.current = updateComment;
 
   // Sync comment data into the CommentDisplay extension storage
-  useEffect(() => {
+  useEffect((): (() => void) | void => {
     if (!editor) return;
-    const ext = editor.extensionManager.extensions.find(e => e.name === 'commentDisplay');
+    const ext = editor.extensionManager.extensions.find((extension): boolean => extension.name === 'commentDisplay');
     if (!ext) return;
 
     ext.storage.comments = comments;
     ext.storage.pendingCommentId = pendingCommentId;
-    ext.storage.onReply = (commentId: string, content: string) => {
-      const rootComment = commentsRef.current.find(c => c.comment_id === commentId && !c.parent_id);
+    ext.storage.onReply = (commentId: string, content: string): void => {
+      const rootComment = commentsRef.current.find((comment): boolean => comment.comment_id === commentId && !comment.parent_id);
       createCommentRef.current.mutate({
         comment_id: commentId,
         content,
         parent_id: rootComment?.id,
       });
     };
-    ext.storage.onResolve = (commentId: string, resolved: boolean) => {
-      const rootComment = commentsRef.current.find(c => c.comment_id === commentId && !c.parent_id);
+    ext.storage.onResolve = (commentId: string, resolved: boolean): void => {
+      const rootComment = commentsRef.current.find((comment): boolean => comment.comment_id === commentId && !comment.parent_id);
       if (rootComment) {
         updateCommentRef.current.mutate({
           commentId: rootComment.id,
@@ -661,18 +661,18 @@ export function Editor({
         // The CommentDisplay plugin handles showing resolved vs unresolved states.
       }
     };
-    ext.storage.onSubmitComment = (commentId: string, content: string) => {
+    ext.storage.onSubmitComment = (commentId: string, content: string): void => {
       createCommentRef.current.mutate({ comment_id: commentId, content });
       setPendingCommentId(null);
     };
-    ext.storage.onCancelComment = (commentId: string) => {
+    ext.storage.onCancelComment = (commentId: string): void => {
       editor.commands.unsetComment(commentId);
       setPendingCommentId(null);
     };
 
     // Force ProseMirror to re-evaluate decorations
     // Delay to ensure DOM is ready and avoid init-time errors
-    const timer = setTimeout(() => {
+    const timer = setTimeout((): void => {
       if (!editor.isDestroyed && editor.view) {
         try {
           editor.view.updateState(editor.view.state);
@@ -681,20 +681,20 @@ export function Editor({
         }
       }
     }, 100);
-    return () => clearTimeout(timer);
+    return (): void => clearTimeout(timer);
   }, [editor, comments, pendingCommentId]);
 
   // Sync AI scoring data into the AIScoringDisplay extension storage
-  useEffect(() => {
+  useEffect((): (() => void) | void => {
     if (!editor) return;
-    const ext = editor.extensionManager.extensions.find(e => e.name === 'aiScoringDisplay');
+    const ext = editor.extensionManager.extensions.find((extension): boolean => extension.name === 'aiScoringDisplay');
     if (!ext) return;
 
     ext.storage.planAnalysis = aiScoringAnalysis?.planAnalysis || null;
     ext.storage.retroAnalysis = aiScoringAnalysis?.retroAnalysis || null;
 
     // Force ProseMirror to re-evaluate decorations
-    const timer = setTimeout(() => {
+    const timer = setTimeout((): void => {
       if (!editor.isDestroyed && editor.view) {
         try {
           editor.view.updateState(editor.view.state);
@@ -703,15 +703,15 @@ export function Editor({
         }
       }
     }, 50);
-    return () => clearTimeout(timer);
+    return (): void => clearTimeout(timer);
   }, [editor, aiScoringAnalysis]);
 
   // Sync document links when editor content changes (for backlinks feature)
   const lastSyncedLinksRef = useRef<string>('');
-  useEffect(() => {
+  useEffect((): (() => void) | void => {
     if (!editor) return;
 
-    const syncLinks = () => {
+    const syncLinks = (): void => {
       const json = editor.getJSON();
       const targetIds = extractDocumentMentionIds(json);
       const targetIdsKey = targetIds.sort().join(',');
@@ -725,14 +725,14 @@ export function Editor({
       // POST to update links (uses target_ids for API compatibility)
       // Use apiPost to handle CSRF token automatically
       apiPost(`/api/documents/${documentId}/links`, { target_ids: targetIds })
-        .catch(err => {
-          console.error('[LinkSync] POST error:', err);
+        .catch((error: unknown): void => {
+          console.error('[LinkSync] POST error:', error);
         });
     };
 
     // Debounce during editing
     let debounceTimer: ReturnType<typeof setTimeout>;
-    const debouncedSync = () => {
+    const debouncedSync = (): void => {
       clearTimeout(debounceTimer);
       debounceTimer = setTimeout(syncLinks, 500);
     };
@@ -741,7 +741,7 @@ export function Editor({
     // Sync on initial load
     syncLinks();
 
-    return () => {
+    return (): void => {
       clearTimeout(debounceTimer);
       editor.off('update', debouncedSync);
       // Flush any pending sync - but this won't complete if navigating away
@@ -750,13 +750,13 @@ export function Editor({
   }, [editor, documentId]);
 
   // Notify parent of content changes (debounced 3s) for AI quality analysis etc.
-  useEffect(() => {
+  useEffect((): (() => void) | void => {
     if (!editor || !onContentChange) return;
 
     let debounceTimer: ReturnType<typeof setTimeout>;
-    const debouncedNotify = () => {
+    const debouncedNotify = (): void => {
       clearTimeout(debounceTimer);
-      debounceTimer = setTimeout(() => {
+      debounceTimer = setTimeout((): void => {
         const json = editor.getJSON();
         onContentChange(json as Record<string, unknown>);
       }, 3000);
@@ -764,7 +764,7 @@ export function Editor({
 
     editor.on('update', debouncedNotify);
 
-    return () => {
+    return (): void => {
       clearTimeout(debounceTimer);
       editor.off('update', debouncedNotify);
     };
@@ -772,10 +772,10 @@ export function Editor({
 
   // Sync plan content when HypothesisBlock changes (for sprint documents)
   const lastSyncedPlanRef = useRef<string | null>(null);
-  useEffect(() => {
+  useEffect((): (() => void) | void => {
     if (!editor || !onPlanChange) return;
 
-    const syncPlan = () => {
+    const syncPlan = (): void => {
       const json = editor.getJSON();
       const plan = extractHypothesisText(json);
 
@@ -791,7 +791,7 @@ export function Editor({
 
     // Debounce during editing (300ms per PRD spec)
     let debounceTimer: ReturnType<typeof setTimeout>;
-    const debouncedSync = () => {
+    const debouncedSync = (): void => {
       clearTimeout(debounceTimer);
       debounceTimer = setTimeout(syncPlan, 300);
     };
@@ -799,14 +799,14 @@ export function Editor({
     editor.on('update', debouncedSync);
     // Don't sync on initial load - let the parent handle initial state
 
-    return () => {
+    return (): void => {
       clearTimeout(debounceTimer);
       editor.off('update', debouncedSync);
     };
   }, [editor, onPlanChange]);
 
   // Handle title changes
-  const handleTitleChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const handleTitleChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>): void => {
     const newTitle = e.target.value;
     hasLocalChangesRef.current = true; // Mark as having local changes to prevent stale overwrites
     setTitle(newTitle);
@@ -847,7 +847,7 @@ export function Editor({
 
           {/* Sync status - WCAG 4.1.3 aria-live for status messages */}
           {/* Show 'Offline' when browser is offline, regardless of WebSocket state */}
-          {(() => {
+          {((): React.JSX.Element => {
             const effectiveStatus = !isBrowserOnline ? 'disconnected' : syncStatus;
             return (
               <div
@@ -892,7 +892,7 @@ export function Editor({
 
         {/* Connected users */}
         <div className="flex items-center gap-1" data-testid="collab-status">
-          {connectedUsers.map((user, index) => (
+          {connectedUsers.map((user, index): React.JSX.Element => (
             <div
               key={index}
               className="flex h-6 w-6 items-center justify-center rounded-full text-xs font-medium text-white"
@@ -928,13 +928,13 @@ export function Editor({
               ref={titleInputRef}
               value={title}
               onChange={titleReadOnly ? undefined : handleTitleChange}
-              onKeyDown={(e) => {
+              onKeyDown={(e: React.KeyboardEvent<HTMLTextAreaElement>): void => {
                 if (e.key === 'Enter') {
                   e.preventDefault();
                   editor?.commands.focus('start');
                 }
               }}
-              onInput={(e) => {
+              onInput={(e: React.FormEvent<HTMLTextAreaElement>): void => {
                 const el = e.currentTarget;
                 el.style.height = 'auto';
                 el.style.height = `${el.scrollHeight}px`;
@@ -951,7 +951,7 @@ export function Editor({
             <div
               className="tiptap-wrapper"
               data-testid="tiptap-editor"
-              onContextMenu={(e) => {
+              onContextMenu={(e: React.MouseEvent<HTMLDivElement>): void => {
                 if (!editor || editor.state.selection.empty) return;
                 e.preventDefault();
                 const menu = document.createElement('div');
@@ -960,9 +960,9 @@ export function Editor({
                 const btn = document.createElement('button');
                 btn.textContent = 'Add Comment';
                 btn.style.cssText = 'display:block;width:100%;padding:6px 12px;background:none;border:none;color:rgb(228,228,231);font-size:13px;cursor:pointer;text-align:left;';
-                btn.onmouseenter = () => { btn.style.background = 'rgb(63,63,70)'; };
-                btn.onmouseleave = () => { btn.style.background = 'none'; };
-                btn.onclick = () => {
+                btn.onmouseenter = (): void => { btn.style.background = 'rgb(63,63,70)'; };
+                btn.onmouseleave = (): void => { btn.style.background = 'none'; };
+                btn.onclick = (): void => {
                   editor.commands.addComment();
                   menu.remove();
                 };
@@ -974,7 +974,7 @@ export function Editor({
                     document.removeEventListener('mousedown', dismiss);
                   }
                 };
-                setTimeout(() => document.addEventListener('mousedown', dismiss), 0);
+                setTimeout((): void => document.addEventListener('mousedown', dismiss), 0);
               }}
             >
               <ErrorBoundary>
@@ -985,7 +985,7 @@ export function Editor({
               <BubbleMenu
                 editor={editor}
                 pluginKey="commentBubbleMenu"
-                shouldShow={({ state }) => {
+                shouldShow={({ state }): boolean => {
                   if (state.selection.empty) return false;
                   const { $from } = state.selection;
                   if ($from.parent.type.name === 'codeBlock') return false;
@@ -994,7 +994,7 @@ export function Editor({
                 tippyOptions={{ placement: 'top', duration: 150 }}
               >
                 <button
-                  onClick={() => editor.commands.addComment()}
+                  onClick={(): void => { editor.commands.addComment(); }}
                   className="flex items-center gap-1.5 px-2.5 py-1 bg-zinc-800 border border-zinc-600 rounded-md text-xs text-zinc-200 hover:bg-zinc-700 transition-colors shadow-lg"
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -1009,7 +1009,7 @@ export function Editor({
           {/* Spacer to fill remaining height - clickable to focus editor at end */}
           <div
             className="flex-1 min-h-[200px]"
-            onClick={() => {
+            onClick={(): void => {
               if (!editor) return;
               // Focus editor at the end
               const lastNode = editor.state.doc.lastChild;
@@ -1046,7 +1046,7 @@ export function Editor({
               <span className="text-sm font-medium text-foreground">Properties</span>
               <Tooltip content="Collapse sidebar">
                 <button
-                  onClick={() => setRightSidebarCollapsed(true)}
+                  onClick={(): void => setRightSidebarCollapsed(true)}
                   className="flex h-6 w-6 items-center justify-center rounded text-muted hover:bg-border hover:text-foreground transition-colors"
                   aria-label="Collapse sidebar"
                 >
@@ -1066,7 +1066,7 @@ export function Editor({
           {rightSidebarCollapsed && (
             <Tooltip content="Expand properties" side="left">
               <button
-                onClick={() => setRightSidebarCollapsed(false)}
+                onClick={(): void => setRightSidebarCollapsed(false)}
                 className="absolute right-0 top-0 flex h-10 w-10 items-center justify-center border-l border-border text-muted hover:bg-border/50 hover:text-foreground transition-colors"
                 aria-label="Expand properties sidebar"
               >
@@ -1081,7 +1081,7 @@ export function Editor({
   );
 }
 
-function CollapseRightIcon() {
+function CollapseRightIcon(): React.JSX.Element {
   return (
     <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 5l7 7-7 7m-8-14v14" />
@@ -1089,7 +1089,7 @@ function CollapseRightIcon() {
   );
 }
 
-function ExpandLeftIcon() {
+function ExpandLeftIcon(): React.JSX.Element {
   return (
     <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11 19l-7-7 7-7m8 14V5" />
@@ -1097,7 +1097,7 @@ function ExpandLeftIcon() {
   );
 }
 
-function TrashIcon() {
+function TrashIcon(): React.JSX.Element {
   return (
     <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />

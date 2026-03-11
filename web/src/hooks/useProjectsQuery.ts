@@ -1,6 +1,45 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import type { QueryKey, UseMutationResult, UseQueryResult } from '@tanstack/react-query';
 import { apiGet, apiPost, apiPatch, apiDelete } from '@/lib/api';
 import { computeICEScore } from '@ship/shared';
+
+type ApiError = Error & { status: number };
+type ProjectsQueryKey = QueryKey;
+type ProjectsAllKey = readonly ['projects'];
+type ProjectsListKey = readonly ['projects', 'list'];
+type ProjectsFilteredListKey = readonly ['projects', 'list', Record<string, unknown> | undefined];
+type ProjectsDetailsKey = readonly ['projects', 'detail'];
+type ProjectsDetailKey = readonly ['projects', 'detail', string];
+type ProjectsIssuesKey = readonly ['projects', 'detail', string, 'issues'];
+type ProjectsWeeksKey = readonly ['projects', 'detail', string, 'weeks'];
+const allProjectKey: ProjectsAllKey = ['projects'];
+
+interface CreateProjectContext {
+  previousProjects?: Project[];
+  optimisticId?: string;
+}
+
+interface UpdateProjectMutationData {
+  id: string;
+  updates: Partial<Project>;
+}
+
+interface UpdateProjectContext {
+  previousProjects?: Project[];
+}
+
+interface DeleteProjectContext {
+  previousProjects?: Project[];
+}
+
+interface UseProjectsResult {
+  projects: Project[];
+  loading: boolean;
+  createProject: (options: CreateProjectOptions) => Promise<Project | null>;
+  updateProject: (id: string, updates: Partial<Project>) => Promise<Project | null>;
+  deleteProject: (id: string) => Promise<boolean>;
+  refreshProjects: () => Promise<void>;
+}
 
 // Inferred project status based on sprint relationships
 export type InferredProjectStatus = 'active' | 'planned' | 'completed' | 'backlog' | 'archived';
@@ -77,24 +116,26 @@ export interface ProjectWeek {
   days_remaining: number | null;
 }
 
+function createApiError(message: string, status: number): ApiError {
+  return Object.assign(new Error(message), { status });
+}
+
 // Query keys
 export const projectKeys = {
-  all: ['projects'] as const,
-  lists: () => [...projectKeys.all, 'list'] as const,
-  list: (filters?: Record<string, unknown>) => [...projectKeys.lists(), filters] as const,
-  details: () => [...projectKeys.all, 'detail'] as const,
-  detail: (id: string) => [...projectKeys.details(), id] as const,
-  issues: (id: string) => [...projectKeys.detail(id), 'issues'] as const,
-  weeks: (id: string) => [...projectKeys.detail(id), 'weeks'] as const,
+  all: allProjectKey,
+  lists: (): ProjectsListKey => ['projects', 'list'],
+  list: (filters?: Record<string, unknown>): ProjectsFilteredListKey => ['projects', 'list', filters],
+  details: (): ProjectsDetailsKey => ['projects', 'detail'],
+  detail: (id: string): ProjectsDetailKey => ['projects', 'detail', id],
+  issues: (id: string): ProjectsIssuesKey => ['projects', 'detail', id, 'issues'],
+  weeks: (id: string): ProjectsWeeksKey => ['projects', 'detail', id, 'weeks'],
 };
 
 // Fetch projects
 async function fetchProjects(): Promise<Project[]> {
   const res = await apiGet('/api/projects');
   if (!res.ok) {
-    const error = new Error('Failed to fetch projects') as Error & { status: number };
-    error.status = res.status;
-    throw error;
+    throw createApiError('Failed to fetch projects', res.status);
   }
   return res.json();
 }
@@ -118,9 +159,7 @@ interface CreateProjectData {
 async function createProjectApi(data: CreateProjectData): Promise<Project> {
   const res = await apiPost('/api/projects', data);
   if (!res.ok) {
-    const error = new Error('Failed to create project') as Error & { status: number };
-    error.status = res.status;
-    throw error;
+    throw createApiError('Failed to create project', res.status);
   }
   return res.json();
 }
@@ -129,9 +168,7 @@ async function createProjectApi(data: CreateProjectData): Promise<Project> {
 async function updateProjectApi(id: string, updates: Partial<Project>): Promise<Project> {
   const res = await apiPatch(`/api/projects/${id}`, updates);
   if (!res.ok) {
-    const error = new Error('Failed to update project') as Error & { status: number };
-    error.status = res.status;
-    throw error;
+    throw createApiError('Failed to update project', res.status);
   }
   return res.json();
 }
@@ -140,14 +177,12 @@ async function updateProjectApi(id: string, updates: Partial<Project>): Promise<
 async function deleteProjectApi(id: string): Promise<void> {
   const res = await apiDelete(`/api/projects/${id}`);
   if (!res.ok) {
-    const error = new Error('Failed to delete project') as Error & { status: number };
-    error.status = res.status;
-    throw error;
+    throw createApiError('Failed to delete project', res.status);
   }
 }
 
 // Hook to get projects
-export function useProjectsQuery() {
+export function useProjectsQuery(): UseQueryResult<Project[], ApiError> {
   return useQuery({
     queryKey: projectKeys.lists(),
     queryFn: fetchProjects,
@@ -156,12 +191,12 @@ export function useProjectsQuery() {
 }
 
 // Hook to create project with optimistic update
-export function useCreateProject() {
+export function useCreateProject(): UseMutationResult<Project, ApiError, CreateProjectData, CreateProjectContext | undefined> {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: CreateProjectData) => createProjectApi(data),
-    onMutate: async (newProject) => {
+    mutationFn: (data: CreateProjectData): Promise<Project> => createProjectApi(data),
+    onMutate: async (newProject: CreateProjectData): Promise<CreateProjectContext> => {
       await queryClient.cancelQueries({ queryKey: projectKeys.lists() });
       const previousProjects = queryClient.getQueryData<Project[]>(projectKeys.lists());
 
@@ -193,44 +228,44 @@ export function useCreateProject() {
 
       queryClient.setQueryData<Project[]>(
         projectKeys.lists(),
-        (old) => [optimisticProject, ...(old || [])]
+        (old: Project[] | undefined): Project[] => [optimisticProject, ...(old || [])]
       );
 
       return { previousProjects, optimisticId: optimisticProject.id };
     },
-    onError: (_err, _newProject, context) => {
+    onError: (_err: ApiError, _newProject: CreateProjectData, context: CreateProjectContext | undefined): void => {
       if (context?.previousProjects) {
         queryClient.setQueryData(projectKeys.lists(), context.previousProjects);
       }
     },
-    onSuccess: (data, _variables, context) => {
+    onSuccess: (data: Project, _variables: CreateProjectData, context: CreateProjectContext | undefined): void => {
       if (context?.optimisticId) {
         queryClient.setQueryData<Project[]>(
           projectKeys.lists(),
-          (old) => old?.map(p => p.id === context.optimisticId ? data : p) || [data]
+          (old: Project[] | undefined): Project[] => old?.map((p: Project): Project => p.id === context.optimisticId ? data : p) || [data]
         );
       }
     },
-    onSettled: () => {
+    onSettled: (): void => {
       queryClient.invalidateQueries({ queryKey: projectKeys.lists() });
     },
   });
 }
 
 // Hook to update project with optimistic update
-export function useUpdateProject() {
+export function useUpdateProject(): UseMutationResult<Project, ApiError, UpdateProjectMutationData, UpdateProjectContext> {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, updates }: { id: string; updates: Partial<Project> }) =>
+    mutationFn: ({ id, updates }: UpdateProjectMutationData): Promise<Project> =>
       updateProjectApi(id, updates),
-    onMutate: async ({ id, updates }) => {
+    onMutate: async ({ id, updates }: UpdateProjectMutationData): Promise<UpdateProjectContext> => {
       await queryClient.cancelQueries({ queryKey: projectKeys.lists() });
       const previousProjects = queryClient.getQueryData<Project[]>(projectKeys.lists());
 
       queryClient.setQueryData<Project[]>(
         projectKeys.lists(),
-        (old) => old?.map(p => {
+        (old: Project[] | undefined): Project[] => old?.map((p: Project): Project => {
           if (p.id === id) {
             const updated = { ...p, ...updates };
             // Recompute ICE score if any ICE property changed
@@ -248,46 +283,46 @@ export function useUpdateProject() {
 
       return { previousProjects };
     },
-    onError: (_err, _variables, context) => {
+    onError: (_err: ApiError, _variables: UpdateProjectMutationData, context: UpdateProjectContext | undefined): void => {
       if (context?.previousProjects) {
         queryClient.setQueryData(projectKeys.lists(), context.previousProjects);
       }
     },
-    onSuccess: (data, { id }) => {
+    onSuccess: (data: Project, { id }: UpdateProjectMutationData): void => {
       queryClient.setQueryData<Project[]>(
         projectKeys.lists(),
-        (old) => old?.map(p => p.id === id ? data : p) || []
+        (old: Project[] | undefined): Project[] => old?.map((p: Project): Project => p.id === id ? data : p) || []
       );
     },
-    onSettled: () => {
+    onSettled: (): void => {
       queryClient.invalidateQueries({ queryKey: projectKeys.lists() });
     },
   });
 }
 
 // Hook to delete project
-export function useDeleteProject() {
+export function useDeleteProject(): UseMutationResult<void, ApiError, string, DeleteProjectContext> {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id: string) => deleteProjectApi(id),
-    onMutate: async (id) => {
+    mutationFn: (id: string): Promise<void> => deleteProjectApi(id),
+    onMutate: async (id: string): Promise<DeleteProjectContext> => {
       await queryClient.cancelQueries({ queryKey: projectKeys.lists() });
       const previousProjects = queryClient.getQueryData<Project[]>(projectKeys.lists());
 
       queryClient.setQueryData<Project[]>(
         projectKeys.lists(),
-        (old) => old?.filter(p => p.id !== id) || []
+        (old: Project[] | undefined): Project[] => old?.filter((p: Project): boolean => p.id !== id) || []
       );
 
       return { previousProjects };
     },
-    onError: (_err, _id, context) => {
+    onError: (_err: ApiError, _id: string, context: DeleteProjectContext | undefined): void => {
       if (context?.previousProjects) {
         queryClient.setQueryData(projectKeys.lists(), context.previousProjects);
       }
     },
-    onSettled: () => {
+    onSettled: (): void => {
       queryClient.invalidateQueries({ queryKey: projectKeys.lists() });
     },
   });
@@ -306,7 +341,7 @@ export interface CreateProjectOptions {
 }
 
 // Compatibility hook that matches the context interface
-export function useProjects() {
+export function useProjects(): UseProjectsResult {
   const { data: projects = [], isLoading: loading, refetch } = useProjectsQuery();
   const createMutation = useCreateProject();
   const updateMutation = useUpdateProject();
@@ -355,18 +390,21 @@ export function useProjects() {
 async function fetchProjectIssues(projectId: string): Promise<ProjectIssue[]> {
   const res = await apiGet(`/api/projects/${projectId}/issues`);
   if (!res.ok) {
-    const error = new Error('Failed to fetch project issues') as Error & { status: number };
-    error.status = res.status;
-    throw error;
+    throw createApiError('Failed to fetch project issues', res.status);
   }
   return res.json();
 }
 
 // Hook to get project issues
-export function useProjectIssuesQuery(projectId: string | undefined) {
+export function useProjectIssuesQuery(projectId: string | undefined): UseQueryResult<ProjectIssue[], ApiError> {
   return useQuery({
     queryKey: projectId ? projectKeys.issues(projectId) : ['disabled'],
-    queryFn: () => fetchProjectIssues(projectId!),
+    queryFn: async (): Promise<ProjectIssue[]> => {
+      if (!projectId) {
+        return [];
+      }
+      return fetchProjectIssues(projectId);
+    },
     enabled: !!projectId,
     staleTime: 1000 * 60 * 2, // 2 minutes
   });
@@ -376,18 +414,21 @@ export function useProjectIssuesQuery(projectId: string | undefined) {
 async function fetchProjectWeeks(projectId: string): Promise<ProjectWeek[]> {
   const res = await apiGet(`/api/projects/${projectId}/weeks`);
   if (!res.ok) {
-    const error = new Error('Failed to fetch project weeks') as Error & { status: number };
-    error.status = res.status;
-    throw error;
+    throw createApiError('Failed to fetch project weeks', res.status);
   }
   return res.json();
 }
 
 // Hook to get project weeks
-export function useProjectWeeksQuery(projectId: string | undefined) {
+export function useProjectWeeksQuery(projectId: string | undefined): UseQueryResult<ProjectWeek[], ApiError> {
   return useQuery({
     queryKey: projectId ? projectKeys.weeks(projectId) : ['disabled'],
-    queryFn: () => fetchProjectWeeks(projectId!),
+    queryFn: async (): Promise<ProjectWeek[]> => {
+      if (!projectId) {
+        return [];
+      }
+      return fetchProjectWeeks(projectId);
+    },
     enabled: !!projectId,
     staleTime: 1000 * 60 * 2, // 2 minutes
   });

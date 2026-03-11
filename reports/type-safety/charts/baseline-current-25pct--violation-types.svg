@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="560" viewBox="0 0 1280 560">
+  <rect width="100%" height="100%" fill="white" />
+  <text x="72" y="34" font-family="ui-sans-serif, system-ui, sans-serif" font-size="28" font-weight="700" fill="#111827">baseline vs current-25pct: Violation Types</text>
+  <text x="72" y="58" font-family="ui-sans-serif, system-ui, sans-serif" font-size="14" fill="#6b7280">Paired bars for each tracked violation category.</text>
+  <g transform="translate(1030, 28)">
+    
+    <g font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#111827">
+      <rect x="0" y="0" width="12" height="12" rx="2" fill="#9ca3af" />
+      <text x="18" y="10">Baseline</text>
+      <rect x="96" y="0" width="12" height="12" rx="2" fill="#2563eb" />
+      <text x="114" y="10">Current</text>
+    </g>
+  
+  </g>
+  <line x1="72" y1="430" x2="1248" y2="430" stroke="#6b7280" />
+  
+      <line x1="72" y1="430" x2="1248" y2="430" stroke="#e5e7eb" />
+      <text x="62" y="434" text-anchor="end" font-size="12" fill="#6b7280">0</text>
+    
+      <line x1="72" y1="360.8" x2="1248" y2="360.8" stroke="#e5e7eb" />
+      <text x="62" y="364.8" text-anchor="end" font-size="12" fill="#6b7280">890</text>
+    
+      <line x1="72" y1="291.6" x2="1248" y2="291.6" stroke="#e5e7eb" />
+      <text x="62" y="295.6" text-anchor="end" font-size="12" fill="#6b7280">1,780</text>
+    
+      <line x1="72" y1="222.40000000000003" x2="1248" y2="222.40000000000003" stroke="#e5e7eb" />
+      <text x="62" y="226.40000000000003" text-anchor="end" font-size="12" fill="#6b7280">2,669</text>
+    
+      <line x1="72" y1="153.20000000000005" x2="1248" y2="153.20000000000005" stroke="#e5e7eb" />
+      <text x="62" y="157.20000000000005" text-anchor="end" font-size="12" fill="#6b7280">3,559</text>
+    
+      <line x1="72" y1="84" x2="1248" y2="84" stroke="#e5e7eb" />
+      <text x="62" y="88" text-anchor="end" font-size="12" fill="#6b7280">4,449</text>
+    
+  
+      <g font-family="ui-sans-serif, system-ui, sans-serif">
+        <rect x="126" y="409.7797257810744" width="40" height="20.2202742189256" rx="4" fill="#9ca3af" />
+        <rect x="174" y="410.4796583501911" width="40" height="19.520341649808945" rx="4" fill="#2563eb" />
+        <text x="146" y="401.7797257810744" text-anchor="middle" font-size="11" fill="#6b7280">260</text>
+        <text x="194" y="402.4796583501911" text-anchor="middle" font-size="11" fill="#6b7280">251</text>
+        <text x="170" y="454" text-anchor="middle" font-size="12" fill="#111827">explicit_any</text>
+        <text x="170" y="474" text-anchor="middle" font-size="11" fill="#047857">delta -9</text>
+      </g>
+    
+      <g font-family="ui-sans-serif, system-ui, sans-serif">
+        <rect x="322" y="375.87188132164533" width="40" height="54.12811867835468" rx="4" fill="#9ca3af" />
+        <rect x="370" y="376.571813890762" width="40" height="53.428186109238034" rx="4" fill="#2563eb" />
+        <text x="342" y="367.87188132164533" text-anchor="middle" font-size="11" fill="#6b7280">696</text>
+        <text x="390" y="368.571813890762" text-anchor="middle" font-size="11" fill="#6b7280">687</text>
+        <text x="366" y="454" text-anchor="middle" font-size="12" fill="#111827">type_assertion_as</text>
+        <text x="366" y="474" text-anchor="middle" font-size="11" fill="#047857">delta -9</text>
+      </g>
+    
+      <g font-family="ui-sans-serif, system-ui, sans-serif">
+        <rect x="518" y="403.3247920881097" width="40" height="26.67520791189031" rx="4" fill="#9ca3af" />
+        <rect x="566" y="410.7907394920207" width="40" height="19.20926050797932" rx="4" fill="#2563eb" />
+        <text x="538" y="395.3247920881097" text-anchor="middle" font-size="11" fill="#6b7280">343</text>
+        <text x="586" y="402.7907394920207" text-anchor="middle" font-size="11" fill="#6b7280">247</text>
+        <text x="562" y="454" text-anchor="middle" font-size="12" fill="#111827">non_null_assertion</text>
+        <text x="562" y="474" text-anchor="middle" font-size="11" fill="#047857">delta -96</text>
+      </g>
+    
+      <g font-family="ui-sans-serif, system-ui, sans-serif">
+        <rect x="714" y="429.9222297145426" width="40" height="0.07777028545740616" rx="4" fill="#9ca3af" />
+        <rect x="762" y="429.9222297145426" width="40" height="0.07777028545740616" rx="4" fill="#2563eb" />
+        <text x="734" y="421.9222297145426" text-anchor="middle" font-size="11" fill="#6b7280">1</text>
+        <text x="782" y="421.9222297145426" text-anchor="middle" font-size="11" fill="#6b7280">1</text>
+        <text x="758" y="454" text-anchor="middle" font-size="12" fill="#111827">ts_comment_direct…</text>
+        <text x="758" y="474" text-anchor="middle" font-size="11" fill="#047857">delta 0</text>
+      </g>
+    
+      <g font-family="ui-sans-serif, system-ui, sans-serif">
+        <rect x="910" y="317.0775455158463" width="40" height="112.92245448415375" rx="4" fill="#9ca3af" />
+        <rect x="958" y="341.5751854349292" width="40" height="88.42481456507079" rx="4" fill="#2563eb" />
+        <text x="930" y="309.0775455158463" text-anchor="middle" font-size="11" fill="#6b7280">1,452</text>
+        <text x="978" y="333.5751854349292" text-anchor="middle" font-size="11" fill="#6b7280">1,137</text>
+        <text x="954" y="454" text-anchor="middle" font-size="12" fill="#111827">untyped_parameter</text>
+        <text x="954" y="474" text-anchor="middle" font-size="11" fill="#047857">delta -315</text>
+      </g>
+    
+      <g font-family="ui-sans-serif, system-ui, sans-serif">
+        <rect x="1106" y="84" width="40" height="346" rx="4" fill="#9ca3af" />
+        <rect x="1154" y="158.3483928972803" width="40" height="271.6516071027197" rx="4" fill="#2563eb" />
+        <text x="1126" y="76" text-anchor="middle" font-size="11" fill="#6b7280">4,449</text>
+        <text x="1174" y="150.3483928972803" text-anchor="middle" font-size="11" fill="#6b7280">3,493</text>
+        <text x="1150" y="454" text-anchor="middle" font-size="12" fill="#111827">missing_return_ty…</text>
+        <text x="1150" y="474" text-anchor="middle" font-size="11" fill="#047857">delta -956</text>
+      </g>
+    
+</svg>

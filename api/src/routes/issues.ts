@@ -16,6 +16,19 @@ import { broadcastToUser } from '../collaboration/index.js';
 type RouterType = ReturnType<typeof Router>;
 const router: RouterType = Router();
 
+type RequestContext = {
+  userId: string;
+  workspaceId: string;
+};
+
+function getRequestContext(req: Request): RequestContext {
+  const { userId, workspaceId } = req;
+  if (!userId || !workspaceId) {
+    throw new Error('Missing authenticated request context');
+  }
+  return { userId, workspaceId };
+}
+
 // BelongsTo entry schema for associations
 const belongsToEntrySchema = z.object({
   id: z.string().uuid(),
@@ -79,7 +92,7 @@ const rejectIssueSchema = z.object({
 });
 
 // Helper to extract issue properties from row (without belongs_to - added separately)
-function extractIssueFromRow(row: any) {
+function extractIssueFromRow(row: any): Record<string, unknown> {
   const props = row.properties || {};
   return {
     id: row.id,
@@ -112,11 +125,10 @@ function extractIssueFromRow(row: any) {
 }
 
 // List issues with filters
-router.get('/', authMiddleware, async (req: Request, res: Response) => {
+router.get('/', authMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
     const { state, priority, assignee_id, program_id, sprint_id, source, parent_filter } = req.query;
-    const userId = req.userId!;
-    const workspaceId = req.workspaceId!;
+    const { userId, workspaceId } = getRequestContext(req);
 
     // Get visibility context for filtering
     const { isAdmin } = await getVisibilityContext(userId, workspaceId);
@@ -223,10 +235,10 @@ router.get('/', authMiddleware, async (req: Request, res: Response) => {
     const result = await pool.query(query, params);
 
     // Extract issues and batch-fetch associations to avoid N+1 queries
-    const issueIds = result.rows.map(row => row.id);
+    const issueIds = result.rows.map((row) => row.id);
     const associationsMap = await getBelongsToAssociationsBatch(issueIds);
 
-    const issues = result.rows.map(row => {
+    const issues = result.rows.map((row) => {
       const issue = extractIssueFromRow(row);
       return {
         ...issue,
@@ -243,7 +255,7 @@ router.get('/', authMiddleware, async (req: Request, res: Response) => {
 });
 
 // Get action items for current user (issues with source='action_items' that are not done)
-router.get('/action-items', authMiddleware, async (req: Request, res: Response) => {
+router.get('/action-items', authMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
     // In test mode, return empty to avoid blocking E2E test interactions with modal
     if (process.env.NODE_ENV === 'test') {
@@ -251,8 +263,7 @@ router.get('/action-items', authMiddleware, async (req: Request, res: Response) 
       return;
     }
 
-    const userId = req.userId!;
-    const workspaceId = req.workspaceId!;
+    const { userId, workspaceId } = getRequestContext(req);
 
     // Get person document ID for the user
     const personResult = await pool.query(
@@ -299,7 +310,7 @@ router.get('/action-items', authMiddleware, async (req: Request, res: Response) 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const items = result.rows.map(row => {
+    const items = result.rows.map((row) => {
       let daysOverdue = 0;
       if (row.due_date) {
         const dueDate = new Date(row.due_date + 'T00:00:00');
@@ -334,7 +345,7 @@ router.get('/action-items', authMiddleware, async (req: Request, res: Response) 
 });
 
 // Get issue by ticket number
-router.get('/by-ticket/:number', authMiddleware, async (req: Request, res: Response) => {
+router.get('/by-ticket/:number', authMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
     const numberParam = req.params.number;
     if (!numberParam || typeof numberParam !== 'string') {
@@ -347,8 +358,7 @@ router.get('/by-ticket/:number', authMiddleware, async (req: Request, res: Respo
       return;
     }
 
-    const userId = req.userId!;
-    const workspaceId = req.workspaceId!;
+    const { userId, workspaceId } = getRequestContext(req);
 
     // Get visibility context for filtering
     const { isAdmin } = await getVisibilityContext(userId, workspaceId);
@@ -412,11 +422,10 @@ router.get('/by-ticket/:number', authMiddleware, async (req: Request, res: Respo
 });
 
 // Get sub-issues (children) of an issue
-router.get('/:id/children', authMiddleware, async (req: Request, res: Response) => {
+router.get('/:id/children', authMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const userId = req.userId!;
-    const workspaceId = req.workspaceId!;
+    const { userId, workspaceId } = getRequestContext(req);
 
     // Get visibility context for filtering
     const { isAdmin } = await getVisibilityContext(userId, workspaceId);
@@ -470,10 +479,10 @@ router.get('/:id/children', authMiddleware, async (req: Request, res: Response) 
     );
 
     // Batch-fetch associations to avoid N+1 queries
-    const childIds = result.rows.map(row => row.id);
+    const childIds = result.rows.map((row) => row.id);
     const associationsMap = await getBelongsToAssociationsBatch(childIds);
 
-    const children = result.rows.map(row => {
+    const children = result.rows.map((row) => {
       const issue = extractIssueFromRow(row);
       return {
         ...issue,
@@ -490,11 +499,10 @@ router.get('/:id/children', authMiddleware, async (req: Request, res: Response) 
 });
 
 // Get single issue
-router.get('/:id', authMiddleware, async (req: Request, res: Response) => {
+router.get('/:id', authMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const userId = req.userId!;
-    const workspaceId = req.workspaceId!;
+    const { userId, workspaceId } = getRequestContext(req);
 
     // Get visibility context for filtering
     const { isAdmin } = await getVisibilityContext(userId, workspaceId);
@@ -560,9 +568,10 @@ router.get('/:id', authMiddleware, async (req: Request, res: Response) => {
 
 // Create issue
 // Uses advisory lock to prevent race condition in ticket number generation
-router.post('/', authMiddleware, async (req: Request, res: Response) => {
+router.post('/', authMiddleware, async (req: Request, res: Response): Promise<void> => {
   const client = await pool.connect();
   try {
+    const { userId, workspaceId } = getRequestContext(req);
     const parsed = createIssueSchema.safeParse(req.body);
     if (!parsed.success) {
       res.status(400).json({ error: 'Invalid input', details: parsed.error.errors });
@@ -587,7 +596,7 @@ router.post('/', authMiddleware, async (req: Request, res: Response) => {
     // Use advisory lock to serialize ticket number generation per workspace
     // This prevents race conditions where concurrent requests get the same MAX value
     // The lock key is derived from workspace_id (first 15 hex chars as bigint)
-    const workspaceIdHex = req.workspaceId!.replace(/-/g, '').substring(0, 15);
+    const workspaceIdHex = workspaceId.replace(/-/g, '').substring(0, 15);
     const lockKey = parseInt(workspaceIdHex, 16);
     await client.query('SELECT pg_advisory_xact_lock($1)', [lockKey]);
 
@@ -596,7 +605,7 @@ router.post('/', authMiddleware, async (req: Request, res: Response) => {
       `SELECT COALESCE(MAX(ticket_number), 0) + 1 as next_number
        FROM documents
        WHERE workspace_id = $1 AND document_type = 'issue'`,
-      [req.workspaceId]
+      [workspaceId]
     );
     const ticketNumber = ticketResult.rows[0].next_number;
 
@@ -618,7 +627,7 @@ router.post('/', authMiddleware, async (req: Request, res: Response) => {
       `INSERT INTO documents (workspace_id, document_type, title, properties, ticket_number, created_by)
        VALUES ($1, 'issue', $2, $3, $4, $5)
        RETURNING *`,
-      [req.workspaceId, title, JSON.stringify(properties), ticketNumber, req.userId]
+      [workspaceId, title, JSON.stringify(properties), ticketNumber, userId]
     );
 
     const newIssueId = result.rows[0].id;
@@ -636,7 +645,7 @@ router.post('/', authMiddleware, async (req: Request, res: Response) => {
     await client.query('COMMIT');
 
     // Auto-complete sprint_issues accountability when first issue is created in a sprint
-    const sprintAssociations = belongs_to.filter(bt => bt.type === 'sprint');
+    const sprintAssociations = belongs_to.filter((bt) => bt.type === 'sprint');
     for (const sprintAssoc of sprintAssociations) {
       // Check if this is the first issue in the sprint
       const issueCountResult = await pool.query(
@@ -648,7 +657,7 @@ router.post('/', authMiddleware, async (req: Request, res: Response) => {
 
       // Broadcast celebration when first issue is added to sprint
       if (issueCount === 1) {
-        broadcastToUser(req.userId!, 'accountability:updated', { type: 'week_issues', targetId: sprintAssoc.id });
+        broadcastToUser(userId, 'accountability:updated', { type: 'week_issues', targetId: sprintAssoc.id });
       }
     }
 
@@ -672,12 +681,11 @@ router.post('/', authMiddleware, async (req: Request, res: Response) => {
 });
 
 // Update issue
-router.patch('/:id', authMiddleware, async (req: Request, res: Response) => {
+router.patch('/:id', authMiddleware, async (req: Request, res: Response): Promise<void> => {
   const client = await pool.connect();
   try {
     const id = String(req.params.id);
-    const userId = req.userId!;
-    const workspaceId = req.workspaceId!;
+    const { userId, workspaceId } = getRequestContext(req);
 
     const parsed = updateIssueSchema.safeParse(req.body);
     if (!parsed.success) {
@@ -741,7 +749,7 @@ router.patch('/:id', authMiddleware, async (req: Request, res: Response) => {
 
       // Filter to incomplete children
       const incompleteChildren = childrenResult.rows.filter(
-        child => child.state !== 'done' && child.state !== 'cancelled'
+        (child): boolean => child.state !== 'done' && child.state !== 'cancelled'
       );
 
       if (incompleteChildren.length > 0 && !data.confirm_orphan_children) {
@@ -749,7 +757,7 @@ router.patch('/:id', authMiddleware, async (req: Request, res: Response) => {
         res.status(409).json({
           error: 'incomplete_children',
           message: `This issue has ${incompleteChildren.length} incomplete sub-issue(s). Closing it will remove their parent association.`,
-          incomplete_children: incompleteChildren.map(child => ({
+          incomplete_children: incompleteChildren.map((child) => ({
             id: child.id,
             title: child.title,
             ticket_number: child.ticket_number,
@@ -840,8 +848,8 @@ router.patch('/:id', authMiddleware, async (req: Request, res: Response) => {
       newBelongsTo = data.belongs_to;
 
       // Compare to see if associations changed
-      const oldIds = oldBelongsTo.map(bt => `${bt.type}:${bt.id}`).sort().join(',');
-      const newIds = newBelongsTo.map(bt => `${bt.type}:${bt.id}`).sort().join(',');
+      const oldIds = oldBelongsTo.map((bt) => `${bt.type}:${bt.id}`).sort().join(',');
+      const newIds = newBelongsTo.map((bt) => `${bt.type}:${bt.id}`).sort().join(',');
 
       if (oldIds !== newIds) {
         belongsToChanged = true;
@@ -893,8 +901,8 @@ router.patch('/:id', authMiddleware, async (req: Request, res: Response) => {
         // Log belongs_to change
         changes.push({
           field: 'belongs_to',
-          oldValue: JSON.stringify(oldBelongsTo.map(bt => ({ id: bt.id, type: bt.type }))),
-          newValue: JSON.stringify(newBelongsTo.map(bt => ({ id: bt.id, type: bt.type }))),
+          oldValue: JSON.stringify(oldBelongsTo.map((bt) => ({ id: bt.id, type: bt.type }))),
+          newValue: JSON.stringify(newBelongsTo.map((bt) => ({ id: bt.id, type: bt.type }))),
         });
       }
     }
@@ -920,7 +928,7 @@ router.patch('/:id', authMiddleware, async (req: Request, res: Response) => {
     // Log all changes to history (within transaction)
     const automatedBy = data.claude_metadata?.updated_by;
     for (const change of changes) {
-      await logDocumentChange(id!, change.field, change.oldValue, change.newValue, req.userId!, automatedBy, client);
+      await logDocumentChange(id, change.field, change.oldValue, change.newValue, userId, automatedBy, client);
     }
 
     // If we have document updates, do the UPDATE
@@ -929,7 +937,7 @@ router.patch('/:id', authMiddleware, async (req: Request, res: Response) => {
 
       await client.query(
         `UPDATE documents SET ${updates.join(', ')} WHERE id = $${paramIndex} AND workspace_id = $${paramIndex + 1}`,
-        [...values, id, req.workspaceId]
+        [...values, id, workspaceId]
       );
     }
 
@@ -964,9 +972,9 @@ router.patch('/:id', authMiddleware, async (req: Request, res: Response) => {
 
     // Check if a NEW sprint association was added and this is the first issue in that sprint
     if (belongsToChanged) {
-      const oldSprintIds = oldBelongsTo.filter(bt => bt.type === 'sprint').map(bt => bt.id);
-      const newSprintIds = newBelongsTo.filter(bt => bt.type === 'sprint').map(bt => bt.id);
-      const addedSprintIds = newSprintIds.filter(sprintId => !oldSprintIds.includes(sprintId));
+      const oldSprintIds = oldBelongsTo.filter((bt) => bt.type === 'sprint').map((bt) => bt.id);
+      const newSprintIds = newBelongsTo.filter((bt) => bt.type === 'sprint').map((bt) => bt.id);
+      const addedSprintIds = newSprintIds.filter((sprintId) => !oldSprintIds.includes(sprintId));
 
       for (const sprintId of addedSprintIds) {
         const issueCountResult = await pool.query(
@@ -977,7 +985,7 @@ router.patch('/:id', authMiddleware, async (req: Request, res: Response) => {
         const issueCount = parseInt(issueCountResult.rows[0].count, 10);
 
         if (issueCount === 1) {
-          broadcastToUser(req.userId!, 'accountability:updated', { type: 'week_issues', targetId: sprintId });
+          broadcastToUser(userId, 'accountability:updated', { type: 'week_issues', targetId: sprintId });
         }
       }
     }
@@ -992,7 +1000,7 @@ router.patch('/:id', authMiddleware, async (req: Request, res: Response) => {
     if (isClosingIssue && wasNotClosed) {
       const props = row.properties || {};
       if (props.source === 'action_items') {
-        const assigneeId = props.assignee_id || req.userId;
+        const assigneeId = props.assignee_id || userId;
         broadcastToUser(assigneeId, 'accountability:updated', { issueId: id, state: data.state });
       }
     }
@@ -1008,11 +1016,10 @@ router.patch('/:id', authMiddleware, async (req: Request, res: Response) => {
 });
 
 // Get issue history
-router.get('/:id/history', authMiddleware, async (req: Request, res: Response) => {
+router.get('/:id/history', authMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const userId = req.userId!;
-    const workspaceId = req.workspaceId!;
+    const { userId, workspaceId } = getRequestContext(req);
 
     // Get visibility context for filtering
     const { isAdmin } = await getVisibilityContext(userId, workspaceId);
@@ -1040,7 +1047,7 @@ router.get('/:id/history', authMiddleware, async (req: Request, res: Response) =
       [id]
     );
 
-    res.json(result.rows.map(row => ({
+    res.json(result.rows.map((row) => ({
       id: row.id,
       field: row.field,
       old_value: row.old_value,
@@ -1066,15 +1073,14 @@ const logHistorySchema = z.object({
   automated_by: z.string().optional(),
 });
 
-router.post('/:id/history', authMiddleware, async (req: Request, res: Response) => {
+router.post('/:id/history', authMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
     const id = String(req.params.id);
     if (!id) {
       res.status(400).json({ error: 'Issue ID required' });
       return;
     }
-    const userId = req.userId!;
-    const workspaceId = req.workspaceId!;
+    const { userId, workspaceId } = getRequestContext(req);
 
     const parsed = logHistorySchema.safeParse(req.body);
     if (!parsed.success) {
@@ -1126,7 +1132,7 @@ const bulkUpdateSchema = z.object({
   }).optional(),
 });
 
-router.post('/bulk', authMiddleware, async (req: Request, res: Response) => {
+router.post('/bulk', authMiddleware, async (req: Request, res: Response): Promise<void> => {
   const client = await pool.connect();
   try {
     const parsed = bulkUpdateSchema.safeParse(req.body);
@@ -1136,8 +1142,7 @@ router.post('/bulk', authMiddleware, async (req: Request, res: Response) => {
     }
 
     const { ids, action, updates } = parsed.data;
-    const userId = req.userId!;
-    const workspaceId = req.workspaceId!;
+    const { userId, workspaceId } = getRequestContext(req);
 
     // Get visibility context
     const { isAdmin } = await getVisibilityContext(userId, workspaceId);
@@ -1152,7 +1157,7 @@ router.post('/bulk', authMiddleware, async (req: Request, res: Response) => {
       [ids, workspaceId, userId, isAdmin]
     );
 
-    const accessibleIds = new Set(accessCheck.rows.map(r => r.id));
+    const accessibleIds = new Set(accessCheck.rows.map((r) => r.id));
     const failed: { id: string; error: string }[] = [];
 
     for (const id of ids) {
@@ -1161,7 +1166,7 @@ router.post('/bulk', authMiddleware, async (req: Request, res: Response) => {
       }
     }
 
-    const validIds = ids.filter(id => accessibleIds.has(id));
+    const validIds = ids.filter((id) => accessibleIds.has(id));
 
     if (validIds.length === 0) {
       await client.query('ROLLBACK');
@@ -1307,7 +1312,7 @@ router.post('/bulk', authMiddleware, async (req: Request, res: Response) => {
     await client.query('COMMIT');
 
     // Map results to issue format
-    const updated = result.rows.map(row => {
+    const updated = result.rows.map((row) => {
       const issue = extractIssueFromRow(row);
       return {
         ...issue,
@@ -1329,11 +1334,10 @@ router.post('/bulk', authMiddleware, async (req: Request, res: Response) => {
 
 // Delete issue
 // System-generated accountability issues cannot be deleted
-router.delete('/:id', authMiddleware, async (req: Request, res: Response) => {
+router.delete('/:id', authMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const userId = req.userId!;
-    const workspaceId = req.workspaceId!;
+    const { userId, workspaceId } = getRequestContext(req);
 
     // Get visibility context for filtering
     const { isAdmin } = await getVisibilityContext(userId, workspaceId);
@@ -1376,11 +1380,10 @@ router.delete('/:id', authMiddleware, async (req: Request, res: Response) => {
 });
 
 // Accept issue (move from triage to backlog)
-router.post('/:id/accept', authMiddleware, async (req: Request, res: Response) => {
+router.post('/:id/accept', authMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
     const id = String(req.params.id);
-    const userId = req.userId!;
-    const workspaceId = req.workspaceId!;
+    const { userId, workspaceId } = getRequestContext(req);
 
     // Get visibility context
     const { isAdmin } = await getVisibilityContext(userId, workspaceId);
@@ -1417,7 +1420,7 @@ router.post('/:id/accept', authMiddleware, async (req: Request, res: Response) =
     );
 
     // Log the state change
-    await logDocumentChange(id!, 'state', 'triage', 'backlog', req.userId!);
+    await logDocumentChange(id, 'state', 'triage', 'backlog', userId);
 
     const issue = extractIssueFromRow(result.rows[0]);
     res.json({ ...issue, display_id: `#${issue.ticket_number}` });
@@ -1442,11 +1445,10 @@ const listIterationsSchema = z.object({
 });
 
 // Create iteration entry - POST /api/issues/:id/iterations
-router.post('/:id/iterations', authMiddleware, async (req: Request, res: Response) => {
+router.post('/:id/iterations', authMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
     const { id: issueId } = req.params;
-    const userId = req.userId!;
-    const workspaceId = req.workspaceId!;
+    const { userId, workspaceId } = getRequestContext(req);
 
     const parsed = createIterationSchema.safeParse(req.body);
     if (!parsed.success) {
@@ -1510,11 +1512,10 @@ router.post('/:id/iterations', authMiddleware, async (req: Request, res: Respons
 });
 
 // Get issue iterations - GET /api/issues/:id/iterations
-router.get('/:id/iterations', authMiddleware, async (req: Request, res: Response) => {
+router.get('/:id/iterations', authMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
     const { id: issueId } = req.params;
-    const userId = req.userId!;
-    const workspaceId = req.workspaceId!;
+    const { userId, workspaceId } = getRequestContext(req);
 
     // Parse and validate query params
     const queryParsed = listIterationsSchema.safeParse(req.query);
@@ -1557,7 +1558,7 @@ router.get('/:id/iterations', authMiddleware, async (req: Request, res: Response
 
     const result = await pool.query(query, params);
 
-    const iterations = result.rows.map(row => ({
+    const iterations = result.rows.map((row) => ({
       id: row.id,
       issue_id: row.issue_id,
       status: row.status,
@@ -1580,11 +1581,10 @@ router.get('/:id/iterations', authMiddleware, async (req: Request, res: Response
 });
 
 // Reject issue (move from triage to cancelled with reason)
-router.post('/:id/reject', authMiddleware, async (req: Request, res: Response) => {
+router.post('/:id/reject', authMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
     const id = String(req.params.id);
-    const userId = req.userId!;
-    const workspaceId = req.workspaceId!;
+    const { userId, workspaceId } = getRequestContext(req);
 
     const parsed = rejectIssueSchema.safeParse(req.body);
     if (!parsed.success) {
@@ -1629,7 +1629,7 @@ router.post('/:id/reject', authMiddleware, async (req: Request, res: Response) =
     );
 
     // Log the state change
-    await logDocumentChange(id!, 'state', 'triage', 'cancelled', req.userId!);
+    await logDocumentChange(id, 'state', 'triage', 'cancelled', userId);
 
     const issue = extractIssueFromRow(result.rows[0]);
     res.json({ ...issue, display_id: `#${issue.ticket_number}` });

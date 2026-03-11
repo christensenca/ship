@@ -39,7 +39,7 @@ import { ProjectContextSidebar } from '@/components/sidebars/ProjectContextSideb
 
 type Mode = 'docs' | 'issues' | 'projects' | 'programs' | 'sprints' | 'team' | 'settings' | 'dashboard' | 'project-context';
 
-export function AppLayout() {
+export function AppLayout(): React.JSX.Element {
   const { user, logout, isSuperAdmin, impersonating, endImpersonation } = useAuth();
   const { currentWorkspace, workspaces, switchWorkspace } = useWorkspace();
   const location = useLocation();
@@ -48,7 +48,7 @@ export function AppLayout() {
   const { programs, updateProgram } = usePrograms();
   const { issues, createIssue, updateIssue } = useIssues();
   const { projects, createProject, updateProject } = useProjects();
-  const [leftSidebarCollapsed, setLeftSidebarCollapsed] = useState(() => {
+  const [leftSidebarCollapsed, setLeftSidebarCollapsed] = useState<boolean>(() => {
     return localStorage.getItem('ship:leftSidebarCollapsed') === 'true';
   });
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
@@ -58,7 +58,7 @@ export function AppLayout() {
   const [actionItemsModalShownOnLoad, setActionItemsModalShownOnLoad] = useState(false);
 
   // Session timeout handling
-  const handleSessionTimeout = useCallback(() => {
+  const handleSessionTimeout = useCallback((): void => {
     // Redirect to login with expired flag and returnTo URL
     const returnTo = encodeURIComponent(location.pathname + location.search + location.hash);
     window.location.href = `/login?expired=true&returnTo=${returnTo}`;
@@ -85,7 +85,7 @@ export function AppLayout() {
   const celebrationTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Listen for realtime accountability updates
-  const handleAccountabilityUpdate = useCallback(() => {
+  const handleAccountabilityUpdate = useCallback((): void => {
     // Show celebration banner
     setIsCelebrating(true);
 
@@ -95,7 +95,7 @@ export function AppLayout() {
     }
 
     // After 4 seconds, invalidate query and hide celebration
-    celebrationTimeoutRef.current = setTimeout(() => {
+    celebrationTimeoutRef.current = setTimeout((): void => {
       // Invalidate action items to refetch
       queryClient.invalidateQueries({ queryKey: actionItemsKeys.all });
       setIsCelebrating(false);
@@ -106,8 +106,8 @@ export function AppLayout() {
   useRealtimeEvent('accountability:updated', handleAccountabilityUpdate);
 
   // Cleanup celebration timeout on unmount
-  useEffect(() => {
-    return () => {
+  useEffect((): (() => void) => {
+    return (): void => {
       if (celebrationTimeoutRef.current) {
         clearTimeout(celebrationTimeoutRef.current);
       }
@@ -116,7 +116,7 @@ export function AppLayout() {
 
   // Show action items modal on initial load if there are pending items
   // Disabled when localStorage flag is set (used by E2E tests to avoid blocking interactions)
-  useEffect(() => {
+  useEffect((): void => {
     if (localStorage.getItem('ship:disableActionItemsModal') === 'true') return;
     if (!actionItemsModalShownOnLoad && hasActionItems && actionItemsData?.items) {
       setActionItemsModalOpen(true);
@@ -128,16 +128,16 @@ export function AppLayout() {
   useFocusOnNavigate();
 
   // Persist sidebar state
-  useEffect(() => {
+  useEffect((): void => {
     localStorage.setItem('ship:leftSidebarCollapsed', String(leftSidebarCollapsed));
   }, [leftSidebarCollapsed]);
 
   // Global Cmd+K keyboard shortcut for command palette
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
+  useEffect((): (() => void) => {
+    const handleKeyDown = (e: KeyboardEvent): void => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault();
-        setCommandPaletteOpen(open => !open);
+        setCommandPaletteOpen((open): boolean => !open);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -200,7 +200,7 @@ export function AppLayout() {
 
   const activeDocumentId = getActiveDocumentId();
 
-  const handleModeClick = (mode: Mode) => {
+  const handleModeClick = (mode: Mode): void => {
     switch (mode) {
       case 'dashboard': navigate('/my-week'); break;
       case 'docs': navigate('/docs'); break;
@@ -213,26 +213,26 @@ export function AppLayout() {
     }
   };
 
-  const handleCreateIssue = async () => {
+  const handleCreateIssue = async (): Promise<void> => {
     const issue = await createIssue();
     if (issue) {
       navigate(`/documents/${issue.id}`);
     }
   };
 
-  const handleCreateDocument = async () => {
+  const handleCreateDocument = async (): Promise<void> => {
     const doc = await createDocument();
     if (doc) {
       navigate(`/documents/${doc.id}`);
     }
   };
 
-  const handleCreateProject = () => {
+  const handleCreateProject = (): void => {
     // Open the project setup wizard instead of immediately creating
     setProjectSetupWizardOpen(true);
   };
 
-  const handleProjectSetupSubmit = async (data: ProjectSetupData) => {
+  const handleProjectSetupSubmit = async (data: ProjectSetupData): Promise<void> => {
     if (!user?.id) return;
     const project = await createProject({
       owner_id: user.id,
@@ -247,7 +247,7 @@ export function AppLayout() {
     }
   };
 
-  const handleSwitchWorkspace = async (workspaceId: string) => {
+  const handleSwitchWorkspace = async (workspaceId: string): Promise<void> => {
     const success = await switchWorkspace(workspaceId);
     if (success) {
       setWorkspaceSwitcherOpen(false);
@@ -300,7 +300,7 @@ export function AppLayout() {
           {/* Workspace switcher */}
           <div className="relative mb-4">
             <button
-              onClick={() => setWorkspaceSwitcherOpen(!workspaceSwitcherOpen)}
+              onClick={(): void => setWorkspaceSwitcherOpen(!workspaceSwitcherOpen)}
               className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent/20 text-accent hover:bg-accent/30 transition-colors"
               title={currentWorkspace?.name || 'Select workspace'}
             >
@@ -311,15 +311,15 @@ export function AppLayout() {
               <>
                 <div
                   className="fixed inset-0 z-40"
-                  onClick={() => setWorkspaceSwitcherOpen(false)}
+                  onClick={(): void => setWorkspaceSwitcherOpen(false)}
                 />
                 <div className="absolute left-full top-0 z-50 ml-2 w-56 rounded-lg border border-border bg-background shadow-lg">
                   <div className="p-2">
                     <div className="px-2 py-1 text-xs font-medium text-muted">Workspaces</div>
-                    {workspaces.map((ws) => (
+                    {workspaces.map((ws): React.JSX.Element => (
                       <button
                         key={ws.id}
-                        onClick={() => handleSwitchWorkspace(ws.id)}
+                        onClick={(): void => { void handleSwitchWorkspace(ws.id); }}
                         className={cn(
                           'flex w-full items-center justify-between rounded-md px-2 py-1.5 text-sm transition-colors',
                           ws.id === currentWorkspace?.id
@@ -335,9 +335,9 @@ export function AppLayout() {
                   {isSuperAdmin && (
                     <div className="border-t border-border p-2">
                       <button
-                        onClick={() => {
+                        onClick={(): void => {
                           setWorkspaceSwitcherOpen(false);
-                          navigate('/admin');
+                          void navigate('/admin');
                         }}
                         className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-muted hover:bg-border/30 hover:text-foreground transition-colors"
                       >
@@ -357,31 +357,31 @@ export function AppLayout() {
               icon={<DashboardIcon />}
               label="Dashboard"
               active={activeMode === 'dashboard'}
-              onClick={() => handleModeClick('dashboard')}
+              onClick={(): void => handleModeClick('dashboard')}
             />
             <RailIcon
               icon={<DocsIcon />}
               label="Docs"
               active={activeMode === 'docs'}
-              onClick={() => handleModeClick('docs')}
+              onClick={(): void => handleModeClick('docs')}
             />
             <RailIcon
               icon={<ProgramsIcon />}
               label="Programs"
               active={activeMode === 'programs'}
-              onClick={() => handleModeClick('programs')}
+              onClick={(): void => handleModeClick('programs')}
             />
             <RailIcon
               icon={<ProjectsIcon />}
               label="Projects"
               active={activeMode === 'projects'}
-              onClick={() => handleModeClick('projects')}
+              onClick={(): void => handleModeClick('projects')}
             />
             <RailIcon
               icon={<TeamIcon />}
               label={standupDue ? "Teams (standup due)" : "Teams"}
               active={activeMode === 'team'}
-              onClick={() => handleModeClick('team')}
+              onClick={(): void => handleModeClick('team')}
               showBadge={standupDue}
             />
           </div>
@@ -390,7 +390,7 @@ export function AppLayout() {
           {leftSidebarCollapsed && !hideLeftSidebar && (
             <Tooltip content="Expand sidebar" side="right">
               <button
-                onClick={() => setLeftSidebarCollapsed(false)}
+                onClick={(): void => setLeftSidebarCollapsed(false)}
                 className="flex h-9 w-9 items-center justify-center rounded-lg text-muted hover:bg-border/50 hover:text-foreground transition-colors"
                 aria-label="Expand sidebar"
               >
@@ -405,7 +405,7 @@ export function AppLayout() {
               icon={<SettingsIcon />}
               label="Settings"
               active={activeMode === 'settings'}
-              onClick={() => handleModeClick('settings')}
+              onClick={(): void => handleModeClick('settings')}
             />
             <button
               onClick={logout}
@@ -475,7 +475,7 @@ export function AppLayout() {
                 )}
                 <Tooltip content="Collapse sidebar">
                   <button
-                    onClick={() => setLeftSidebarCollapsed(true)}
+                    onClick={(): void => setLeftSidebarCollapsed(true)}
                     className="flex h-6 w-6 items-center justify-center rounded text-muted hover:bg-border hover:text-foreground transition-colors"
                     aria-label="Collapse sidebar"
                   >
@@ -581,7 +581,7 @@ export function AppLayout() {
   );
 }
 
-function RailIcon({ icon, label, active, onClick, showBadge }: { icon: React.ReactNode; label: string; active: boolean; onClick: () => void; showBadge?: boolean }) {
+function RailIcon({ icon, label, active, onClick, showBadge }: { icon: React.ReactNode; label: string; active: boolean; onClick: () => void; showBadge?: boolean }): React.JSX.Element {
   return (
     <Tooltip content={label} side="right">
       <button
@@ -603,12 +603,12 @@ function RailIcon({ icon, label, active, onClick, showBadge }: { icon: React.Rea
 
 const SIDEBAR_ITEM_LIMIT = 10;
 
-function DocumentsTree({ documents, activeId, onSelect }: { documents: WikiDocument[]; activeId?: string; onSelect: (id: string) => void }) {
+function DocumentsTree({ documents, activeId, onSelect }: { documents: WikiDocument[]; activeId?: string; onSelect: (id: string) => void }): React.JSX.Element {
   // Split documents by visibility and build separate trees
-  const { privateTree, workspaceTree } = useMemo(() => {
+  const { privateTree, workspaceTree } = useMemo((): { privateTree: DocumentTreeNode[]; workspaceTree: DocumentTreeNode[] } => {
     // Group documents by visibility (root documents determine the section)
-    const privateDocs = documents.filter(d => d.visibility === 'private');
-    const workspaceDocs = documents.filter(d => d.visibility !== 'private');
+    const privateDocs = documents.filter((d): boolean => d.visibility === 'private');
+    const workspaceDocs = documents.filter((d): boolean => d.visibility !== 'private');
     return {
       privateTree: buildDocumentTree(privateDocs),
       workspaceTree: buildDocumentTree(workspaceDocs),
@@ -636,7 +636,7 @@ function DocumentsTree({ documents, activeId, onSelect }: { documents: WikiDocum
         </div>
         <ul role="tree" aria-label="Workspace documents" aria-live="polite" className="space-y-0.5 px-2">
           {workspaceToShow.length > 0 ? (
-            workspaceToShow.map((doc) => (
+            workspaceToShow.map((doc): React.JSX.Element => (
               <DocumentTreeItem
                 key={doc.id}
                 document={doc}
@@ -668,7 +668,7 @@ function DocumentsTree({ documents, activeId, onSelect }: { documents: WikiDocum
             Private
           </div>
           <ul role="tree" aria-label="Private documents" aria-live="polite" className="space-y-0.5 px-2">
-            {privateToShow.map((doc) => (
+            {privateToShow.map((doc): React.JSX.Element => (
               <DocumentTreeItem
                 key={doc.id}
                 document={doc}
@@ -715,7 +715,7 @@ function DocumentTreeItem({
   activeId?: string;
   onSelect: (id: string) => void;
   depth: number;
-}) {
+}): React.JSX.Element {
   const { createDocument, updateDocument, deleteDocument } = useDocuments();
   const { showToast } = useToast();
   const navigate = useNavigate();
@@ -729,7 +729,7 @@ function DocumentTreeItem({
   const menuButtonRef = useRef<HTMLButtonElement>(null);
 
   // Update isOpen when activeId changes (for navigation)
-  useEffect(() => {
+  useEffect((): void => {
     if (shouldAutoExpand && !isOpen) {
       setIsOpen(true);
     }
@@ -739,13 +739,13 @@ function DocumentTreeItem({
   const hasChildren = document.children.length > 0;
 
   // Context menu handlers
-  const handleContextMenu = useCallback((e: React.MouseEvent) => {
+  const handleContextMenu = useCallback((e: React.MouseEvent): void => {
     e.preventDefault();
     e.stopPropagation();
     setContextMenu({ x: e.clientX, y: e.clientY });
   }, []);
 
-  const handleMenuButtonClick = useCallback((e: React.MouseEvent) => {
+  const handleMenuButtonClick = useCallback((e: React.MouseEvent): void => {
     e.preventDefault();
     e.stopPropagation();
     if (menuButtonRef.current) {
@@ -754,12 +754,12 @@ function DocumentTreeItem({
     }
   }, []);
 
-  const closeContextMenu = useCallback(() => {
+  const closeContextMenu = useCallback((): void => {
     setContextMenu(null);
   }, []);
 
   // Action handlers
-  const handleCreateSubdocument = useCallback(async () => {
+  const handleCreateSubdocument = useCallback(async (): Promise<void> => {
     closeContextMenu();
     const newDoc = await createDocument(document.id);
     if (newDoc) {
@@ -767,19 +767,19 @@ function DocumentTreeItem({
     }
   }, [createDocument, document.id, navigate, closeContextMenu]);
 
-  const handleRename = useCallback(() => {
+  const handleRename = useCallback((): void => {
     closeContextMenu();
     // Navigate to document and focus title (the title becomes editable when you click it)
     navigate(`/documents/${document.id}`);
   }, [document.id, navigate, closeContextMenu]);
 
-  const handleChangeVisibility = useCallback(async (visibility: string) => {
+  const handleChangeVisibility = useCallback(async (visibility: 'private' | 'workspace'): Promise<void> => {
     closeContextMenu();
-    await updateDocument(document.id, { visibility: visibility as 'private' | 'workspace' });
+    await updateDocument(document.id, { visibility });
     showToast(`Visibility changed to ${visibility}`, 'success');
   }, [document.id, updateDocument, showToast, closeContextMenu]);
 
-  const handleDelete = useCallback(async () => {
+  const handleDelete = useCallback(async (): Promise<void> => {
     closeContextMenu();
     const docTitle = document.title || 'Untitled';
     const childCount = document.children.length;
@@ -800,7 +800,7 @@ function DocumentTreeItem({
 
       showToast(message, 'info', 5000, {
         label: 'Undo',
-        onClick: async () => {
+        onClick: async (): Promise<void> => {
           // Recreate the document (undo)
           const restored = await createDocument(docData.parent_id || undefined);
           if (restored) {
@@ -839,7 +839,7 @@ function DocumentTreeItem({
           <button
             type="button"
             className="w-4 h-4 flex-shrink-0 flex items-center justify-center p-0 rounded hover:bg-border/50"
-            onClick={() => setIsOpen(!isOpen)}
+            onClick={(): void => setIsOpen(!isOpen)}
             aria-label={isOpen ? 'Collapse' : 'Expand'}
           >
             <ChevronIcon isOpen={isOpen} />
@@ -883,10 +883,10 @@ function DocumentTreeItem({
             Rename
           </ContextMenuItem>
           <ContextMenuSubmenu label="Change visibility">
-            {VISIBILITY_OPTIONS.map((opt) => (
+            {VISIBILITY_OPTIONS.map((opt): React.JSX.Element => (
               <ContextMenuItem
                 key={opt.value}
-                onClick={() => handleChangeVisibility(opt.value)}
+                onClick={(): void => { void handleChangeVisibility(opt.value); }}
               >
                 {opt.value === 'private' && <LockIcon className="h-3.5 w-3.5 mr-2" />}
                 {opt.value === 'workspace' && <GlobeIcon className="h-3.5 w-3.5 mr-2" />}
@@ -904,7 +904,7 @@ function DocumentTreeItem({
       {/* Children (collapsible) */}
       {hasChildren && isOpen && (
         <ul role="group" className="space-y-0.5">
-          {document.children.map((child) => (
+          {document.children.map((child): React.JSX.Element => (
             <DocumentTreeItem
               key={child.id}
               document={child}
@@ -919,7 +919,7 @@ function DocumentTreeItem({
   );
 }
 
-function MoreHorizontalIcon({ className }: { className?: string }) {
+function MoreHorizontalIcon({ className }: { className?: string }): React.JSX.Element {
   return (
     <svg
       className={className}
@@ -935,7 +935,7 @@ function MoreHorizontalIcon({ className }: { className?: string }) {
   );
 }
 
-function ChevronIcon({ isOpen }: { isOpen: boolean }) {
+function ChevronIcon({ isOpen }: { isOpen: boolean }): React.JSX.Element {
   return (
     <svg
       className={cn(
@@ -965,7 +965,7 @@ function IssuesSidebar({
   issues: Issue[];
   activeId?: string;
   onUpdateIssue: (id: string, updates: Partial<Issue>) => Promise<Issue | null>;
-}) {
+}): React.JSX.Element {
   // Show context tree when viewing a specific issue
   const showContext = !!activeId;
 
@@ -1005,32 +1005,30 @@ function IssuesList({
   issues: Issue[];
   activeId?: string;
   onUpdateIssue: (id: string, updates: Partial<Issue>) => Promise<Issue | null>;
-}) {
+}): React.JSX.Element {
   const { showToast } = useToast();
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number; issue: Issue } | null>(null);
 
-  const handleContextMenu = useCallback((e: React.MouseEvent, issue: Issue) => {
+  const handleContextMenu = useCallback((e: React.MouseEvent, issue: Issue): void => {
     e.preventDefault();
     e.stopPropagation();
     setContextMenu({ x: e.clientX, y: e.clientY, issue });
   }, []);
 
-  const handleMenuClick = useCallback((e: React.MouseEvent, issue: Issue) => {
+  const handleMenuClick = useCallback((e: React.MouseEvent, issue: Issue): void => {
     e.preventDefault();
     e.stopPropagation();
     const rect = e.currentTarget.getBoundingClientRect();
     setContextMenu({ x: rect.right, y: rect.bottom, issue });
   }, []);
 
-  const handleChangeStatus = useCallback(async (issue: Issue, state: string) => {
-    const originalState = issue.state;
+  const handleChangeStatus = useCallback(async (issue: Issue, state: string): Promise<void> => {
     await onUpdateIssue(issue.id, { state });
     showToast(`Status changed to ${state.replace('_', ' ')}`, 'success');
     setContextMenu(null);
   }, [onUpdateIssue, showToast]);
 
-  const handleArchive = useCallback(async (issue: Issue) => {
-    const originalState = issue.state;
+  const handleArchive = useCallback(async (issue: Issue): Promise<void> => {
     await onUpdateIssue(issue.id, { state: 'cancelled' });
     showToast('Issue archived', 'success');
     setContextMenu(null);
@@ -1051,7 +1049,7 @@ function IssuesList({
   return (
     <>
       <ul className="space-y-0.5 px-2" data-testid="issues-list">
-        {issues.map((issue) => (
+        {issues.map((issue): React.JSX.Element => (
           <li key={issue.id} data-testid="issue-item" className="group relative">
             <Link
               to={`/documents/${issue.id}`}
@@ -1069,7 +1067,7 @@ function IssuesList({
             {/* Three-dot menu button */}
             <button
               type="button"
-              onClick={(e) => handleMenuClick(e, issue)}
+              onClick={(e: React.MouseEvent): void => handleMenuClick(e, issue)}
               className="absolute right-1 top-1/2 -translate-y-1/2 p-0.5 rounded opacity-0 group-hover:opacity-100 hover:bg-border/50 text-muted hover:text-foreground transition-opacity"
               aria-label={`Actions for ${issue.title || 'Untitled'}`}
             >
@@ -1087,25 +1085,25 @@ function IssuesList({
       {contextMenu && (
         <ContextMenu x={contextMenu.x} y={contextMenu.y} onClose={() => setContextMenu(null)}>
           <ContextMenuSubmenu label="Change Status">
-            <ContextMenuItem onClick={() => handleChangeStatus(contextMenu.issue, 'backlog')}>
+            <ContextMenuItem onClick={(): void => { void handleChangeStatus(contextMenu.issue, 'backlog'); }}>
               <IssueStatusIcon state="backlog" />
               Backlog
             </ContextMenuItem>
-            <ContextMenuItem onClick={() => handleChangeStatus(contextMenu.issue, 'todo')}>
+            <ContextMenuItem onClick={(): void => { void handleChangeStatus(contextMenu.issue, 'todo'); }}>
               <IssueStatusIcon state="todo" />
               Todo
             </ContextMenuItem>
-            <ContextMenuItem onClick={() => handleChangeStatus(contextMenu.issue, 'in_progress')}>
+            <ContextMenuItem onClick={(): void => { void handleChangeStatus(contextMenu.issue, 'in_progress'); }}>
               <IssueStatusIcon state="in_progress" />
               In Progress
             </ContextMenuItem>
-            <ContextMenuItem onClick={() => handleChangeStatus(contextMenu.issue, 'done')}>
+            <ContextMenuItem onClick={(): void => { void handleChangeStatus(contextMenu.issue, 'done'); }}>
               <IssueStatusIcon state="done" />
               Done
             </ContextMenuItem>
           </ContextMenuSubmenu>
           <ContextMenuSeparator />
-          <ContextMenuItem onClick={() => handleArchive(contextMenu.issue)}>
+          <ContextMenuItem onClick={(): void => { void handleArchive(contextMenu.issue); }}>
             <ArchiveIcon className="h-4 w-4" />
             Archive
           </ContextMenuItem>
@@ -1115,7 +1113,7 @@ function IssuesList({
   );
 }
 
-function IssueStatusIcon({ state }: { state: string }) {
+function IssueStatusIcon({ state }: { state: string }): React.JSX.Element {
   const colors: Record<string, string> = {
     backlog: 'text-gray-400',
     todo: 'text-blue-400',
@@ -1138,7 +1136,7 @@ function ProjectsList({
   activeId?: string;
   currentProjectId?: string | null;
   onUpdateProject: (id: string, updates: Partial<Project>) => Promise<Project | null>;
-}) {
+}): React.JSX.Element {
   const location = useLocation();
   const { currentDocumentType } = useCurrentDocument();
   const { showToast } = useToast();
@@ -1149,7 +1147,7 @@ function ProjectsList({
     const path = location.pathname;
     if (!activeId) return null;
     // Check if viewing any tab of a project that exists in the list
-    const projectIds = projects.map(p => p.id);
+    const projectIds = projects.map((p): string => p.id);
     if (!projectIds.includes(activeId)) return null;
     if (path === `/documents/${activeId}`) return 'details';
     if (path === `/documents/${activeId}/weeks`) return 'weeks';
@@ -1161,34 +1159,34 @@ function ProjectsList({
   const activeProjectTab = getActiveProjectTab();
 
   // Auto-expand projects that contain the current document
-  const [expandedProjects, setExpandedProjects] = useState<Set<string>>(() => {
+  const [expandedProjects, setExpandedProjects] = useState<Set<string>>((): Set<string> => {
     // If viewing a weekly doc with a project, auto-expand that project
     if (currentProjectId) {
       return new Set([currentProjectId]);
     }
     // If viewing a project's tab directly, auto-expand that project
-    if (activeId && projects.some(p => p.id === activeId)) {
+    if (activeId && projects.some((p): boolean => p.id === activeId)) {
       return new Set([activeId]);
     }
     return new Set();
   });
 
   // Auto-expand when currentProjectId or activeId changes
-  useEffect(() => {
+  useEffect((): void => {
     if (currentProjectId && !expandedProjects.has(currentProjectId)) {
-      setExpandedProjects(prev => new Set([...prev, currentProjectId]));
+      setExpandedProjects((prev): Set<string> => new Set([...prev, currentProjectId]));
     }
   }, [currentProjectId]);
 
   // Auto-expand when viewing a project's tab
-  useEffect(() => {
+  useEffect((): void => {
     if (activeId && activeProjectTab && !expandedProjects.has(activeId)) {
-      setExpandedProjects(prev => new Set([...prev, activeId]));
+      setExpandedProjects((prev): Set<string> => new Set([...prev, activeId]));
     }
   }, [activeId, activeProjectTab]);
 
-  const toggleProject = useCallback((projectId: string) => {
-    setExpandedProjects(prev => {
+  const toggleProject = useCallback((projectId: string): void => {
+    setExpandedProjects((prev): Set<string> => {
       const next = new Set(prev);
       if (next.has(projectId)) {
         next.delete(projectId);
@@ -1213,20 +1211,20 @@ function ProjectsList({
     return null;
   };
 
-  const handleContextMenu = useCallback((e: React.MouseEvent, project: Project) => {
+  const handleContextMenu = useCallback((e: React.MouseEvent, project: Project): void => {
     e.preventDefault();
     e.stopPropagation();
     setContextMenu({ x: e.clientX, y: e.clientY, project });
   }, []);
 
-  const handleMenuClick = useCallback((e: React.MouseEvent, project: Project) => {
+  const handleMenuClick = useCallback((e: React.MouseEvent, project: Project): void => {
     e.preventDefault();
     e.stopPropagation();
     const rect = e.currentTarget.getBoundingClientRect();
     setContextMenu({ x: rect.right, y: rect.bottom, project });
   }, []);
 
-  const handleArchive = useCallback(async (project: Project) => {
+  const handleArchive = useCallback(async (project: Project): Promise<void> => {
     await onUpdateProject(project.id, { archived_at: new Date().toISOString() });
     showToast('Project archived', 'success');
     setContextMenu(null);
@@ -1239,7 +1237,7 @@ function ProjectsList({
   return (
     <>
       <ul className="space-y-0.5 px-2" role="tree" data-testid="projects-list">
-        {projects.map((project) => {
+        {projects.map((project): React.JSX.Element => {
           const isExpanded = expandedProjects.has(project.id);
           const currentTab = getCurrentTab(project.id);
           return (
@@ -1257,7 +1255,7 @@ function ProjectsList({
                   {/* Expand/collapse chevron */}
                   <button
                     type="button"
-                    onClick={() => toggleProject(project.id)}
+                    onClick={(): void => toggleProject(project.id)}
                     className="w-4 h-4 flex-shrink-0 flex items-center justify-center p-0 rounded hover:bg-border/50"
                     aria-label={isExpanded ? 'Collapse' : 'Expand'}
                   >
@@ -1281,7 +1279,7 @@ function ProjectsList({
                 {/* Three-dot menu button */}
                 <button
                   type="button"
-                  onClick={(e) => handleMenuClick(e, project)}
+                  onClick={(e: React.MouseEvent): void => handleMenuClick(e, project)}
                   className="absolute right-1 top-1/2 -translate-y-1/2 p-0.5 rounded opacity-0 group-hover:opacity-100 hover:bg-border/50 text-muted hover:text-foreground transition-opacity"
                   aria-label={`Actions for ${project.title || 'Untitled'}`}
                 >
@@ -1361,7 +1359,7 @@ function ProjectsList({
 
       {contextMenu && (
         <ContextMenu x={contextMenu.x} y={contextMenu.y} onClose={() => setContextMenu(null)}>
-          <ContextMenuItem onClick={() => handleArchive(contextMenu.project)}>
+          <ContextMenuItem onClick={(): void => { void handleArchive(contextMenu.project); }}>
             <ArchiveIcon className="h-4 w-4" />
             Archive
           </ContextMenuItem>
@@ -1371,7 +1369,7 @@ function ProjectsList({
   );
 }
 
-function CalendarIcon() {
+function CalendarIcon(): React.JSX.Element {
   return (
     <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -1379,7 +1377,7 @@ function CalendarIcon() {
   );
 }
 
-function IssueIcon() {
+function IssueIcon(): React.JSX.Element {
   return (
     <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
@@ -1387,7 +1385,7 @@ function IssueIcon() {
   );
 }
 
-function RetroIcon() {
+function RetroIcon(): React.JSX.Element {
   return (
     <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5l7 7-7 7" />
@@ -1417,34 +1415,34 @@ function ProgramsList({
   activeId?: string;
   onSelect: (id: string) => void;
   onUpdateProgram: (id: string, updates: Partial<Program>) => Promise<Program | null>;
-}) {
+}): React.JSX.Element {
   const { showToast } = useToast();
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number; programId: string } | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const handleContextMenu = useCallback((e: React.MouseEvent, programId: string) => {
+  const handleContextMenu = useCallback((e: React.MouseEvent, programId: string): void => {
     e.preventDefault();
     e.stopPropagation();
     setContextMenu({ x: e.clientX, y: e.clientY, programId });
   }, []);
 
-  const handleMenuClick = useCallback((e: React.MouseEvent, programId: string) => {
+  const handleMenuClick = useCallback((e: React.MouseEvent, programId: string): void => {
     e.stopPropagation();
     const rect = e.currentTarget.getBoundingClientRect();
     setContextMenu({ x: rect.right, y: rect.bottom, programId });
   }, []);
 
-  const handleRename = useCallback((program: Program) => {
+  const handleRename = useCallback((program: Program): void => {
     setContextMenu(null);
     setEditingId(program.id);
     setEditingName(program.name);
     // Focus input after render
-    setTimeout(() => inputRef.current?.focus(), 0);
+    setTimeout((): void => inputRef.current?.focus(), 0);
   }, []);
 
-  const handleRenameSubmit = useCallback(async (programId: string) => {
+  const handleRenameSubmit = useCallback(async (programId: string): Promise<void> => {
     if (editingName.trim()) {
       await onUpdateProgram(programId, { name: editingName.trim() });
       showToast('Program renamed', 'success');
@@ -1453,7 +1451,7 @@ function ProgramsList({
     setEditingName('');
   }, [editingName, onUpdateProgram, showToast]);
 
-  const handleRenameKeyDown = useCallback((e: React.KeyboardEvent, programId: string) => {
+  const handleRenameKeyDown = useCallback((e: React.KeyboardEvent, programId: string): void => {
     if (e.key === 'Enter') {
       handleRenameSubmit(programId);
     } else if (e.key === 'Escape') {
@@ -1462,19 +1460,19 @@ function ProgramsList({
     }
   }, [handleRenameSubmit]);
 
-  const handleChangeColor = useCallback(async (programId: string, color: string) => {
+  const handleChangeColor = useCallback(async (programId: string, color: string): Promise<void> => {
     setContextMenu(null);
     await onUpdateProgram(programId, { color });
     showToast('Color updated', 'success');
   }, [onUpdateProgram, showToast]);
 
-  const handleArchive = useCallback(async (program: Program) => {
+  const handleArchive = useCallback(async (program: Program): Promise<void> => {
     setContextMenu(null);
     const originalArchivedAt = program.archived_at;
     await onUpdateProgram(program.id, { archived_at: new Date().toISOString() });
     showToast('Program archived', 'success', 5000, {
       label: 'Undo',
-      onClick: async () => {
+      onClick: async (): Promise<void> => {
         await onUpdateProgram(program.id, { archived_at: originalArchivedAt });
         showToast('Archive undone', 'info');
       },
@@ -1485,12 +1483,12 @@ function ProgramsList({
     return <div className="px-3 py-2 text-sm text-muted">No programs yet</div>;
   }
 
-  const contextMenuProgram = contextMenu ? programs.find(p => p.id === contextMenu.programId) : null;
+  const contextMenuProgram = contextMenu ? programs.find((p): boolean => p.id === contextMenu.programId) : null;
 
   return (
     <>
       <ul className="space-y-0.5 px-2" data-testid="programs-list">
-        {programs.map((program) => (
+        {programs.map((program): React.JSX.Element => (
           <li key={program.id} data-testid="program-item">
             <div
               className="group relative"
@@ -1508,15 +1506,15 @@ function ProgramsList({
                     ref={inputRef}
                     type="text"
                     value={editingName}
-                    onChange={(e) => setEditingName(e.target.value)}
-                    onBlur={() => handleRenameSubmit(program.id)}
-                    onKeyDown={(e) => handleRenameKeyDown(e, program.id)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEditingName(e.target.value)}
+                    onBlur={(): void => { void handleRenameSubmit(program.id); }}
+                    onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => handleRenameKeyDown(e, program.id)}
                     className="flex-1 bg-transparent border-none outline-none text-sm text-foreground"
                   />
                 </div>
               ) : (
                 <button
-                  onClick={() => onSelect(program.id)}
+                  onClick={(): void => onSelect(program.id)}
                   className={cn(
                     'flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm transition-colors',
                     activeId === program.id
@@ -1537,7 +1535,7 @@ function ProgramsList({
               {editingId !== program.id && (
                 <button
                   type="button"
-                  onClick={(e) => handleMenuClick(e, program.id)}
+                  onClick={(e: React.MouseEvent): void => handleMenuClick(e, program.id)}
                   className="absolute right-1 top-1/2 -translate-y-1/2 p-1 rounded hover:bg-border/50 opacity-0 group-hover:opacity-100 transition-opacity"
                   aria-label={`Actions for ${program.name}`}
                 >
@@ -1552,15 +1550,15 @@ function ProgramsList({
       {/* Context Menu */}
       {contextMenu && contextMenuProgram && (
         <ContextMenu x={contextMenu.x} y={contextMenu.y} onClose={() => setContextMenu(null)}>
-          <ContextMenuItem onClick={() => handleRename(contextMenuProgram)}>
+          <ContextMenuItem onClick={(): void => handleRename(contextMenuProgram)}>
             <EditIcon className="h-4 w-4" />
             Rename
           </ContextMenuItem>
           <ContextMenuSubmenu label="Change Color">
-            {PROGRAM_COLORS.map((color) => (
+            {PROGRAM_COLORS.map((color): React.JSX.Element => (
               <ContextMenuItem
                 key={color.value}
-                onClick={() => handleChangeColor(contextMenuProgram.id, color.value)}
+                onClick={(): void => { void handleChangeColor(contextMenuProgram.id, color.value); }}
               >
                 <span
                   className="h-3 w-3 rounded-full"
@@ -1571,7 +1569,7 @@ function ProgramsList({
             ))}
           </ContextMenuSubmenu>
           <ContextMenuSeparator />
-          <ContextMenuItem onClick={() => handleArchive(contextMenuProgram)}>
+          <ContextMenuItem onClick={(): void => { void handleArchive(contextMenuProgram); }}>
             <ArchiveIcon className="h-4 w-4" />
             Archive
           </ContextMenuItem>
@@ -1581,7 +1579,7 @@ function ProgramsList({
   );
 }
 
-function EditIcon({ className }: { className?: string }) {
+function EditIcon({ className }: { className?: string }): React.JSX.Element {
   return (
     <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -1589,7 +1587,7 @@ function EditIcon({ className }: { className?: string }) {
   );
 }
 
-function TeamSidebar() {
+function TeamSidebar(): React.JSX.Element {
   const location = useLocation();
   const navigate = useNavigate();
   const { currentDocumentType } = useCurrentDocument();
@@ -1616,7 +1614,7 @@ function TeamSidebar() {
   const { data: people = [] } = useTeamMembersQuery();
 
   // Filter out pending users for the sidebar list
-  const activePeople = people.filter(p => !p.isPending);
+  const activePeople = people.filter((p): boolean => !p.isPending);
 
   return (
     <div className="space-y-3 px-2">
@@ -1624,7 +1622,7 @@ function TeamSidebar() {
       <ul className="space-y-0.5">
         <li>
           <button
-            onClick={() => navigate('/team/allocation')}
+            onClick={(): void => { void navigate('/team/allocation'); }}
             className={cn(
               'flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm transition-colors',
               isAllocation
@@ -1638,7 +1636,7 @@ function TeamSidebar() {
         </li>
         <li>
           <button
-            onClick={() => navigate('/team/directory')}
+            onClick={(): void => { void navigate('/team/directory'); }}
             className={cn(
               'flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm transition-colors',
               isDirectory
@@ -1652,7 +1650,7 @@ function TeamSidebar() {
         </li>
         <li>
           <button
-            onClick={() => navigate('/team/status')}
+            onClick={(): void => { void navigate('/team/status'); }}
             className={cn(
               'flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm transition-colors',
               isStatusOverview
@@ -1666,7 +1664,7 @@ function TeamSidebar() {
         </li>
         <li>
           <button
-            onClick={() => navigate('/team/reviews')}
+            onClick={(): void => { void navigate('/team/reviews'); }}
             className={cn(
               'flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm transition-colors',
               isReviews
@@ -1680,7 +1678,7 @@ function TeamSidebar() {
         </li>
         <li>
           <button
-            onClick={() => navigate('/team/org-chart')}
+            onClick={(): void => { void navigate('/team/org-chart'); }}
             className={cn(
               'flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm transition-colors',
               isOrgChart
@@ -1701,10 +1699,10 @@ function TeamSidebar() {
             Team Members
           </div>
           <ul className="space-y-0.5">
-            {activePeople.map(person => (
+            {activePeople.map((person): React.JSX.Element => (
               <li key={person.id}>
                 <button
-                  onClick={() => navigate(`/team/${person.id}`)}
+                  onClick={(): void => { void navigate(`/team/${person.id}`); }}
                   className={cn(
                     'flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm transition-colors',
                     personIdFromUrl === person.id
@@ -1729,7 +1727,7 @@ function TeamSidebar() {
   );
 }
 
-function GridIcon() {
+function GridIcon(): React.JSX.Element {
   return (
     <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zM14 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" />
@@ -1737,7 +1735,7 @@ function GridIcon() {
   );
 }
 
-function PeopleIcon() {
+function PeopleIcon(): React.JSX.Element {
   return (
     <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
@@ -1745,7 +1743,7 @@ function PeopleIcon() {
   );
 }
 
-function ActivityIcon() {
+function ActivityIcon(): React.JSX.Element {
   return (
     <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M22 12h-4l-3 9L9 3l-3 9H2" />
@@ -1753,7 +1751,7 @@ function ActivityIcon() {
   );
 }
 
-function ReviewsIcon() {
+function ReviewsIcon(): React.JSX.Element {
   return (
     <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
