@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "generated_at": "2026-03-11T20:34:19.141Z",
+  "generated_at": "2026-03-11T20:45:53.436Z",
   "strict_mode": {
     "enabled": true,
     "by_config": {
@@ -3824,14 +3824,14 @@
     }
   ],
   "delta_from_previous": {
-    "overall": -13,
+    "overall": 0,
     "by_violation_type": {
       "explicit_any": 0,
-      "type_assertion_as": -9,
+      "type_assertion_as": 0,
       "non_null_assertion": 0,
       "ts_comment_directive": 0,
       "untyped_parameter": 0,
-      "missing_return_type": -4
+      "missing_return_type": 0
     },
     "status_band": "Stable"
   },

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="500" viewBox="0 0 1400 500">
+  <rect width="100%" height="100%" fill="white" />
+  <text x="72" y="34" font-family="ui-sans-serif, system-ui, sans-serif" font-size="28" font-weight="700" fill="#111827">Totals</text>
+  <g transform="translate(72, 76)">
+    
+    <g font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#111827">
+      <rect x="0" y="0" width="12" height="12" rx="2" fill="#9ca3af" />
+      <text x="18" y="10">Baseline</text>
+      <rect x="96" y="0" width="12" height="12" rx="2" fill="#2563eb" />
+      <text x="114" y="10">Current</text>
+    </g>
+  
+  </g>
+  <line x1="72" y1="354" x2="1352" y2="354" stroke="#6b7280" />
+  
+      <line x1="72" y1="354" x2="1352" y2="354" stroke="#e5e7eb" />
+      <text x="62" y="358" text-anchor="end" font-size="12" fill="#6b7280">0</text>
+    
+      <line x1="72" y1="307.6" x2="1352" y2="307.6" stroke="#e5e7eb" />
+      <text x="62" y="311.6" text-anchor="end" font-size="12" fill="#6b7280">1,440</text>
+    
+      <line x1="72" y1="261.2" x2="1352" y2="261.2" stroke="#e5e7eb" />
+      <text x="62" y="265.2" text-anchor="end" font-size="12" fill="#6b7280">2,880</text>
+    
+      <line x1="72" y1="214.79999999999998" x2="1352" y2="214.79999999999998" stroke="#e5e7eb" />
+      <text x="62" y="218.79999999999998" text-anchor="end" font-size="12" fill="#6b7280">4,321</text>
+    
+      <line x1="72" y1="168.39999999999998" x2="1352" y2="168.39999999999998" stroke="#e5e7eb" />
+      <text x="62" y="172.39999999999998" text-anchor="end" font-size="12" fill="#6b7280">5,761</text>
+    
+      <line x1="72" y1="122" x2="1352" y2="122" stroke="#e5e7eb" />
+      <text x="62" y="126" text-anchor="end" font-size="12" fill="#6b7280">7,201</text>
+    
+  
+      <g font-family="ui-sans-serif, system-ui, sans-serif">
+        <rect x="225.83333333333334" y="122" width="58" height="232" rx="4" fill="#9ca3af" />
+        <rect x="286.83333333333337" y="169.00569365365922" width="58" height="184.99430634634078" rx="4" fill="#2563eb" />
+        <text x="254.83333333333334" y="114" text-anchor="middle" font-size="11" fill="#6b7280">7,201</text>
+        <text x="315.83333333333337" y="161.00569365365922" text-anchor="middle" font-size="11" fill="#6b7280">5,742</text>
+        <text x="285.33333333333337" y="378" text-anchor="middle" font-size="12" fill="#111827">Overall</text>
+        <text x="285.33333333333337" y="398" text-anchor="middle" font-size="11" fill="#047857">delta -1,459</text>
+      </g>
+    
+      <g font-family="ui-sans-serif, system-ui, sans-serif">
+        <rect x="652.5" y="175.51367865574227" width="58" height="178.48632134425773" rx="4" fill="#9ca3af" />
+        <rect x="713.5" y="222.51937230940146" width="58" height="131.48062769059854" rx="4" fill="#2563eb" />
+        <text x="681.5" y="167.51367865574227" text-anchor="middle" font-size="11" fill="#6b7280">5,540</text>
+        <text x="742.5" y="214.51937230940146" text-anchor="middle" font-size="11" fill="#6b7280">4,081</text>
+        <text x="712" y="378" text-anchor="middle" font-size="12" fill="#111827">Production Only</text>
+        <text x="712" y="398" text-anchor="middle" font-size="11" fill="#047857">delta -1,459</text>
+      </g>
+    
+      <g font-family="ui-sans-serif, system-ui, sans-serif">
+        <rect x="1079.1666666666667" y="300.48632134425776" width="58" height="53.513678655742254" rx="4" fill="#9ca3af" />
+        <rect x="1140.1666666666667" y="300.48632134425776" width="58" height="53.513678655742254" rx="4" fill="#2563eb" />
+        <text x="1108.1666666666667" y="292.48632134425776" text-anchor="middle" font-size="11" fill="#6b7280">1,661</text>
+        <text x="1169.1666666666667" y="292.48632134425776" text-anchor="middle" font-size="11" fill="#6b7280">1,661</text>
+        <text x="1138.6666666666667" y="378" text-anchor="middle" font-size="12" fill="#111827">Tests Only</text>
+        <text x="1138.6666666666667" y="398" text-anchor="middle" font-size="11" fill="#047857">delta 0</text>
+      </g>
+    
+</svg>

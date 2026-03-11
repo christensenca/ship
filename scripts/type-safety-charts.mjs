@@ -93,8 +93,10 @@ function truncateLabel(value, maxLength = 32) {
   return `${value.slice(0, maxLength - 1)}…`;
 }
 
-function chartTitle(comparison, suffix) {
-  return `${comparison.baseline.label} vs ${comparison.current.label}: ${suffix}`;
+function formatChartLabel(value) {
+  return value
+    .replaceAll('_', ' ')
+    .replace(/\b\w/g, (character) => character.toUpperCase());
 }
 
 function renderLegend() {
@@ -108,14 +110,16 @@ function renderLegend() {
   `;
 }
 
-function renderVerticalPairedBarChart({ title, subtitle, items, outputPath, height = 520 }) {
-  const width = 1280;
-  const margin = { top: 84, right: 32, bottom: 130, left: 72 };
+function renderVerticalPairedBarChart({ title, items, outputPath, height = 520 }) {
+  const width = 1400;
+  const margin = { top: 122, right: 48, bottom: 146, left: 72 };
   const plotWidth = width - margin.left - margin.right;
   const plotHeight = height - margin.top - margin.bottom;
   const maxValue = Math.max(1, ...items.flatMap((item) => [item.baseline, item.current]));
   const groupWidth = plotWidth / items.length;
-  const barWidth = Math.min(40, (groupWidth - 18) / 2);
+  const pairGap = 3;
+  const groupPadding = Math.max(12, Math.min(28, groupWidth * 0.12));
+  const barWidth = Math.min(58, (groupWidth - groupPadding - pairGap) / 2);
   const yTicks = 5;
 
   const grid = [];
@@ -132,12 +136,13 @@ function renderVerticalPairedBarChart({ title, subtitle, items, outputPath, heig
     const groupX = margin.left + groupWidth * index;
     const baselineHeight = (item.baseline / maxValue) * plotHeight;
     const currentHeight = (item.current / maxValue) * plotHeight;
-    const baselineX = groupX + (groupWidth / 2) - barWidth - 4;
-    const currentX = groupX + (groupWidth / 2) + 4;
+    const pairWidth = (barWidth * 2) + pairGap;
+    const baselineX = groupX + ((groupWidth - pairWidth) / 2);
+    const currentX = baselineX + barWidth + pairGap;
     const baselineY = margin.top + plotHeight - baselineHeight;
     const currentY = margin.top + plotHeight - currentHeight;
     const deltaColor = item.delta <= 0 ? COLORS.deltaNegative : COLORS.deltaPositive;
-    const label = truncateLabel(item.label, 18);
+    const label = truncateLabel(formatChartLabel(item.label), 22);
     return `
       <g font-family="ui-sans-serif, system-ui, sans-serif">
         <rect x="${baselineX}" y="${baselineY}" width="${barWidth}" height="${baselineHeight}" rx="4" fill="${COLORS.baseline}" />
@@ -154,8 +159,7 @@ function renderVerticalPairedBarChart({ title, subtitle, items, outputPath, heig
 <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
   <rect width="100%" height="100%" fill="white" />
   <text x="${margin.left}" y="34" font-family="ui-sans-serif, system-ui, sans-serif" font-size="28" font-weight="700" fill="${COLORS.text}">${escapeXml(title)}</text>
-  <text x="${margin.left}" y="58" font-family="ui-sans-serif, system-ui, sans-serif" font-size="14" fill="${COLORS.axis}">${escapeXml(subtitle)}</text>
-  <g transform="translate(${width - 250}, 28)">
+  <g transform="translate(${margin.left}, 76)">
     ${renderLegend()}
   </g>
   <line x1="${margin.left}" y1="${margin.top + plotHeight}" x2="${width - margin.right}" y2="${margin.top + plotHeight}" stroke="${COLORS.axis}" />
@@ -166,14 +170,15 @@ function renderVerticalPairedBarChart({ title, subtitle, items, outputPath, heig
   fs.writeFileSync(outputPath, `${svg}\n`, 'utf8');
 }
 
-function renderHorizontalPairedBarChart({ title, subtitle, items, outputPath }) {
+function renderHorizontalPairedBarChart({ title, items, outputPath }) {
   const width = 1400;
-  const rowHeight = 42;
-  const margin = { top: 90, right: 72, bottom: 34, left: 420 };
+  const rowHeight = 38;
+  const margin = { top: 122, right: 72, bottom: 34, left: 420 };
   const height = margin.top + margin.bottom + (items.length * rowHeight);
   const plotWidth = width - margin.left - margin.right;
   const maxValue = Math.max(1, ...items.flatMap((item) => [item.baseline, item.current]));
   const barHeight = 12;
+  const pairGap = 2;
 
   const grid = [];
   const ticks = 5;
@@ -190,15 +195,13 @@ function renderHorizontalPairedBarChart({ title, subtitle, items, outputPath }) 
     const y = margin.top + (index * rowHeight);
     const baselineWidth = (item.baseline / maxValue) * plotWidth;
     const currentWidth = (item.current / maxValue) * plotWidth;
-    const deltaColor = item.delta <= 0 ? COLORS.deltaNegative : COLORS.deltaPositive;
     return `
       <g font-family="ui-sans-serif, system-ui, sans-serif">
-        <text x="${margin.left - 12}" y="${y + 14}" text-anchor="end" font-size="12" fill="${COLORS.text}">${escapeXml(truncateLabel(item.label, 52))}</text>
+        <text x="${margin.left - 12}" y="${y + 13}" text-anchor="end" font-size="12" fill="${COLORS.text}">${escapeXml(truncateLabel(formatChartLabel(item.label), 52))}</text>
         <rect x="${margin.left}" y="${y}" width="${baselineWidth}" height="${barHeight}" rx="3" fill="${COLORS.baseline}" />
-        <rect x="${margin.left}" y="${y + 16}" width="${currentWidth}" height="${barHeight}" rx="3" fill="${COLORS.current}" />
+        <rect x="${margin.left}" y="${y + barHeight + pairGap}" width="${currentWidth}" height="${barHeight}" rx="3" fill="${COLORS.current}" />
         <text x="${margin.left + baselineWidth + 8}" y="${y + 10}" font-size="11" fill="${COLORS.axis}">${escapeXml(formatNumber(item.baseline))}</text>
-        <text x="${margin.left + currentWidth + 8}" y="${y + 26}" font-size="11" fill="${COLORS.axis}">${escapeXml(formatNumber(item.current))}</text>
-        <text x="${width - margin.right + 8}" y="${y + 18}" font-size="11" fill="${deltaColor}">${escapeXml(formatDelta(item.delta))}</text>
+        <text x="${margin.left + currentWidth + 8}" y="${y + (barHeight * 2) + pairGap - 2}" font-size="11" fill="${COLORS.axis}">${escapeXml(formatNumber(item.current))}</text>
       </g>
     `;
   }).join('');
@@ -207,8 +210,7 @@ function renderHorizontalPairedBarChart({ title, subtitle, items, outputPath }) 
 <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
   <rect width="100%" height="100%" fill="white" />
   <text x="${margin.left}" y="34" font-family="ui-sans-serif, system-ui, sans-serif" font-size="28" font-weight="700" fill="${COLORS.text}">${escapeXml(title)}</text>
-  <text x="${margin.left}" y="58" font-family="ui-sans-serif, system-ui, sans-serif" font-size="14" fill="${COLORS.axis}">${escapeXml(subtitle)}</text>
-  <g transform="translate(${width - 260}, 28)">
+  <g transform="translate(${margin.left}, 76)">
     ${renderLegend()}
   </g>
   ${grid.join('')}
@@ -245,8 +247,7 @@ function main() {
   const filesPath = path.join(CHARTS_DIR, `${slug}--top-files.svg`);
 
   renderVerticalPairedBarChart({
-    title: chartTitle(comparison, 'Totals'),
-    subtitle: 'Paired bars for overall, production-only, and test-only violations.',
+    title: 'Totals',
     items: comparison.charts.totals.map((item) => ({
       label: item.label,
       baseline: item.baseline,
@@ -258,8 +259,7 @@ function main() {
   });
 
   renderVerticalPairedBarChart({
-    title: chartTitle(comparison, 'Violation Types'),
-    subtitle: 'Paired bars for each tracked violation category.',
+    title: 'Violation Types',
     items: comparison.charts.by_violation_type.map((item) => ({
       label: item.label,
       baseline: item.baseline,
@@ -271,8 +271,7 @@ function main() {
   });
 
   renderHorizontalPairedBarChart({
-    title: chartTitle(comparison, `Top ${top} Files by Baseline Severity`),
-    subtitle: 'Production files only. Ordered by baseline violation count.',
+    title: `Top ${top} Files`,
     items: buildFileChartItems(comparison, top),
     outputPath: filesPath,
   });
