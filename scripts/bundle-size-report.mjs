@@ -20,9 +20,16 @@ import { join, resolve } from 'path';
 const ROOT = resolve(import.meta.dirname, '..');
 const WEB = join(ROOT, 'web');
 const REPORTS_DIR = join(ROOT, 'reports', 'bundle-size');
+const BASELINE_DATE = '2026-03-10';
+const BASELINE_INITIAL_CHUNK_RENDERED_KB = 4532.3;
+const TARGET_INITIAL_CHUNK_RENDERED_KB = +(BASELINE_INITIAL_CHUNK_RENDERED_KB * 0.8).toFixed(1);
 
 function run(cmd, opts = {}) {
   return execSync(cmd, { cwd: WEB, encoding: 'utf-8', maxBuffer: 50 * 1024 * 1024, ...opts }).trim();
+}
+
+function escapeRegex(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 // Step 1: Build shared + web
@@ -41,12 +48,17 @@ const unusedDeps = [];
 for (const dep of deps) {
   if (dep === 'react' || dep.startsWith('@ship/')) continue;
   try {
+    const escapedDep = escapeRegex(dep);
+    const importPattern = `from ['"]${escapedDep}([/'"])`;
+    const globPattern = `import\\.meta\\.glob.*${escapedDep}`;
+    const dynamicPattern = `import\\(['"]${escapedDep}`;
+
     // Check for standard ES imports: from 'pkg' or from "pkg"
-    const importResult = run(`grep -rE "from ['\"]${dep}['\"/]" src/ --include="*.ts" --include="*.tsx" -l 2>/dev/null || true`);
+    const importResult = run(`rg -l -g '*.ts' -g '*.tsx' ${JSON.stringify(importPattern)} src || true`);
     // Check for import.meta.glob patterns (e.g. @uswds/uswds icons)
-    const globResult = run(`grep -rE "import\\.meta\\.glob.*${dep}" src/ --include="*.ts" --include="*.tsx" -l 2>/dev/null || true`);
+    const globResult = run(`rg -l -g '*.ts' -g '*.tsx' ${JSON.stringify(globPattern)} src || true`);
     // Check for dynamic import() calls
-    const dynamicResult = run(`grep -rE "import\\(['\"]${dep}" src/ --include="*.ts" --include="*.tsx" -l 2>/dev/null || true`);
+    const dynamicResult = run(`rg -l -g '*.ts' -g '*.tsx' ${JSON.stringify(dynamicPattern)} src || true`);
     if (!importResult.trim() && !globResult.trim() && !dynamicResult.trim()) {
       unusedDeps.push(dep);
     }
@@ -143,6 +155,10 @@ const dependencyBreakdown = Object.entries(pkgSizes)
 const totalGzip = Object.values(chunkSizes).reduce((s, v) => s + v.gzip, 0);
 const totalBrotli = Object.values(chunkSizes).reduce((s, v) => s + v.brotli, 0);
 const largest = sortedChunks[0] || { name: 'unknown', rendered_kb: 0, gzip_kb: 0, brotli_kb: 0 };
+const initialChunks = sortedChunks.filter((chunk) => /(^|\/)assets\/index-[^/]+\.js$/.test(chunk.name));
+const initialChunkName = initialChunks.map((chunk) => chunk.name).join(', ') || 'none';
+const initialChunkRenderedKb = +initialChunks.reduce((sum, chunk) => sum + chunk.rendered_kb, 0).toFixed(1);
+const initialChunkGzipKb = +initialChunks.reduce((sum, chunk) => sum + chunk.gzip_kb, 0).toFixed(1);
 
 // Copy treemap to reports
 copyFileSync(statsPath, join(REPORTS_DIR, 'treemap.html'));
@@ -157,6 +173,12 @@ const report = {
     total_rendered_kb: +(totalRendered / 1024).toFixed(1),
     total_gzip_kb: +(totalGzip / 1024).toFixed(1),
     total_brotli_kb: +(totalBrotli / 1024).toFixed(1),
+    initial_chunk: initialChunkName,
+    initial_chunk_rendered_kb: initialChunkRenderedKb,
+    initial_chunk_gzip_kb: initialChunkGzipKb,
+    baseline_date: BASELINE_DATE,
+    target_initial_chunk_rendered_kb: TARGET_INITIAL_CHUNK_RENDERED_KB,
+    passes_initial_budget: initialChunkRenderedKb <= TARGET_INITIAL_CHUNK_RENDERED_KB,
     largest_chunk: largest,
     number_of_chunks: sortedChunks.length,
     top_dependencies: dependencyBreakdown.filter(d => d.name !== 'other').slice(0, 10),

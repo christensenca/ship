@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import EmojiPicker, { Theme, EmojiClickData } from 'emoji-picker-react';
+import type { Theme } from 'emoji-picker-react';
 import { cn } from '@/lib/cn';
 
 interface EmojiPickerPopoverProps {
@@ -11,11 +11,18 @@ interface EmojiPickerPopoverProps {
 
 export function EmojiPickerPopover({ value, onChange, children, className }: EmojiPickerPopoverProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [emojiModule, setEmojiModule] = useState<null | typeof import('emoji-picker-react')>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Close on click outside
   useEffect(() => {
     if (!isOpen) return;
+
+    if (!emojiModule) {
+      void import('emoji-picker-react').then((mod) => {
+        setEmojiModule(mod);
+      });
+    }
 
     const handleClickOutside = (e: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
@@ -25,7 +32,7 @@ export function EmojiPickerPopover({ value, onChange, children, className }: Emo
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [isOpen]);
+  }, [emojiModule, isOpen]);
 
   // Close on escape
   useEffect(() => {
@@ -41,10 +48,13 @@ export function EmojiPickerPopover({ value, onChange, children, className }: Emo
     return () => document.removeEventListener('keydown', handleEscape);
   }, [isOpen]);
 
-  const handleEmojiClick = (emojiData: EmojiClickData) => {
+  const handleEmojiClick = (emojiData: { emoji: string }) => {
     onChange(emojiData.emoji);
     setIsOpen(false);
   };
+
+  const EmojiPicker = emojiModule?.default;
+  const theme = emojiModule?.Theme?.DARK ?? ('dark' as Theme);
 
   const handleClear = () => {
     onChange(null);
@@ -73,15 +83,21 @@ export function EmojiPickerPopover({ value, onChange, children, className }: Emo
                 Remove emoji
               </button>
             )}
-            <EmojiPicker
-              onEmojiClick={handleEmojiClick}
-              skinTonesDisabled={true}
-              theme={Theme.DARK}
-              height={350}
-              width={300}
-              searchPlaceholder="Search emoji..."
-              previewConfig={{ showPreview: false }}
-            />
+            {EmojiPicker ? (
+              <EmojiPicker
+                onEmojiClick={handleEmojiClick}
+                skinTonesDisabled={true}
+                theme={theme}
+                height={350}
+                width={300}
+                searchPlaceholder="Search emoji..."
+                previewConfig={{ showPreview: false }}
+              />
+            ) : (
+              <div className="flex h-[350px] w-[300px] items-center justify-center text-sm text-muted">
+                Loading emoji picker...
+              </div>
+            )}
           </div>
         </div>
       )}
