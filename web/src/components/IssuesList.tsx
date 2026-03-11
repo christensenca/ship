@@ -453,7 +453,7 @@ export function IssuesList({
   }, [bulkUpdate, showToast, clearUndoState]);
 
   // Cleanup timeout on unmount
-  useEffect(() => {
+  useEffect((): (() => void) => {
     return (): void => {
       if (undoTimeoutRef.current) {
         clearTimeout(undoTimeoutRef.current);
@@ -480,7 +480,7 @@ export function IssuesList({
   const [, forceUpdate] = useState(0);
 
   // Persist selection changes to context
-  useEffect(() => {
+  useEffect((): void => {
     if (selectionPersistenceKey && selectionPersistence) {
       selectionPersistence.setSelection(selectionPersistenceKey, {
         selectedIds,
@@ -490,14 +490,14 @@ export function IssuesList({
   }, [selectedIds, selectionPersistenceKey, selectionPersistence]);
 
   // Sync state filter with external state (when not using URL sync)
-  useEffect(() => {
+  useEffect((): void => {
     if (!stateUrlParam) {
       setStateFilter(initialStateFilter);
     }
   }, [initialStateFilter, stateUrlParam]);
 
   // Sync state filter from URL (when using URL sync)
-  useEffect(() => {
+  useEffect((): void => {
     if (stateUrlParam) {
       const urlValue = searchParams.get(stateUrlParam) ?? '';
       if (urlValue !== stateFilter) {
@@ -507,7 +507,7 @@ export function IssuesList({
   }, [searchParams, stateUrlParam, stateFilter]);
 
   // Compute unique programs from issues for the filter dropdown
-  const programOptions = useMemo(() => {
+  const programOptions = useMemo((): Array<{ value: string; label: string }> => {
     const programMap = new Map<string, string>();
     issues.forEach((issue): void => {
       const programId = getProgramId(issue);
@@ -517,12 +517,12 @@ export function IssuesList({
       }
     });
     return Array.from(programMap.entries())
-      .map(([id, name]) => ({ value: id, label: name }))
+      .map(([id, name]): { value: string; label: string } => ({ value: id, label: name }))
       .sort((a, b): number => a.label.localeCompare(b.label));
   }, [issues]);
 
   // Compute unique projects from issues for the filter dropdown
-  const projectOptions = useMemo(() => {
+  const projectOptions = useMemo((): Array<{ value: string; label: string }> => {
     const projectMap = new Map<string, string>();
     issues.forEach((issue): void => {
       const projectId = getProjectId(issue);
@@ -532,12 +532,12 @@ export function IssuesList({
       }
     });
     return Array.from(projectMap.entries())
-      .map(([id, name]) => ({ value: id, label: name }))
+      .map(([id, name]): { value: string; label: string } => ({ value: id, label: name }))
       .sort((a, b): number => a.label.localeCompare(b.label));
   }, [issues]);
 
   // Compute unique sprints from issues for the filter dropdown
-  const sprintOptions = useMemo(() => {
+  const sprintOptions = useMemo((): Array<{ value: string; label: string }> => {
     const sprintMap = new Map<string, string>();
     issues.forEach((issue): void => {
       const sprintId = getSprintId(issue);
@@ -547,7 +547,7 @@ export function IssuesList({
       }
     });
     return Array.from(sprintMap.entries())
-      .map(([id, name]) => ({ value: id, label: name }))
+      .map(([id, name]): { value: string; label: string } => ({ value: id, label: name }))
       .sort((a, b): number => a.label.localeCompare(b.label));
   }, [issues]);
 
@@ -668,7 +668,7 @@ export function IssuesList({
 
   // Clear selection when filter changes (but not on initial mount to preserve persisted selection)
   const prevStateFilterRef = useRef(stateFilter);
-  useEffect(() => {
+  useEffect((): void => {
     if (prevStateFilterRef.current !== stateFilter) {
       clearSelection();
       prevStateFilterRef.current = stateFilter;
@@ -916,8 +916,8 @@ export function IssuesList({
         setIsConverting(false);
         setConvertingIssue(null);
       }
-    } catch (err) {
-      console.error('Failed to convert issue:', err);
+    } catch (error) {
+      console.error('Failed to convert issue:', error);
       showToast('Failed to convert issue to project', 'error');
       setIsConverting(false);
       setConvertingIssue(null);
@@ -928,7 +928,7 @@ export function IssuesList({
   const handleSelectionChange = useCallback((newSelectedIds: Set<string>, newSelection: UseSelectionReturn): void => {
     setSelectedIds(newSelectedIds);
     selectionRef.current = newSelection;
-    forceUpdate((n): number => n + 1);
+    forceUpdate((count: number): number => count + 1);
   }, []);
 
   // Global keyboard navigation for j/k and Enter
@@ -955,7 +955,7 @@ export function IssuesList({
   }, []);
 
   // Kanban context menu handler
-  const handleKanbanContextMenu = useCallback((event: { x: number; y: number; issueId: string }) => {
+  const handleKanbanContextMenu = useCallback((event: { x: number; y: number; issueId: string }): void => {
     if (!selectedIds.has(event.issueId)) {
       setSelectedIds(new Set([event.issueId]));
     }
@@ -983,7 +983,7 @@ export function IssuesList({
   }, [selectedIds]);
 
   // Context menu handler for SelectableList
-  const handleContextMenu = useCallback((e: React.MouseEvent, _item: Issue, selection: UseSelectionReturn) => {
+  const handleContextMenu = useCallback((e: React.MouseEvent, _item: Issue, selection: UseSelectionReturn): void => {
     selectionRef.current = selection;
     setContextMenu({ x: e.clientX, y: e.clientY, selection });
   }, []);
@@ -1155,7 +1155,7 @@ export function IssuesList({
               {/* Add from Backlog button - text collapses on small screens */}
               {showBacklogPicker && (effectiveContext.sprintId || effectiveContext.projectId || effectiveContext.programId) && (
                 <button
-                  onClick={() => setIsBacklogPickerOpen(true)}
+                  onClick={(): void => setIsBacklogPickerOpen(true)}
                   className="rounded-md border border-border px-2 py-1.5 text-sm text-muted hover:text-foreground hover:bg-border/30 transition-colors flex items-center gap-1.5 flex-shrink-0"
                   title="Add from Backlog"
                 >
@@ -1168,7 +1168,7 @@ export function IssuesList({
               {/* Show All Issues toggle - text collapses on small screens */}
               {allowShowAllIssues && shouldSelfFetch && (
                 <button
-                  onClick={() => setShowAllIssues(!showAllIssues)}
+                  onClick={(): void => setShowAllIssues(!showAllIssues)}
                   className={cn(
                     "rounded-md border px-2 py-1.5 text-sm transition-colors flex items-center gap-1.5 flex-shrink-0",
                     showAllIssues
@@ -1245,7 +1245,7 @@ export function IssuesList({
             renderRow={renderIssueRow}
             columns={columns}
             emptyState={emptyState || defaultEmptyState}
-            onItemClick={(issue) => navigate(`/documents/${issue.id}`)}
+            onItemClick={(issue: Issue): void => { void navigate(`/documents/${issue.id}`); }}
             onSelectionChange={handleSelectionChange}
             onContextMenu={handleContextMenu}
             ariaLabel="Issues list"
@@ -1256,7 +1256,7 @@ export function IssuesList({
 
       {/* Context Menu */}
       {contextMenu && (
-        <ContextMenu x={contextMenu.x} y={contextMenu.y} onClose={() => setContextMenu(null)}>
+        <ContextMenu x={contextMenu.x} y={contextMenu.y} onClose={(): void => setContextMenu(null)}>
           <div className="px-3 py-1.5 text-xs text-muted border-b border-border mb-1">
             {Math.max(1, contextMenu.selection.selectedCount)} selected
           </div>
@@ -1265,13 +1265,13 @@ export function IssuesList({
             Archive
           </ContextMenuItem>
           <ContextMenuSubmenu label="Change Status">
-            <ContextMenuItem onClick={() => handleBulkChangeStatus('backlog')}>Backlog</ContextMenuItem>
-            <ContextMenuItem onClick={() => handleBulkChangeStatus('todo')}>Todo</ContextMenuItem>
-            <ContextMenuItem onClick={() => handleBulkChangeStatus('in_progress')}>In Progress</ContextMenuItem>
-            <ContextMenuItem onClick={() => handleBulkChangeStatus('done')}>Done</ContextMenuItem>
+            <ContextMenuItem onClick={(): void => handleBulkChangeStatus('backlog')}>Backlog</ContextMenuItem>
+            <ContextMenuItem onClick={(): void => handleBulkChangeStatus('todo')}>Todo</ContextMenuItem>
+            <ContextMenuItem onClick={(): void => handleBulkChangeStatus('in_progress')}>In Progress</ContextMenuItem>
+            <ContextMenuItem onClick={(): void => handleBulkChangeStatus('done')}>Done</ContextMenuItem>
           </ContextMenuSubmenu>
           <ContextMenuSubmenu label="Move to Week">
-            <ContextMenuItem onClick={() => handleBulkMoveToSprint(null)}>No Week</ContextMenuItem>
+            <ContextMenuItem onClick={(): void => handleBulkMoveToSprint(null)}>No Week</ContextMenuItem>
           </ContextMenuSubmenu>
           {showPromoteToProject && contextMenu.selection.selectedCount === 1 && (
             <>
@@ -1298,7 +1298,7 @@ export function IssuesList({
       {convertingIssue && (
         <ConversionDialog
           isOpen={!!convertingIssue}
-          onClose={() => setConvertingIssue(null)}
+          onClose={(): void => setConvertingIssue(null)}
           onConvert={executeConversion}
           sourceType="issue"
           title={convertingIssue.title}
@@ -1310,13 +1310,13 @@ export function IssuesList({
       {showBacklogPicker && (
         <BacklogPickerModal
           isOpen={isBacklogPickerOpen}
-          onClose={() => setIsBacklogPickerOpen(false)}
+          onClose={(): void => setIsBacklogPickerOpen(false)}
           context={{
             sprintId: effectiveContext.sprintId,
             projectId: effectiveContext.projectId,
             programId: effectiveContext.programId,
           }}
-          onIssuesAdded={() => {
+          onIssuesAdded={(): void => {
             // Invalidate queries to refresh the issues list
             queryClient.invalidateQueries({ queryKey: issueKeys.all });
             if (effectiveContext.sprintId) {
