@@ -4,6 +4,15 @@ import { apiGet, apiPost, apiPatch, apiDelete } from '@/lib/api';
 
 type ApiError = Error & { status: number };
 type SprintsQueryKey = QueryKey;
+type SprintsAllKey = readonly ['sprints'];
+type SprintsListKey = readonly ['sprints', 'list'];
+type SprintsProgramListKey = readonly ['sprints', 'list', string];
+type SprintsProjectListKey = readonly ['sprints', 'projectList'];
+type SprintsProjectKey = readonly ['sprints', 'projectList', string];
+type SprintsActiveKey = readonly ['sprints', 'active'];
+type SprintsDetailsKey = readonly ['sprints', 'detail'];
+type SprintsDetailKey = readonly ['sprints', 'detail', string];
+const allSprintKey: SprintsAllKey = ['sprints'];
 
 interface CreateSprintContext {
   previousData?: SprintsResponse;
@@ -75,14 +84,14 @@ export interface SprintsResponse {
 
 // Query keys
 export const sprintKeys = {
-  all: ['sprints'] as const,
-  lists: (): SprintsQueryKey => [...sprintKeys.all, 'list'] as const,
-  list: (programId: string): SprintsQueryKey => [...sprintKeys.lists(), programId] as const,
-  projectLists: (): SprintsQueryKey => [...sprintKeys.all, 'projectList'] as const,
-  projectList: (projectId: string): SprintsQueryKey => [...sprintKeys.projectLists(), projectId] as const,
-  active: (): SprintsQueryKey => [...sprintKeys.all, 'active'] as const,
-  details: (): SprintsQueryKey => [...sprintKeys.all, 'detail'] as const,
-  detail: (id: string): SprintsQueryKey => [...sprintKeys.details(), id] as const,
+  all: allSprintKey,
+  lists: (): SprintsListKey => ['sprints', 'list'],
+  list: (programId: string): SprintsProgramListKey => ['sprints', 'list', programId],
+  projectLists: (): SprintsProjectListKey => ['sprints', 'projectList'],
+  projectList: (projectId: string): SprintsProjectKey => ['sprints', 'projectList', projectId],
+  active: (): SprintsActiveKey => ['sprints', 'active'],
+  details: (): SprintsDetailsKey => ['sprints', 'detail'],
+  detail: (id: string): SprintsDetailKey => ['sprints', 'detail', id],
 };
 
 // Extended Sprint type for active sprints endpoint
@@ -102,13 +111,15 @@ export interface ActiveWeeksResponse {
   sprint_end_date: string;
 }
 
+function createApiError(message: string, status: number): ApiError {
+  return Object.assign(new Error(message), { status });
+}
+
 // Fetch all active sprints across workspace
 async function fetchActiveWeeks(): Promise<ActiveWeeksResponse> {
   const res = await apiGet('/api/weeks');
   if (!res.ok) {
-    const error = new Error('Failed to fetch active sprints') as ApiError;
-    error.status = res.status;
-    throw error;
+    throw createApiError('Failed to fetch active sprints', res.status);
   }
   return res.json();
 }
@@ -126,9 +137,7 @@ export function useActiveWeeksQuery(): UseQueryResult<ActiveWeeksResponse, ApiEr
 async function fetchSprints(programId: string): Promise<SprintsResponse> {
   const res = await apiGet(`/api/programs/${programId}/sprints`);
   if (!res.ok) {
-    const error = new Error('Failed to fetch sprints') as ApiError;
-    error.status = res.status;
-    throw error;
+    throw createApiError('Failed to fetch sprints', res.status);
   }
   return res.json();
 }
@@ -144,9 +153,7 @@ interface CreateSprintData {
 async function createSprintApi(data: CreateSprintData): Promise<Sprint> {
   const res = await apiPost('/api/weeks', data);
   if (!res.ok) {
-    const error = new Error('Failed to create sprint') as ApiError;
-    error.status = res.status;
-    throw error;
+    throw createApiError('Failed to create sprint', res.status);
   }
   return res.json();
 }
@@ -155,9 +162,7 @@ async function createSprintApi(data: CreateSprintData): Promise<Sprint> {
 async function updateSprintApi(id: string, updates: Partial<Sprint> & { owner_id?: string }): Promise<Sprint> {
   const res = await apiPatch(`/api/weeks/${id}`, updates);
   if (!res.ok) {
-    const error = new Error('Failed to update sprint') as ApiError;
-    error.status = res.status;
-    throw error;
+    throw createApiError('Failed to update sprint', res.status);
   }
   return res.json();
 }
@@ -166,9 +171,7 @@ async function updateSprintApi(id: string, updates: Partial<Sprint> & { owner_id
 async function deleteSprintApi(id: string): Promise<void> {
   const res = await apiDelete(`/api/weeks/${id}`);
   if (!res.ok) {
-    const error = new Error('Failed to delete sprint') as ApiError;
-    error.status = res.status;
-    throw error;
+    throw createApiError('Failed to delete sprint', res.status);
   }
 }
 
@@ -453,9 +456,7 @@ export interface ProjectSprint extends Sprint {
 async function fetchProjectSprints(projectId: string): Promise<ProjectSprint[]> {
   const res = await apiGet(`/api/projects/${projectId}/sprints`);
   if (!res.ok) {
-    const error = new Error('Failed to fetch project sprints') as ApiError;
-    error.status = res.status;
-    throw error;
+    throw createApiError('Failed to fetch project sprints', res.status);
   }
   return res.json();
 }

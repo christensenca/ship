@@ -36,6 +36,7 @@
     "report:type-safety": "node scripts/type-safety-report.mjs",
     "report:type-safety:snapshot": "node scripts/type-safety-snapshot.mjs",
     "report:type-safety:compare": "node scripts/type-safety-compare.mjs",
+    "report:type-safety:charts": "node scripts/type-safety-charts.mjs",
     "report:type-safety:baseline": "node scripts/type-safety-baseline.mjs",
     "report:api-latency": "node scripts/api-latency-report.mjs",
     "report:db-efficiency": "pnpm --filter @ship/api exec node --import tsx/esm ../scripts/db-query-efficiency-report.mjs",

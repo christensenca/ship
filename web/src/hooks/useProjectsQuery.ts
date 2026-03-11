@@ -5,6 +5,14 @@ import { computeICEScore } from '@ship/shared';
 
 type ApiError = Error & { status: number };
 type ProjectsQueryKey = QueryKey;
+type ProjectsAllKey = readonly ['projects'];
+type ProjectsListKey = readonly ['projects', 'list'];
+type ProjectsFilteredListKey = readonly ['projects', 'list', Record<string, unknown> | undefined];
+type ProjectsDetailsKey = readonly ['projects', 'detail'];
+type ProjectsDetailKey = readonly ['projects', 'detail', string];
+type ProjectsIssuesKey = readonly ['projects', 'detail', string, 'issues'];
+type ProjectsWeeksKey = readonly ['projects', 'detail', string, 'weeks'];
+const allProjectKey: ProjectsAllKey = ['projects'];
 
 interface CreateProjectContext {
   previousProjects?: Project[];
@@ -108,24 +116,26 @@ export interface ProjectWeek {
   days_remaining: number | null;
 }
 
+function createApiError(message: string, status: number): ApiError {
+  return Object.assign(new Error(message), { status });
+}
+
 // Query keys
 export const projectKeys = {
-  all: ['projects'] as const,
-  lists: (): ProjectsQueryKey => [...projectKeys.all, 'list'] as const,
-  list: (filters?: Record<string, unknown>): ProjectsQueryKey => [...projectKeys.lists(), filters] as const,
-  details: (): ProjectsQueryKey => [...projectKeys.all, 'detail'] as const,
-  detail: (id: string): ProjectsQueryKey => [...projectKeys.details(), id] as const,
-  issues: (id: string): ProjectsQueryKey => [...projectKeys.detail(id), 'issues'] as const,
-  weeks: (id: string): ProjectsQueryKey => [...projectKeys.detail(id), 'weeks'] as const,
+  all: allProjectKey,
+  lists: (): ProjectsListKey => ['projects', 'list'],
+  list: (filters?: Record<string, unknown>): ProjectsFilteredListKey => ['projects', 'list', filters],
+  details: (): ProjectsDetailsKey => ['projects', 'detail'],
+  detail: (id: string): ProjectsDetailKey => ['projects', 'detail', id],
+  issues: (id: string): ProjectsIssuesKey => ['projects', 'detail', id, 'issues'],
+  weeks: (id: string): ProjectsWeeksKey => ['projects', 'detail', id, 'weeks'],
 };
 
 // Fetch projects
 async function fetchProjects(): Promise<Project[]> {
   const res = await apiGet('/api/projects');
   if (!res.ok) {
-    const error = new Error('Failed to fetch projects') as ApiError;
-    error.status = res.status;
-    throw error;
+    throw createApiError('Failed to fetch projects', res.status);
   }
   return res.json();
 }
@@ -149,9 +159,7 @@ interface CreateProjectData {
 async function createProjectApi(data: CreateProjectData): Promise<Project> {
   const res = await apiPost('/api/projects', data);
   if (!res.ok) {
-    const error = new Error('Failed to create project') as ApiError;
-    error.status = res.status;
-    throw error;
+    throw createApiError('Failed to create project', res.status);
   }
   return res.json();
 }
@@ -160,9 +168,7 @@ async function createProjectApi(data: CreateProjectData): Promise<Project> {
 async function updateProjectApi(id: string, updates: Partial<Project>): Promise<Project> {
   const res = await apiPatch(`/api/projects/${id}`, updates);
   if (!res.ok) {
-    const error = new Error('Failed to update project') as ApiError;
-    error.status = res.status;
-    throw error;
+    throw createApiError('Failed to update project', res.status);
   }
   return res.json();
 }
@@ -171,9 +177,7 @@ async function updateProjectApi(id: string, updates: Partial<Project>): Promise<
 async function deleteProjectApi(id: string): Promise<void> {
   const res = await apiDelete(`/api/projects/${id}`);
   if (!res.ok) {
-    const error = new Error('Failed to delete project') as ApiError;
-    error.status = res.status;
-    throw error;
+    throw createApiError('Failed to delete project', res.status);
   }
 }
 
@@ -386,9 +390,7 @@ export function useProjects(): UseProjectsResult {
 async function fetchProjectIssues(projectId: string): Promise<ProjectIssue[]> {
   const res = await apiGet(`/api/projects/${projectId}/issues`);
   if (!res.ok) {
-    const error = new Error('Failed to fetch project issues') as ApiError;
-    error.status = res.status;
-    throw error;
+    throw createApiError('Failed to fetch project issues', res.status);
   }
   return res.json();
 }
@@ -412,9 +414,7 @@ export function useProjectIssuesQuery(projectId: string | undefined): UseQueryRe
 async function fetchProjectWeeks(projectId: string): Promise<ProjectWeek[]> {
   const res = await apiGet(`/api/projects/${projectId}/weeks`);
   if (!res.ok) {
-    const error = new Error('Failed to fetch project weeks') as ApiError;
-    error.status = res.status;
-    throw error;
+    throw createApiError('Failed to fetch project weeks', res.status);
   }
   return res.json();
 }

@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "generated_at": "2026-03-11T20:16:22.446Z",
+  "generated_at": "2026-03-11T20:34:19.141Z",
   "strict_mode": {
     "enabled": true,
     "by_config": {
@@ -25,25 +25,25 @@
     "strict_error_count_total_if_disabled": null
   },
   "totals": {
-    "overall": 5816,
-    "production_only": 4155,
+    "overall": 5742,
+    "production_only": 4081,
     "tests_only": 1661,
     "by_violation_type": {
       "explicit_any": 251,
-      "type_assertion_as": 687,
+      "type_assertion_as": 620,
       "non_null_assertion": 247,
       "ts_comment_directive": 1,
       "untyped_parameter": 1137,
-      "missing_return_type": 3493
+      "missing_return_type": 3486
     },
     "by_scope": {
       "production_only": {
         "explicit_any": 74,
-        "type_assertion_as": 500,
+        "type_assertion_as": 433,
         "non_null_assertion": 243,
         "ts_comment_directive": 0,
         "untyped_parameter": 1065,
-        "missing_return_type": 2273
+        "missing_return_type": 2266
       },
       "tests_only": {
         "explicit_any": 177,
@@ -66,11 +66,11 @@
     },
     "web": {
       "explicit_any": 25,
-      "type_assertion_as": 363,
+      "type_assertion_as": 296,
       "non_null_assertion": 28,
       "ts_comment_directive": 1,
       "untyped_parameter": 848,
-      "missing_return_type": 2303
+      "missing_return_type": 2296
     },
     "shared": {
       "explicit_any": 0,
@@ -293,20 +293,6 @@
       }
     },
     {
-      "file": "web/src/hooks/useProgramsQuery.ts",
-      "package": "web",
-      "is_test_like": false,
-      "total": 67,
-      "counts": {
-        "explicit_any": 0,
-        "type_assertion_as": 9,
-        "non_null_assertion": 0,
-        "ts_comment_directive": 0,
-        "untyped_parameter": 26,
-        "missing_return_type": 32
-      }
-    },
-    {
       "file": "api/src/routes/issues-history.test.ts",
       "package": "api",
       "is_test_like": true,
@@ -430,6 +416,20 @@
         "ts_comment_directive": 0,
         "untyped_parameter": 14,
         "missing_return_type": 14
+      }
+    },
+    {
+      "file": "web/src/hooks/useProgramsQuery.ts",
+      "package": "web",
+      "is_test_like": false,
+      "total": 54,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 26,
+        "missing_return_type": 28
       }
     },
     {
@@ -1343,20 +1343,6 @@
       }
     },
     {
-      "file": "web/src/hooks/useWeeklyReviewActions.ts",
-      "package": "web",
-      "is_test_like": false,
-      "total": 25,
-      "counts": {
-        "explicit_any": 0,
-        "type_assertion_as": 11,
-        "non_null_assertion": 0,
-        "ts_comment_directive": 0,
-        "untyped_parameter": 0,
-        "missing_return_type": 14
-      }
-    },
-    {
       "file": "api/src/collaboration/__tests__/api-content-preservation.test.ts",
       "package": "api",
       "is_test_like": true,
@@ -1987,20 +1973,6 @@
       }
     },
     {
-      "file": "web/src/hooks/useWeeksQuery.ts",
-      "package": "web",
-      "is_test_like": false,
-      "total": 14,
-      "counts": {
-        "explicit_any": 0,
-        "type_assertion_as": 14,
-        "non_null_assertion": 0,
-        "ts_comment_directive": 0,
-        "untyped_parameter": 0,
-        "missing_return_type": 0
-      }
-    },
-    {
       "file": "api/src/routes/comments.ts",
       "package": "api",
       "is_test_like": false,
@@ -2040,34 +2012,6 @@
         "ts_comment_directive": 0,
         "untyped_parameter": 5,
         "missing_return_type": 8
-      }
-    },
-    {
-      "file": "web/src/hooks/useIssuesQuery.ts",
-      "package": "web",
-      "is_test_like": false,
-      "total": 13,
-      "counts": {
-        "explicit_any": 0,
-        "type_assertion_as": 13,
-        "non_null_assertion": 0,
-        "ts_comment_directive": 0,
-        "untyped_parameter": 0,
-        "missing_return_type": 0
-      }
-    },
-    {
-      "file": "web/src/hooks/useProjectsQuery.ts",
-      "package": "web",
-      "is_test_like": false,
-      "total": 13,
-      "counts": {
-        "explicit_any": 0,
-        "type_assertion_as": 13,
-        "non_null_assertion": 0,
-        "ts_comment_directive": 0,
-        "untyped_parameter": 0,
-        "missing_return_type": 0
       }
     },
     {
@@ -2320,6 +2264,20 @@
         "ts_comment_directive": 0,
         "untyped_parameter": 0,
         "missing_return_type": 7
+      }
+    },
+    {
+      "file": "web/src/hooks/useWeeklyReviewActions.ts",
+      "package": "web",
+      "is_test_like": false,
+      "total": 11,
+      "counts": {
+        "explicit_any": 0,
+        "type_assertion_as": 0,
+        "non_null_assertion": 0,
+        "ts_comment_directive": 0,
+        "untyped_parameter": 0,
+        "missing_return_type": 11
       }
     },
     {
@@ -2740,20 +2698,6 @@
         "ts_comment_directive": 0,
         "untyped_parameter": 0,
         "missing_return_type": 3
-      }
-    },
-    {
-      "file": "web/src/hooks/useDocumentsQuery.ts",
-      "package": "web",
-      "is_test_like": false,
-      "total": 7,
-      "counts": {
-        "explicit_any": 0,
-        "type_assertion_as": 7,
-        "non_null_assertion": 0,
-        "ts_comment_directive": 0,
-        "untyped_parameter": 0,
-        "missing_return_type": 0
       }
     },
     {
@@ -3880,14 +3824,14 @@
     }
   ],
   "delta_from_previous": {
-    "overall": -5,
+    "overall": -13,
     "by_violation_type": {
       "explicit_any": 0,
-      "type_assertion_as": 0,
+      "type_assertion_as": -9,
       "non_null_assertion": 0,
       "ts_comment_directive": 0,
       "untyped_parameter": 0,
-      "missing_return_type": -5
+      "missing_return_type": -4
     },
     "status_band": "Stable"
   },

@@ -39,20 +39,20 @@ interface MutationContext {
   previousDocs?: WikiDocument[];
 }
 
+const allDocumentKey: readonly ['documents'] = ['documents'];
+
 function createHttpError(message: string, status: number): HttpError {
-  const error = new Error(message) as HttpError;
-  error.status = status;
-  return error;
+  return Object.assign(new Error(message), { status });
 }
 
 // Query keys
 export const documentKeys = {
-  all: ['documents'] as const,
-  lists: (): readonly ['documents', 'list'] => [...documentKeys.all, 'list'] as const,
-  list: (type: string): readonly ['documents', 'list', string] => [...documentKeys.lists(), type] as const,
-  wikiList: (): readonly ['documents', 'wiki'] => [...documentKeys.all, 'wiki'] as const,
-  details: (): readonly ['documents', 'detail'] => [...documentKeys.all, 'detail'] as const,
-  detail: (id: string): readonly ['documents', 'detail', string] => [...documentKeys.details(), id] as const,
+  all: allDocumentKey,
+  lists: (): readonly ['documents', 'list'] => ['documents', 'list'],
+  list: (type: string): readonly ['documents', 'list', string] => ['documents', 'list', type],
+  wikiList: (): readonly ['documents', 'wiki'] => ['documents', 'wiki'],
+  details: (): readonly ['documents', 'detail'] => ['documents', 'detail'],
+  detail: (id: string): readonly ['documents', 'detail', string] => ['documents', 'detail', id],
 };
 
 // Fetch documents

@@ -1,16 +1,16 @@
 # Type Safety Audit Report
 
-Generated: 2026-03-11T20:16:22.446Z
+Generated: 2026-03-11T20:34:19.141Z
 
 ## Summary
 
 | Metric | Baseline |
 |---|---|
-| Total violations | 5816 |
-| Production-only violations | 4155 |
+| Total violations | 5742 |
+| Production-only violations | 4081 |
 | Test-only violations | 1661 |
 | Total any types | 251 |
-| Total type assertions (as) | 687 |
+| Total type assertions (as) | 620 |
 | Total non-null assertions (!) | 247 |
 | Total @ts-ignore / @ts-expect-error | 1 |
 | Strict mode enabled? | Yes |
@@ -20,15 +20,15 @@ Generated: 2026-03-11T20:16:22.446Z
 ## Trend Status
 
 - Status: **Stable**
-- Total violations: 5816
-- Delta from previous: -5
+- Total violations: 5742
+- Delta from previous: -13
 
 ## Package Breakdown
 
 | Package | explicit_any | type_assertion_as | non_null_assertion | ts_comment_directive | untyped_parameter | missing_return_type | total |
 |---|---:|---:|---:|---:|---:|---:|---:|
 | api | 226 | 322 | 219 | 0 | 289 | 1190 | 2246 |
-| web | 25 | 363 | 28 | 1 | 848 | 2303 | 3568 |
+| web | 25 | 296 | 28 | 1 | 848 | 2296 | 3494 |
 | shared | 0 | 2 | 0 | 0 | 0 | 0 | 2 |
 
 ## Top 5 Violation-Dense Files

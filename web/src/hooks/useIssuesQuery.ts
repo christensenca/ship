@@ -5,6 +5,12 @@ import type { CascadeWarning, IncompleteChild, BelongsTo, BelongsToType } from '
 
 type ApiError = Error & { status: number };
 type IssuesQueryKey = QueryKey;
+type IssuesAllKey = readonly ['issues'];
+type IssuesListKey = readonly ['issues', 'list'];
+type IssuesFilteredListKey = readonly ['issues', 'list', IssueFilters | undefined];
+type IssuesDetailsKey = readonly ['issues', 'detail'];
+type IssuesDetailKey = readonly ['issues', 'detail', string];
+const allIssueKey: IssuesAllKey = ['issues'];
 
 interface CreateIssueContext {
   previousIssues?: Issue[];
@@ -126,23 +132,46 @@ export interface IssueFilters {
   sprintId?: string;
 }
 
+interface ApiIssueShape extends Omit<Issue, 'belongs_to'> {
+  belongs_to?: BelongsTo[];
+}
+
+interface CascadeWarningResponse {
+  error?: string;
+  message?: string;
+  incomplete_children?: IncompleteChild[];
+  confirm_action?: string;
+}
+
+function createApiError(message: string, status: number): ApiError {
+  return Object.assign(new Error(message), { status });
+}
+
+function isCascadeWarningResponse(value: CascadeWarningResponse): value is CascadeWarning {
+  return (
+    value.error === 'incomplete_children' &&
+    typeof value.message === 'string' &&
+    Array.isArray(value.incomplete_children) &&
+    typeof value.confirm_action === 'string'
+  );
+}
+
 // Query keys
 export const issueKeys = {
-  all: ['issues'] as const,
-  lists: (): IssuesQueryKey => [...issueKeys.all, 'list'] as const,
-  list: (filters?: IssueFilters): IssuesQueryKey => [...issueKeys.lists(), filters] as const,
-  details: (): IssuesQueryKey => [...issueKeys.all, 'detail'] as const,
-  detail: (id: string): IssuesQueryKey => [...issueKeys.details(), id] as const,
+  all: allIssueKey,
+  lists: (): IssuesListKey => ['issues', 'list'],
+  list: (filters?: IssueFilters): IssuesFilteredListKey => ['issues', 'list', filters],
+  details: (): IssuesDetailsKey => ['issues', 'detail'],
+  detail: (id: string): IssuesDetailKey => ['issues', 'detail', id],
 };
 
 // Transform API issue response to Issue type
-function transformIssue(apiIssue: Record<string, unknown>): Issue {
-  const belongs_to = (apiIssue.belongs_to as BelongsTo[]) || [];
-
+function transformIssue(apiIssue: ApiIssueShape): Issue {
+  const belongs_to = apiIssue.belongs_to ?? [];
   return {
     ...apiIssue,
     belongs_to,
-  } as Issue;
+  };
 }
 
 // Fetch issues with optional filters
@@ -157,12 +186,10 @@ async function fetchIssues(filters?: IssueFilters): Promise<Issue[]> {
 
   const res = await apiGet(url);
   if (!res.ok) {
-    const error = new Error('Failed to fetch issues') as ApiError;
-    error.status = res.status;
-    throw error;
+    throw createApiError('Failed to fetch issues', res.status);
   }
-  const data = await res.json();
-  let issues = (data as Record<string, unknown>[]).map(transformIssue);
+  const data: ApiIssueShape[] = await res.json();
+  let issues = data.map(transformIssue);
 
   // Client-side filter for projectId (API doesn't support direct project_id param)
   if (filters?.projectId) {
@@ -189,11 +216,9 @@ async function createIssueApi(data: CreateIssueData): Promise<Issue> {
 
   const res = await apiPost('/api/issues', apiData);
   if (!res.ok) {
-    const error = new Error('Failed to create issue') as ApiError;
-    error.status = res.status;
-    throw error;
+    throw createApiError('Failed to create issue', res.status);
   }
-  const apiIssue = await res.json();
+  const apiIssue: ApiIssueShape = await res.json();
   return transformIssue(apiIssue);
 }
 
@@ -204,16 +229,14 @@ async function updateIssueApi(id: string, updates: Partial<Issue>): Promise<Issu
   if (!res.ok) {
     // Check for cascade warning (409 with incomplete_children)
     if (res.status === 409) {
-      const body = await res.json();
-      if (body.error === 'incomplete_children') {
-        throw new CascadeWarningError(body as CascadeWarning);
+      const body: CascadeWarningResponse = await res.json();
+      if (isCascadeWarningResponse(body)) {
+        throw new CascadeWarningError(body);
       }
     }
-    const error = new Error('Failed to update issue') as ApiError;
-    error.status = res.status;
-    throw error;
+    throw createApiError('Failed to update issue', res.status);
   }
-  const apiIssue = await res.json();
+  const apiIssue: ApiIssueShape = await res.json();
   return transformIssue(apiIssue);
 }
 
@@ -351,9 +374,7 @@ interface BulkUpdateResponse {
 async function bulkUpdateIssuesApi(data: BulkUpdateRequest): Promise<BulkUpdateResponse> {
   const res = await apiPost('/api/issues/bulk', data);
   if (!res.ok) {
-    const error = new Error('Failed to bulk update issues') as ApiError;
-    error.status = res.status;
-    throw error;
+    throw createApiError('Failed to bulk update issues', res.status);
   }
   return res.json();
 }
