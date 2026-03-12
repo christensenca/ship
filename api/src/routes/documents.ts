@@ -2,13 +2,29 @@ import { Router, Request, Response } from 'express';
 import { pool } from '../db/client.js';
 import { z } from 'zod';
 import { authMiddleware } from '../middleware/auth.js';
-import { isWorkspaceAdmin } from '../middleware/visibility.js';
+import { resolveVisibilityContextFromRequest, isWorkspaceAdmin } from '../middleware/visibility.js';
 import { handleVisibilityChange, handleDocumentConversion, invalidateDocumentCache, broadcastToUser } from '../collaboration/index.js';
 import { extractHypothesisFromContent, extractSuccessCriteriaFromContent, extractVisionFromContent, extractGoalsFromContent, checkDocumentCompleteness } from '../utils/extractHypothesis.js';
 import { loadContentFromYjsState } from '../utils/yjsConverter.js';
+import { measureRequestPerf, measureRequestPerfAsync } from '../middleware/request-performance.js';
 
 type RouterType = ReturnType<typeof Router>;
 const router: RouterType = Router();
+
+type DocumentListRow = {
+  id: string;
+  workspace_id: string;
+  document_type: string;
+  title: string;
+  parent_id: string | null;
+  position: number;
+  ticket_number?: number | null;
+  properties?: Record<string, unknown> | null;
+  created_at: string;
+  updated_at: string;
+  created_by: string | null;
+  visibility: 'private' | 'workspace';
+};
 
 // Check if user can access a document (visibility check)
 async function canAccessDocument(
@@ -96,13 +112,14 @@ router.get('/', authMiddleware, async (req: Request, res: Response) => {
     const { type, parent_id } = req.query;
     const userId = req.userId!;
     const workspaceId = req.workspaceId!;
+    const requestedType = typeof type === 'string' ? type : null;
+    const isWikiList = requestedType === 'wiki';
 
-    // Check if user is admin (admins can see all documents)
-    const isAdmin = await isWorkspaceAdmin(userId, workspaceId);
+    const { isAdmin } = await resolveVisibilityContextFromRequest(req, userId, workspaceId);
 
     let query = `
       SELECT id, workspace_id, document_type, title, parent_id, position,
-             ticket_number, properties,
+             ${isWikiList ? '' : 'ticket_number, properties,'}
              created_at, updated_at, created_by, visibility
       FROM documents
       WHERE workspace_id = $1
@@ -128,14 +145,18 @@ router.get('/', authMiddleware, async (req: Request, res: Response) => {
 
     query += ` ORDER BY position ASC, created_at DESC`;
 
-    const result = await pool.query(query, params);
+    const result = await measureRequestPerfAsync(req, 'db_main', () => pool.query<DocumentListRow>(query, params));
 
-    // Extract properties into flat fields for backwards compatibility
-    const documents = result.rows.map(row => {
+    if (isWikiList) {
+      res.json(result.rows);
+      return;
+    }
+
+    // Extract properties into flat fields for backwards compatibility on non-wiki list usage.
+    const documents = measureRequestPerf(req, 'mapping', () => result.rows.map((row) => {
       const props = row.properties || {};
       return {
         ...row,
-        // Flatten common properties for backwards compatibility
         state: props.state,
         priority: props.priority,
         estimate: props.estimate,
@@ -144,7 +165,7 @@ router.get('/', authMiddleware, async (req: Request, res: Response) => {
         prefix: props.prefix,
         color: props.color,
       };
-    });
+    }));
 
     res.json(documents);
   } catch (err) {

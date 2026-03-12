@@ -1,0 +1,174 @@
+{
+  "generated_at": "2026-03-12T00:58:50.703Z",
+  "baseline": {
+    "label": "baseline-defensible",
+    "generated_at": "2026-03-11T23:59:00.279Z",
+    "path": "/Users/cadechristensen/Source/ship/reports/api-latency/snapshots/2026-03-11T23-59-00-279Z--baseline-defensible.json"
+  },
+  "current": {
+    "label": "current-route-pass",
+    "generated_at": "2026-03-12T00:58:45.215Z",
+    "path": "/Users/cadechristensen/Source/ship/reports/api-latency/snapshots/2026-03-12T00-58-45-215Z--current-route-pass.json"
+  },
+  "gate": {
+    "metric": "p95_ms",
+    "concurrency": 25,
+    "threshold_pct": -20
+  },
+  "c25": [
+    {
+      "path": "/api/documents?type=wiki",
+      "p95_ms": {
+        "label": "p95_ms",
+        "baseline": 57,
+        "current": 47,
+        "delta_ms": -10,
+        "delta_pct": -17.543859649122805
+      },
+      "p99_ms": {
+        "label": "p99_ms",
+        "baseline": 60,
+        "current": 50,
+        "delta_ms": -10,
+        "delta_pct": -16.666666666666664
+      }
+    },
+    {
+      "path": "/api/issues",
+      "p95_ms": {
+        "label": "p95_ms",
+        "baseline": 54,
+        "current": 52,
+        "delta_ms": -2,
+        "delta_pct": -3.7037037037037033
+      },
+      "p99_ms": {
+        "label": "p99_ms",
+        "baseline": 57,
+        "current": 55,
+        "delta_ms": -2,
+        "delta_pct": -3.508771929824561
+      }
+    },
+    {
+      "path": "/api/projects",
+      "p95_ms": {
+        "label": "p95_ms",
+        "baseline": 32,
+        "current": 23,
+        "delta_ms": -9,
+        "delta_pct": -28.125
+      },
+      "p99_ms": {
+        "label": "p99_ms",
+        "baseline": 37,
+        "current": 26,
+        "delta_ms": -11,
+        "delta_pct": -29.72972972972973
+      }
+    },
+    {
+      "path": "/api/programs",
+      "p95_ms": {
+        "label": "p95_ms",
+        "baseline": 24,
+        "current": 17,
+        "delta_ms": -7,
+        "delta_pct": -29.166666666666668
+      },
+      "p99_ms": {
+        "label": "p99_ms",
+        "baseline": 30,
+        "current": 19,
+        "delta_ms": -11,
+        "delta_pct": -36.666666666666664
+      }
+    },
+    {
+      "path": "/api/dashboard/my-week",
+      "p95_ms": {
+        "label": "p95_ms",
+        "baseline": 39,
+        "current": 35,
+        "delta_ms": -4,
+        "delta_pct": -10.256410256410255
+      },
+      "p99_ms": {
+        "label": "p99_ms",
+        "baseline": 42,
+        "current": 38,
+        "delta_ms": -4,
+        "delta_pct": -9.523809523809524
+      }
+    }
+  ],
+  "docs_and_issues_by_concurrency": [
+    {
+      "path": "/api/documents?type=wiki",
+      "concurrency": 10,
+      "p95_ms": {
+        "label": "p95_ms",
+        "baseline": 27,
+        "current": 22,
+        "delta_ms": -5,
+        "delta_pct": -18.51851851851852
+      }
+    },
+    {
+      "path": "/api/documents?type=wiki",
+      "concurrency": 25,
+      "p95_ms": {
+        "label": "p95_ms",
+        "baseline": 57,
+        "current": 47,
+        "delta_ms": -10,
+        "delta_pct": -17.543859649122805
+      }
+    },
+    {
+      "path": "/api/documents?type=wiki",
+      "concurrency": 50,
+      "p95_ms": {
+        "label": "p95_ms",
+        "baseline": 114,
+        "current": 89,
+        "delta_ms": -25,
+        "delta_pct": -21.929824561403507
+      }
+    },
+    {
+      "path": "/api/issues",
+      "concurrency": 10,
+      "p95_ms": {
+        "label": "p95_ms",
+        "baseline": 25,
+        "current": 28,
+        "delta_ms": 3,
+        "delta_pct": 12
+      }
+    },
+    {
+      "path": "/api/issues",
+      "concurrency": 25,
+      "p95_ms": {
+        "label": "p95_ms",
+        "baseline": 54,
+        "current": 52,
+        "delta_ms": -2,
+        "delta_pct": -3.7037037037037033
+      }
+    },
+    {
+      "path": "/api/issues",
+      "concurrency": 50,
+      "p95_ms": {
+        "label": "p95_ms",
+        "baseline": 123,
+        "current": 102,
+        "delta_ms": -21,
+        "delta_pct": -17.073170731707318
+      }
+    }
+  ],
+  "phase_breakdowns": []
+}

@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { pool } from '../db/client.js';
 import { z } from 'zod';
-import { getVisibilityContext, VISIBILITY_FILTER_SQL } from '../middleware/visibility.js';
+import { getVisibilityContext, VISIBILITY_FILTER_SQL, resolveVisibilityContextFromRequest } from '../middleware/visibility.js';
 import { authMiddleware } from '../middleware/auth.js';
 import {
   logDocumentChange,
@@ -12,6 +12,7 @@ import {
   type BelongsToEntry,
 } from '../utils/document-crud.js';
 import { broadcastToUser } from '../collaboration/index.js';
+import { measureRequestPerf, measureRequestPerfAsync } from '../middleware/request-performance.js';
 
 type RouterType = ReturnType<typeof Router>;
 const router: RouterType = Router();
@@ -19,6 +20,64 @@ const router: RouterType = Router();
 type RequestContext = {
   userId: string;
   workspaceId: string;
+};
+
+type IssueRowLike = {
+  id: string;
+  title: string;
+  properties?: Record<string, unknown> | null;
+  state?: string | null;
+  priority?: string | null;
+  assignee_id?: string | null;
+  estimate?: number | null;
+  source?: string | null;
+  rejection_reason?: string | null;
+  due_date?: string | null;
+  is_system_generated?: boolean | null;
+  accountability_target_id?: string | null;
+  accountability_type?: string | null;
+  ticket_number: number;
+  created_at: string;
+  updated_at: string;
+  created_by: string;
+  started_at?: string | null;
+  completed_at?: string | null;
+  cancelled_at?: string | null;
+  reopened_at?: string | null;
+  converted_from_id?: string | null;
+  assignee_name?: string | null;
+  assignee_archived?: boolean | null;
+  created_by_name?: string | null;
+};
+
+type IssueListRow = Omit<IssueRowLike, 'properties'>;
+
+type IssueListResponse = {
+  id: string;
+  title: string;
+  state: string;
+  priority: string;
+  assignee_id: string | null;
+  assignee_name: string | null;
+  assignee_archived: boolean;
+  estimate: number | null;
+  source: string;
+  rejection_reason: string | null;
+  due_date: string | null;
+  is_system_generated: boolean;
+  accountability_target_id: string | null;
+  accountability_type: string | null;
+  ticket_number: number;
+  display_id: string;
+  created_at: string;
+  updated_at: string;
+  created_by: string;
+  started_at: string | null;
+  completed_at: string | null;
+  cancelled_at: string | null;
+  reopened_at: string | null;
+  converted_from_id: string | null;
+  belongs_to: BelongsToEntry[];
 };
 
 function getRequestContext(req: Request): RequestContext {
@@ -92,24 +151,23 @@ const rejectIssueSchema = z.object({
 });
 
 // Helper to extract issue properties from row (without belongs_to - added separately)
-function extractIssueFromRow(row: any): Record<string, unknown> {
+function extractIssueFromRow(row: IssueRowLike): Record<string, unknown> {
   const props = row.properties || {};
   return {
     id: row.id,
     title: row.title,
-    state: props.state || 'backlog',
-    priority: props.priority || 'medium',
-    assignee_id: props.assignee_id || null,
-    estimate: props.estimate ?? null,
-    source: props.source || 'internal',
-    rejection_reason: props.rejection_reason || null,
+    state: row.state ?? props.state ?? 'backlog',
+    priority: row.priority ?? props.priority ?? 'medium',
+    assignee_id: row.assignee_id ?? props.assignee_id ?? null,
+    estimate: row.estimate ?? props.estimate ?? null,
+    source: row.source ?? props.source ?? 'internal',
+    rejection_reason: row.rejection_reason ?? props.rejection_reason ?? null,
     // Accountability fields for action_items issues
-    due_date: props.due_date || null,
-    is_system_generated: props.is_system_generated || false,
-    accountability_target_id: props.accountability_target_id || null,
-    accountability_type: props.accountability_type || null,
+    due_date: row.due_date ?? props.due_date ?? null,
+    is_system_generated: row.is_system_generated ?? props.is_system_generated ?? false,
+    accountability_target_id: row.accountability_target_id ?? props.accountability_target_id ?? null,
+    accountability_type: row.accountability_type ?? props.accountability_type ?? null,
     ticket_number: row.ticket_number,
-    content: row.content,
     created_at: row.created_at,
     updated_at: row.updated_at,
     created_by: row.created_by,
@@ -124,18 +182,60 @@ function extractIssueFromRow(row: any): Record<string, unknown> {
   };
 }
 
+function mapIssueListRow(row: IssueListRow, belongsTo: BelongsToEntry[]): IssueListResponse {
+  return {
+    id: row.id,
+    title: row.title,
+    state: row.state ?? 'backlog',
+    priority: row.priority ?? 'medium',
+    assignee_id: row.assignee_id ?? null,
+    assignee_name: row.assignee_name ?? null,
+    assignee_archived: row.assignee_archived ?? false,
+    estimate: row.estimate ?? null,
+    source: row.source ?? 'internal',
+    rejection_reason: row.rejection_reason ?? null,
+    due_date: row.due_date ?? null,
+    is_system_generated: row.is_system_generated ?? false,
+    accountability_target_id: row.accountability_target_id ?? null,
+    accountability_type: row.accountability_type ?? null,
+    ticket_number: row.ticket_number,
+    display_id: `#${row.ticket_number}`,
+    created_at: row.created_at,
+    updated_at: row.updated_at,
+    created_by: row.created_by,
+    started_at: row.started_at ?? null,
+    completed_at: row.completed_at ?? null,
+    cancelled_at: row.cancelled_at ?? null,
+    reopened_at: row.reopened_at ?? null,
+    converted_from_id: row.converted_from_id ?? null,
+    belongs_to: belongsTo,
+  };
+}
+
 // List issues with filters
 router.get('/', authMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
     const { state, priority, assignee_id, program_id, sprint_id, source, parent_filter } = req.query;
     const { userId, workspaceId } = getRequestContext(req);
 
-    // Get visibility context for filtering
-    const { isAdmin } = await getVisibilityContext(userId, workspaceId);
+    const { isAdmin } = await resolveVisibilityContextFromRequest(req, userId, workspaceId);
 
     let query = `
-      SELECT d.id, d.title, d.properties, d.ticket_number,
-             d.content,
+      SELECT d.id, d.title, d.ticket_number,
+             d.properties->>'state' as state,
+             d.properties->>'priority' as priority,
+             d.properties->>'assignee_id' as assignee_id,
+             CASE
+               WHEN d.properties ? 'estimate' AND d.properties->>'estimate' <> ''
+               THEN (d.properties->>'estimate')::numeric
+               ELSE NULL
+             END as estimate,
+             d.properties->>'source' as source,
+             d.properties->>'rejection_reason' as rejection_reason,
+             d.properties->>'due_date' as due_date,
+             COALESCE((d.properties->>'is_system_generated')::boolean, false) as is_system_generated,
+             d.properties->>'accountability_target_id' as accountability_target_id,
+             d.properties->>'accountability_type' as accountability_type,
              d.created_at, d.updated_at, d.created_by,
              d.started_at, d.completed_at, d.cancelled_at, d.reopened_at,
              d.converted_from_id,
@@ -232,20 +332,14 @@ router.get('/', authMiddleware, async (req: Request, res: Response): Promise<voi
       END,
       d.updated_at DESC`;
 
-    const result = await pool.query(query, params);
+    const result = await measureRequestPerfAsync(req, 'db_main', () => pool.query<IssueListRow>(query, params));
 
     // Extract issues and batch-fetch associations to avoid N+1 queries
     const issueIds = result.rows.map((row) => row.id);
-    const associationsMap = await getBelongsToAssociationsBatch(issueIds);
-
-    const issues = result.rows.map((row) => {
-      const issue = extractIssueFromRow(row);
-      return {
-        ...issue,
-        display_id: `#${issue.ticket_number}`,
-        belongs_to: associationsMap.get(row.id) || [],
-      };
-    });
+    const associationsMap = await measureRequestPerfAsync(req, 'db_related', () => getBelongsToAssociationsBatch(issueIds));
+    const issues = measureRequestPerf(req, 'mapping', () => (
+      result.rows.map((row) => mapIssueListRow(row, associationsMap.get(row.id) || []))
+    ));
 
     res.json(issues);
   } catch (err) {

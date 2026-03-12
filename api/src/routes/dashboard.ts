@@ -1,9 +1,10 @@
 import { Router, Request, Response } from 'express';
 import { pool } from '../db/client.js';
-import { getVisibilityContext, VISIBILITY_FILTER_SQL } from '../middleware/visibility.js';
+import { VISIBILITY_FILTER_SQL, resolveVisibilityContextFromRequest } from '../middleware/visibility.js';
 import { authMiddleware } from '../middleware/auth.js';
 import { computeICEScore } from '@ship/shared';
 import { extractText } from '../utils/document-content.js';
+import { measureRequestPerf, measureRequestPerfAsync } from '../middleware/request-performance.js';
 
 type RouterType = ReturnType<typeof Router>;
 const router: RouterType = Router();
@@ -32,6 +33,63 @@ interface WorkItem {
   program_name?: string | null;
 }
 
+type WeekContext = {
+  currentWeekNumber: number;
+  targetWeekNumber: number;
+  previousWeekNumber: number;
+  weekStart: Date;
+  weekEnd: Date;
+  isCurrent: boolean;
+  daysRemaining: number;
+};
+
+function normalizeWorkspaceStartDate(rawStartDate: unknown): Date {
+  if (rawStartDate instanceof Date) {
+    return new Date(Date.UTC(rawStartDate.getFullYear(), rawStartDate.getMonth(), rawStartDate.getDate()));
+  }
+  if (typeof rawStartDate === 'string') {
+    return new Date(`${rawStartDate}T00:00:00Z`);
+  }
+  return new Date();
+}
+
+function buildWeekContext(workspaceStartDate: Date, requestedWeekNumber?: string): WeekContext {
+  const sprintDuration = 7;
+  const today = new Date();
+  today.setUTCHours(0, 0, 0, 0);
+  const daysSinceStart = Math.floor((today.getTime() - workspaceStartDate.getTime()) / (1000 * 60 * 60 * 24));
+  const currentWeekNumber = Math.floor(daysSinceStart / sprintDuration) + 1;
+
+  let targetWeekNumber = currentWeekNumber;
+  if (requestedWeekNumber) {
+    const parsed = Number.parseInt(requestedWeekNumber, 10);
+    if (!Number.isNaN(parsed) && parsed > 0) {
+      targetWeekNumber = parsed;
+    }
+  }
+
+  const weekStart = new Date(workspaceStartDate);
+  weekStart.setUTCDate(weekStart.getUTCDate() + (targetWeekNumber - 1) * sprintDuration);
+  const weekEnd = new Date(weekStart);
+  weekEnd.setUTCDate(weekEnd.getUTCDate() + sprintDuration - 1);
+
+  const currentWeekStart = new Date(workspaceStartDate);
+  currentWeekStart.setUTCDate(currentWeekStart.getUTCDate() + (currentWeekNumber - 1) * sprintDuration);
+  const currentWeekEnd = new Date(currentWeekStart);
+  currentWeekEnd.setUTCDate(currentWeekEnd.getUTCDate() + sprintDuration - 1);
+  const daysRemaining = Math.max(0, Math.ceil((currentWeekEnd.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)) + 1);
+
+  return {
+    currentWeekNumber,
+    targetWeekNumber,
+    previousWeekNumber: targetWeekNumber - 1,
+    weekStart,
+    weekEnd,
+    isCurrent: targetWeekNumber === currentWeekNumber,
+    daysRemaining,
+  };
+}
+
 /**
  * GET /api/dashboard/my-work
  * Returns work items for the current user organized by urgency.
@@ -44,44 +102,21 @@ router.get('/my-work', authMiddleware, async (req: Request, res: Response) => {
     const userId = req.userId!;
     const workspaceId = req.workspaceId!;
 
-    // Get visibility context for filtering
-    const { isAdmin } = await getVisibilityContext(userId, workspaceId);
+    const { isAdmin } = await resolveVisibilityContextFromRequest(req, userId, workspaceId);
 
     // Get workspace sprint configuration to calculate current sprint number
-    const workspaceResult = await pool.query(
+    const workspaceResult = await measureRequestPerfAsync(req, 'db_main', () => pool.query(
       `SELECT sprint_start_date FROM workspaces WHERE id = $1`,
       [workspaceId]
-    );
+    ));
 
     if (workspaceResult.rows.length === 0) {
       res.status(404).json({ error: 'Workspace not found' });
       return;
     }
 
-    const rawStartDate = workspaceResult.rows[0].sprint_start_date;
-    const sprintDuration = 7; // 7-day sprints
-
-    // Calculate the current sprint number
-    let workspaceStartDate: Date;
-    if (rawStartDate instanceof Date) {
-      workspaceStartDate = new Date(Date.UTC(rawStartDate.getFullYear(), rawStartDate.getMonth(), rawStartDate.getDate()));
-    } else if (typeof rawStartDate === 'string') {
-      workspaceStartDate = new Date(rawStartDate + 'T00:00:00Z');
-    } else {
-      workspaceStartDate = new Date();
-    }
-
-    const today = new Date();
-    today.setUTCHours(0, 0, 0, 0);
-    const daysSinceStart = Math.floor((today.getTime() - workspaceStartDate.getTime()) / (1000 * 60 * 60 * 24));
-    const currentSprintNumber = Math.floor(daysSinceStart / sprintDuration) + 1;
-
-    // Calculate days remaining in current sprint
-    const currentSprintStart = new Date(workspaceStartDate);
-    currentSprintStart.setUTCDate(currentSprintStart.getUTCDate() + (currentSprintNumber - 1) * sprintDuration);
-    const currentSprintEnd = new Date(currentSprintStart);
-    currentSprintEnd.setUTCDate(currentSprintEnd.getUTCDate() + sprintDuration - 1);
-    const daysRemaining = Math.max(0, Math.ceil((currentSprintEnd.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)) + 1);
+    const workspaceStartDate = normalizeWorkspaceStartDate(workspaceResult.rows[0].sprint_start_date);
+    const { currentWeekNumber: currentSprintNumber, daysRemaining } = buildWeekContext(workspaceStartDate);
 
     const workItems: WorkItem[] = [];
 
@@ -500,14 +535,19 @@ router.get('/my-week', authMiddleware, async (req: Request, res: Response) => {
     const userId = req.userId!;
     const workspaceId = req.workspaceId!;
 
-    // 1. Look up the user's person document
-    const personResult = await pool.query(
-      `SELECT id, title FROM documents
-       WHERE workspace_id = $1 AND document_type = 'person'
-         AND (properties->>'user_id') = $2
-       LIMIT 1`,
-      [workspaceId, userId]
-    );
+    const [personResult, workspaceResult] = await measureRequestPerfAsync(req, 'db_main', () => Promise.all([
+      pool.query(
+        `SELECT id, title FROM documents
+         WHERE workspace_id = $1 AND document_type = 'person'
+           AND (properties->>'user_id') = $2
+         LIMIT 1`,
+        [workspaceId, userId]
+      ),
+      pool.query(
+        `SELECT sprint_start_date FROM workspaces WHERE id = $1`,
+        [workspaceId]
+      ),
+    ]));
 
     if (personResult.rows.length === 0) {
       res.status(404).json({ error: 'Person not found for current user' });
@@ -517,123 +557,16 @@ router.get('/my-week', authMiddleware, async (req: Request, res: Response) => {
     const personId = personResult.rows[0].id;
     const personName = personResult.rows[0].title;
 
-    // 2. Get workspace sprint configuration
-    const workspaceResult = await pool.query(
-      `SELECT sprint_start_date FROM workspaces WHERE id = $1`,
-      [workspaceId]
-    );
-
     if (workspaceResult.rows.length === 0) {
       res.status(404).json({ error: 'Workspace not found' });
       return;
     }
 
-    const rawStartDate = workspaceResult.rows[0].sprint_start_date;
-    const sprintDuration = 7;
-
-    let workspaceStartDate: Date;
-    if (rawStartDate instanceof Date) {
-      workspaceStartDate = new Date(Date.UTC(rawStartDate.getFullYear(), rawStartDate.getMonth(), rawStartDate.getDate()));
-    } else if (typeof rawStartDate === 'string') {
-      workspaceStartDate = new Date(rawStartDate + 'T00:00:00Z');
-    } else {
-      workspaceStartDate = new Date();
-    }
-
-    const today = new Date();
-    today.setUTCHours(0, 0, 0, 0);
-    const daysSinceStart = Math.floor((today.getTime() - workspaceStartDate.getTime()) / (1000 * 60 * 60 * 24));
-    const currentWeekNumber = Math.floor(daysSinceStart / sprintDuration) + 1;
-
-    // Determine target week (support ?week_number=N for navigation)
-    let targetWeekNumber = currentWeekNumber;
-    if (req.query.week_number && typeof req.query.week_number === 'string') {
-      const parsed = parseInt(req.query.week_number, 10);
-      if (!isNaN(parsed) && parsed > 0) {
-        targetWeekNumber = parsed;
-      }
-    }
-
-    const isCurrent = targetWeekNumber === currentWeekNumber;
-    const previousWeekNumber = targetWeekNumber - 1;
-
-    // Calculate week start/end dates
-    const weekStart = new Date(workspaceStartDate);
-    weekStart.setUTCDate(weekStart.getUTCDate() + (targetWeekNumber - 1) * sprintDuration);
-    const weekEnd = new Date(weekStart);
-    weekEnd.setUTCDate(weekEnd.getUTCDate() + sprintDuration - 1);
-
-    // 3. Fetch plan for target week (by person_id + week_number only)
-    const planResult = await pool.query(
-      `SELECT id, title, content, properties, created_at, updated_at
-       FROM documents
-       WHERE workspace_id = $1
-         AND document_type = 'weekly_plan'
-         AND (properties->>'person_id') = $2
-         AND (properties->>'week_number')::int = $3
-         AND archived_at IS NULL
-         AND deleted_at IS NULL
-       LIMIT 1`,
-      [workspaceId, personId, targetWeekNumber]
+    const weekContext = buildWeekContext(
+      normalizeWorkspaceStartDate(workspaceResult.rows[0].sprint_start_date),
+      typeof req.query.week_number === 'string' ? req.query.week_number : undefined
     );
-
-    const plan = planResult.rows.length > 0
-      ? {
-          id: planResult.rows[0].id,
-          title: planResult.rows[0].title,
-          submitted_at: planResult.rows[0].properties?.submitted_at || null,
-          items: extractPlanItems(planResult.rows[0].content),
-        }
-      : null;
-
-    // 4. Fetch retro for target week
-    const retroResult = await pool.query(
-      `SELECT id, title, content, properties, created_at, updated_at
-       FROM documents
-       WHERE workspace_id = $1
-         AND document_type = 'weekly_retro'
-         AND (properties->>'person_id') = $2
-         AND (properties->>'week_number')::int = $3
-         AND archived_at IS NULL
-         AND deleted_at IS NULL
-       LIMIT 1`,
-      [workspaceId, personId, targetWeekNumber]
-    );
-
-    const retro = retroResult.rows.length > 0
-      ? {
-          id: retroResult.rows[0].id,
-          title: retroResult.rows[0].title,
-          submitted_at: retroResult.rows[0].properties?.submitted_at || null,
-          items: extractPlanItems(retroResult.rows[0].content),
-        }
-      : null;
-
-    // 5. Fetch previous week retro (for "incomplete retro" nudge)
-    let previousRetro = null;
-    if (previousWeekNumber > 0) {
-      const prevRetroResult = await pool.query(
-        `SELECT id, title, properties
-         FROM documents
-         WHERE workspace_id = $1
-           AND document_type = 'weekly_retro'
-           AND (properties->>'person_id') = $2
-           AND (properties->>'week_number')::int = $3
-           AND archived_at IS NULL
-           AND deleted_at IS NULL
-         LIMIT 1`,
-        [workspaceId, personId, previousWeekNumber]
-      );
-
-      previousRetro = prevRetroResult.rows.length > 0
-        ? {
-            id: prevRetroResult.rows[0].id,
-            title: prevRetroResult.rows[0].title,
-            submitted_at: prevRetroResult.rows[0].properties?.submitted_at || null,
-            week_number: previousWeekNumber,
-          }
-        : { id: null, title: null, submitted_at: null, week_number: previousWeekNumber };
-    }
+    const { currentWeekNumber, targetWeekNumber, previousWeekNumber, weekStart, weekEnd, isCurrent } = weekContext;
 
     // 6. Fetch standups for the 7 days of the target week
     // Compute the 7 dates
@@ -645,17 +578,103 @@ router.get('/my-week', authMiddleware, async (req: Request, res: Response) => {
       standupDates.push(dateStr);
     }
 
-    const standupsResult = await pool.query(
-      `SELECT id, title, properties, created_at, updated_at
-       FROM documents
-       WHERE workspace_id = $1
-         AND document_type = 'standup'
-         AND (properties->>'author_id') = $2
-         AND (properties->>'date') = ANY($3)
-         AND deleted_at IS NULL
-       ORDER BY (properties->>'date') ASC`,
-      [workspaceId, userId, standupDates]
-    );
+    const [planResult, retroResult, previousRetroResult, standupsResult, allocationsResult] = await measureRequestPerfAsync(req, 'db_main', () => Promise.all([
+      pool.query(
+        `SELECT id, title, content, properties, created_at, updated_at
+         FROM documents
+         WHERE workspace_id = $1
+           AND document_type = 'weekly_plan'
+           AND (properties->>'person_id') = $2
+           AND (properties->>'week_number')::int = $3
+           AND archived_at IS NULL
+           AND deleted_at IS NULL
+         LIMIT 1`,
+        [workspaceId, personId, targetWeekNumber]
+      ),
+      pool.query(
+        `SELECT id, title, content, properties, created_at, updated_at
+         FROM documents
+         WHERE workspace_id = $1
+           AND document_type = 'weekly_retro'
+           AND (properties->>'person_id') = $2
+           AND (properties->>'week_number')::int = $3
+           AND archived_at IS NULL
+           AND deleted_at IS NULL
+         LIMIT 1`,
+        [workspaceId, personId, targetWeekNumber]
+      ),
+      previousWeekNumber > 0
+        ? pool.query(
+          `SELECT id, title, properties
+           FROM documents
+           WHERE workspace_id = $1
+             AND document_type = 'weekly_retro'
+             AND (properties->>'person_id') = $2
+             AND (properties->>'week_number')::int = $3
+             AND archived_at IS NULL
+             AND deleted_at IS NULL
+           LIMIT 1`,
+          [workspaceId, personId, previousWeekNumber]
+        )
+        : Promise.resolve({ rows: [] }),
+      pool.query(
+        `SELECT id, title, properties, created_at, updated_at
+         FROM documents
+         WHERE workspace_id = $1
+           AND document_type = 'standup'
+           AND (properties->>'author_id') = $2
+           AND (properties->>'date') = ANY($3)
+           AND deleted_at IS NULL
+         ORDER BY (properties->>'date') ASC`,
+        [workspaceId, userId, standupDates]
+      ),
+      pool.query(
+        `SELECT DISTINCT
+           proj.id as project_id,
+           proj.title as project_title,
+           prog.title as program_name
+         FROM documents s
+         JOIN documents proj ON (s.properties->>'project_id')::uuid = proj.id AND proj.document_type = 'project'
+         LEFT JOIN document_associations prog_da ON proj.id = prog_da.document_id AND prog_da.relationship_type = 'program'
+         LEFT JOIN documents prog ON prog_da.related_id = prog.id AND prog.document_type = 'program'
+         WHERE s.workspace_id = $1
+           AND s.document_type = 'sprint'
+           AND s.properties->'assignee_ids' ? $2
+           AND (s.properties->>'sprint_number')::int = $3
+           AND s.deleted_at IS NULL
+           AND proj.archived_at IS NULL`,
+        [workspaceId, personId, targetWeekNumber]
+      ),
+    ]));
+
+    const plan = planResult.rows.length > 0
+      ? {
+        id: planResult.rows[0].id,
+        title: planResult.rows[0].title,
+        submitted_at: planResult.rows[0].properties?.submitted_at || null,
+        items: extractPlanItems(planResult.rows[0].content),
+      }
+      : null;
+
+    const retro = retroResult.rows.length > 0
+      ? {
+        id: retroResult.rows[0].id,
+        title: retroResult.rows[0].title,
+        submitted_at: retroResult.rows[0].properties?.submitted_at || null,
+        items: extractPlanItems(retroResult.rows[0].content),
+      }
+      : null;
+
+    const previousRetro = previousWeekNumber > 0
+      ? (previousRetroResult.rows.length > 0
+        ? {
+          id: previousRetroResult.rows[0].id,
+          title: previousRetroResult.rows[0].title,
+          submitted_at: previousRetroResult.rows[0].properties?.submitted_at || null,
+          week_number: previousWeekNumber,
+        }
+        : { id: null, title: null, submitted_at: null, week_number: previousWeekNumber })
+      : null;
 
     // Build standup map by date
     const standupMap = new Map<string, { id: string; title: string; date: string; created_at: string }>();
@@ -672,38 +691,19 @@ router.get('/my-week', authMiddleware, async (req: Request, res: Response) => {
     }
 
     // Build 7-slot standup array
-    const standups = standupDates.map(date => {
+    const standups = measureRequestPerf(req, 'mapping', () => standupDates.map(date => {
       const standup = standupMap.get(date);
       const dayOfWeek = new Date(date + 'T00:00:00Z').toLocaleDateString('en-US', { weekday: 'long', timeZone: 'UTC' });
       return standup
         ? { date, day: dayOfWeek, standup }
         : { date, day: dayOfWeek, standup: null };
-    });
+    }));
 
-    // 7. Fetch project allocations for the target week
-    const allocationsResult = await pool.query(
-      `SELECT DISTINCT
-         proj.id as project_id,
-         proj.title as project_title,
-         prog.title as program_name
-       FROM documents s
-       JOIN documents proj ON (s.properties->>'project_id')::uuid = proj.id AND proj.document_type = 'project'
-       LEFT JOIN document_associations prog_da ON proj.id = prog_da.document_id AND prog_da.relationship_type = 'program'
-       LEFT JOIN documents prog ON prog_da.related_id = prog.id AND prog.document_type = 'program'
-       WHERE s.workspace_id = $1
-         AND s.document_type = 'sprint'
-         AND s.properties->'assignee_ids' ? $2
-         AND (s.properties->>'sprint_number')::int = $3
-         AND s.deleted_at IS NULL
-         AND proj.archived_at IS NULL`,
-      [workspaceId, personId, targetWeekNumber]
-    );
-
-    const projects = allocationsResult.rows.map(row => ({
+    const projects = measureRequestPerf(req, 'mapping', () => allocationsResult.rows.map(row => ({
       id: row.project_id,
       title: row.project_title,
       program_name: row.program_name || null,
-    }));
+    })));
 
     // 8. Assemble response
     res.json({

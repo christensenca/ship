@@ -1,0 +1,254 @@
+{
+  "generated_at": "2026-03-11T23:24:24.098Z",
+  "label": "current",
+  "git_sha": "c3b8b9e",
+  "api_url": "http://127.0.0.1:3002",
+  "machine": {
+    "hostname": "Cades-MacBook-Air.local",
+    "platform": "darwin",
+    "arch": "arm64",
+    "cpus": 10
+  },
+  "seed_dataset": {
+    "strategy": "dedicated perf seed",
+    "workspace": "Perf Benchmark Workspace",
+    "seed_key": "api-latency-perf-v1"
+  },
+  "benchmark": {
+    "tool": "autocannon",
+    "warmup_seconds": 15,
+    "measured_seconds": 30,
+    "concurrency_levels": [
+      10,
+      25,
+      50
+    ]
+  },
+  "endpoints": [
+    {
+      "name": "Documents (wiki list)",
+      "path": "/api/documents?type=wiki"
+    },
+    {
+      "name": "Issues list",
+      "path": "/api/issues"
+    },
+    {
+      "name": "Projects list",
+      "path": "/api/projects"
+    },
+    {
+      "name": "Programs list",
+      "path": "/api/programs"
+    },
+    {
+      "name": "Dashboard my-week",
+      "path": "/api/dashboard/my-week"
+    }
+  ],
+  "results": [
+    {
+      "endpoint": "Documents (wiki list)",
+      "path": "/api/documents?type=wiki",
+      "concurrency": 10,
+      "p50_ms": 0,
+      "p95_ms": 0,
+      "p99_ms": 0,
+      "rps": 31542.14,
+      "non_2xx": 945280
+    },
+    {
+      "endpoint": "Documents (wiki list)",
+      "path": "/api/documents?type=wiki",
+      "concurrency": 25,
+      "p50_ms": 0,
+      "p95_ms": 1,
+      "p99_ms": 1,
+      "rps": 33345.34,
+      "non_2xx": 1000329
+    },
+    {
+      "endpoint": "Documents (wiki list)",
+      "path": "/api/documents?type=wiki",
+      "concurrency": 50,
+      "p50_ms": 1,
+      "p95_ms": 2,
+      "p99_ms": 2,
+      "rps": 31430.77,
+      "non_2xx": 941889
+    },
+    {
+      "endpoint": "Issues list",
+      "path": "/api/issues",
+      "concurrency": 10,
+      "p50_ms": 0,
+      "p95_ms": 0,
+      "p99_ms": 0,
+      "rps": 33005.97,
+      "non_2xx": 989150
+    },
+    {
+      "endpoint": "Issues list",
+      "path": "/api/issues",
+      "concurrency": 25,
+      "p50_ms": 0,
+      "p95_ms": 1,
+      "p99_ms": 1,
+      "rps": 34843.2,
+      "non_2xx": 1045347
+    },
+    {
+      "endpoint": "Issues list",
+      "path": "/api/issues",
+      "concurrency": 50,
+      "p50_ms": 1,
+      "p95_ms": 2,
+      "p99_ms": 2,
+      "rps": 33743.5,
+      "non_2xx": 1011265
+    },
+    {
+      "endpoint": "Projects list",
+      "path": "/api/projects",
+      "concurrency": 10,
+      "p50_ms": 0,
+      "p95_ms": 0,
+      "p99_ms": 0,
+      "rps": 35307.74,
+      "non_2xx": 1059242
+    },
+    {
+      "endpoint": "Projects list",
+      "path": "/api/projects",
+      "concurrency": 25,
+      "p50_ms": 0,
+      "p95_ms": 1,
+      "p99_ms": 1,
+      "rps": 33408.94,
+      "non_2xx": 1001346
+    },
+    {
+      "endpoint": "Projects list",
+      "path": "/api/projects",
+      "concurrency": 50,
+      "p50_ms": 1,
+      "p95_ms": 2,
+      "p99_ms": 2,
+      "rps": 34563.2,
+      "non_2xx": 1036919
+    },
+    {
+      "endpoint": "Programs list",
+      "path": "/api/programs",
+      "concurrency": 10,
+      "p50_ms": 0,
+      "p95_ms": 0,
+      "p99_ms": 0,
+      "rps": 33314.14,
+      "non_2xx": 999399
+    },
+    {
+      "endpoint": "Programs list",
+      "path": "/api/programs",
+      "concurrency": 25,
+      "p50_ms": 0,
+      "p95_ms": 1,
+      "p99_ms": 2,
+      "rps": 30992.67,
+      "non_2xx": 928759
+    },
+    {
+      "endpoint": "Programs list",
+      "path": "/api/programs",
+      "concurrency": 50,
+      "p50_ms": 1,
+      "p95_ms": 2,
+      "p99_ms": 3,
+      "rps": 32827.74,
+      "non_2xx": 984823
+    },
+    {
+      "endpoint": "Dashboard my-week",
+      "path": "/api/dashboard/my-week",
+      "concurrency": 10,
+      "p50_ms": 0,
+      "p95_ms": 0,
+      "p99_ms": 0,
+      "rps": 32592.47,
+      "non_2xx": 976782
+    },
+    {
+      "endpoint": "Dashboard my-week",
+      "path": "/api/dashboard/my-week",
+      "concurrency": 25,
+      "p50_ms": 0,
+      "p95_ms": 1,
+      "p99_ms": 1,
+      "rps": 33236,
+      "non_2xx": 996999
+    },
+    {
+      "endpoint": "Dashboard my-week",
+      "path": "/api/dashboard/my-week",
+      "concurrency": 50,
+      "p50_ms": 1,
+      "p95_ms": 2,
+      "p99_ms": 3,
+      "rps": 31860.74,
+      "non_2xx": 954853
+    }
+  ],
+  "summary": {
+    "avg_p95_ms": 1
+  },
+  "slowest_endpoints": [
+    {
+      "path": "/api/documents?type=wiki",
+      "endpoint": "Documents (wiki list)",
+      "concurrency": 50,
+      "p95_ms": 2,
+      "p99_ms": 2,
+      "hypothesis": "Visibility filters + ordering over larger wiki sets can trigger more expensive scans/sorts without selective indexes."
+    },
+    {
+      "path": "/api/issues",
+      "endpoint": "Issues list",
+      "concurrency": 50,
+      "p95_ms": 2,
+      "p99_ms": 2,
+      "hypothesis": "Heavy joins + belongs_to association expansion can increase query time as issue volume grows."
+    },
+    {
+      "path": "/api/projects",
+      "endpoint": "Projects list",
+      "concurrency": 50,
+      "p95_ms": 2,
+      "p99_ms": 2,
+      "hypothesis": "Derived status and nested count subqueries add per-row computation under larger project/sprint datasets."
+    },
+    {
+      "path": "/api/programs",
+      "endpoint": "Programs list",
+      "concurrency": 50,
+      "p95_ms": 2,
+      "p99_ms": 3,
+      "hypothesis": "Program list includes issue/sprint count subqueries, so aggregate counting cost can dominate response time."
+    },
+    {
+      "path": "/api/dashboard/my-week",
+      "endpoint": "Dashboard my-week",
+      "concurrency": 50,
+      "p95_ms": 2,
+      "p99_ms": 3,
+      "hypothesis": "Multiple sequential queries (person, plan/retro, standups, allocations) compound latency versus single-list endpoints."
+    }
+  ],
+  "delta_from_previous": {
+    "avg_p95_ms_delta": -34.8,
+    "status_band": "Improving"
+  },
+  "policy": {
+    "mode": "report-only",
+    "fail_on_threshold": false
+  }
+}

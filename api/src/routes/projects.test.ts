@@ -10,6 +10,7 @@ vi.mock('../db/client.js', () => ({
 // Mock visibility middleware
 vi.mock('../middleware/visibility.js', () => ({
   getVisibilityContext: vi.fn().mockResolvedValue({ isAdmin: false }),
+  resolveVisibilityContextFromRequest: vi.fn().mockResolvedValue({ isAdmin: false }),
   VISIBILITY_FILTER_SQL: vi.fn().mockReturnValue('1=1'),
 }));
 

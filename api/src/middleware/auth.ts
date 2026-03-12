@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import crypto from 'crypto';
 import { pool } from '../db/client.js';
 import { SESSION_TIMEOUT_MS, ABSOLUTE_SESSION_TIMEOUT_MS, ERROR_CODES, HTTP_STATUS } from '@ship/shared';
+import { measureRequestPerfAsync } from './request-performance.js';
 
 // Extend Express Request to include session info
 declare global {
@@ -12,9 +13,12 @@ declare global {
       workspaceId?: string;
       isSuperAdmin?: boolean;
       isApiToken?: boolean; // True when authenticated via API token
+      workspaceRole?: string | null;
     }
   }
 }
+
+const ACTIVITY_REFRESH_THRESHOLD_MS = 60 * 1000;
 
 // Hash a token for comparison
 function hashToken(token: string): string {
@@ -73,7 +77,7 @@ export async function authMiddleware(
     const token = authHeader.slice(7);
 
     try {
-      const tokenData = await validateApiToken(token);
+      const tokenData = await measureRequestPerfAsync(req, 'auth_token', () => validateApiToken(token));
 
       if (!tokenData) {
         res.status(HTTP_STATUS.UNAUTHORIZED).json({
@@ -91,6 +95,7 @@ export async function authMiddleware(
       req.workspaceId = tokenData.workspaceId;
       req.isSuperAdmin = tokenData.isSuperAdmin;
       req.isApiToken = true;
+      req.workspaceRole = null;
 
       next();
       return;
@@ -123,14 +128,14 @@ export async function authMiddleware(
 
   try {
     // Get session and check if it's valid
-    const result = await pool.query(
+    const result = await measureRequestPerfAsync(req, 'auth_session', () => pool.query(
       `SELECT s.id, s.user_id, s.workspace_id, s.expires_at, s.last_activity, s.created_at,
               u.is_super_admin
        FROM sessions s
        JOIN users u ON s.user_id = u.id
        WHERE s.id = $1`,
       [sessionId]
-    );
+    ));
 
     const session = result.rows[0];
 
@@ -181,12 +186,14 @@ export async function authMiddleware(
 
     // Verify user still has access to the workspace (unless super-admin)
     if (session.workspace_id && !session.is_super_admin) {
-      const membershipResult = await pool.query(
-        'SELECT id FROM workspace_memberships WHERE workspace_id = $1 AND user_id = $2',
+      const membershipResult = await measureRequestPerfAsync(req, 'auth_membership', () => pool.query(
+        'SELECT role FROM workspace_memberships WHERE workspace_id = $1 AND user_id = $2',
         [session.workspace_id, session.user_id]
-      );
+      ));
 
-      if (!membershipResult.rows[0]) {
+      const membership = membershipResult.rows[0];
+
+      if (!membership) {
         // User no longer has access - delete session
         await pool.query('DELETE FROM sessions WHERE id = $1', [sessionId]);
 
@@ -199,18 +206,22 @@ export async function authMiddleware(
         });
         return;
       }
+
+      req.workspaceRole = membership.role;
+    } else {
+      req.workspaceRole = null;
     }
 
-    // Update last activity
-    await pool.query(
-      'UPDATE sessions SET last_activity = $1 WHERE id = $2',
-      [now, sessionId]
-    );
+    // Update last activity only when enough time has elapsed to avoid a write on every request.
+    if (inactivityMs > ACTIVITY_REFRESH_THRESHOLD_MS) {
+      await measureRequestPerfAsync(req, 'auth_refresh', () => pool.query(
+        'UPDATE sessions SET last_activity = $1 WHERE id = $2',
+        [now, sessionId]
+      ));
+    }
 
-    // Refresh cookie with sliding expiration (throttled to avoid overhead)
-    // Only refresh if more than 60 seconds since last activity
-    const COOKIE_REFRESH_THRESHOLD_MS = 60 * 1000;
-    if (inactivityMs > COOKIE_REFRESH_THRESHOLD_MS) {
+    // Refresh cookie with the same throttling window as last_activity writes.
+    if (inactivityMs > ACTIVITY_REFRESH_THRESHOLD_MS) {
       res.cookie('session_id', sessionId, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
@@ -284,6 +295,22 @@ export async function workspaceAdminMiddleware(
     return;
   }
 
+  if (req.workspaceId === workspaceId && req.workspaceRole) {
+    if (req.workspaceRole === 'admin') {
+      next();
+      return;
+    }
+
+    res.status(HTTP_STATUS.FORBIDDEN).json({
+      success: false,
+      error: {
+        code: ERROR_CODES.FORBIDDEN,
+        message: 'Workspace admin access required',
+      },
+    });
+    return;
+  }
+
   try {
     const result = await pool.query(
       'SELECT role FROM workspace_memberships WHERE workspace_id = $1 AND user_id = $2',
@@ -338,6 +365,11 @@ export async function workspaceAccessMiddleware(
         message: 'Workspace ID required',
       },
     });
+    return;
+  }
+
+  if (req.workspaceId === workspaceId && (req.workspaceRole || req.isSuperAdmin)) {
+    next();
     return;
   }
 

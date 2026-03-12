@@ -27,6 +27,7 @@ function createMockReqRes(cookies: Record<string, string> = {}) {
 describe('authMiddleware', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(pool.query).mockReset();
   });
 
   describe('session validation', () => {
@@ -70,13 +71,14 @@ describe('authMiddleware', () => {
             is_super_admin: false,
           }],
         } as any)
-        .mockResolvedValueOnce({ rows: [{ id: 'membership-1' }] } as any)
+        .mockResolvedValueOnce({ rows: [{ role: 'member' }] } as any)
         .mockResolvedValueOnce({ rows: [] } as any);
 
       await authMiddleware(req, res, next);
       expect(req.sessionId).toBe('valid-session');
       expect(req.userId).toBe('user-123');
       expect(req.workspaceId).toBe('ws-123');
+      expect(req.workspaceRole).toBeDefined();
       expect(next).toHaveBeenCalled();
     });
   });
@@ -240,7 +242,7 @@ describe('authMiddleware', () => {
             is_super_admin: false,
           }],
         } as any)
-        .mockResolvedValueOnce({ rows: [{ id: 'membership-1' }] } as any)
+        .mockResolvedValueOnce({ rows: [{ role: 'member' }] } as any)
         .mockResolvedValueOnce({ rows: [] } as any);
 
       await authMiddleware(req, res, next);
@@ -270,11 +272,15 @@ describe('authMiddleware', () => {
             is_super_admin: false,
           }],
         } as any)
-        .mockResolvedValueOnce({ rows: [{ id: 'membership-1' }] } as any)
+        .mockResolvedValueOnce({ rows: [{ role: 'member' }] } as any)
         .mockResolvedValueOnce({ rows: [] } as any);
 
       await authMiddleware(req, res, next);
       expect(res.cookie).not.toHaveBeenCalled();
+      expect(pool.query).not.toHaveBeenCalledWith(
+        'UPDATE sessions SET last_activity = $1 WHERE id = $2',
+        expect.anything()
+      );
       expect(next).toHaveBeenCalled();
     });
   });
