@@ -2,7 +2,10 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import os from 'node:os';
+import { execFileSync } from 'node:child_process';
 import autocannon from 'autocannon';
+import { ensureDir, readJsonFileSafe, slugify } from './api-latency-lib.mjs';
 
 const ROOT = process.cwd();
 const OUTPUT_DIR = path.join(ROOT, 'reports', 'api-latency');
@@ -10,6 +13,7 @@ const LATEST_JSON_PATH = path.join(OUTPUT_DIR, 'latest.json');
 const LATEST_MD_PATH = path.join(OUTPUT_DIR, 'latest.md');
 const HISTORY_PATH = path.join(OUTPUT_DIR, 'history.jsonl');
 const SLOW_ENDPOINTS_PATH = path.join(OUTPUT_DIR, 'slow-endpoints.md');
+const SNAPSHOTS_DIR = path.join(OUTPUT_DIR, 'snapshots');
 
 const API_URL = process.env.API_URL || process.env.VITE_API_URL || 'http://localhost:3000';
 const PERF_EMAIL = process.env.PERF_BENCH_EMAIL || 'perf.admin@ship.local';
@@ -18,6 +22,7 @@ const PERF_PASSWORD = process.env.PERF_BENCH_PASSWORD || 'admin123';
 const CONCURRENCY_LEVELS = [10, 25, 50];
 const WARMUP_SECONDS = 15;
 const DURATION_SECONDS = 30;
+const TIMING_SAMPLE_COUNT = 15;
 
 const ENDPOINTS = [
   { name: 'Documents (wiki list)', path: '/api/documents?type=wiki' },
@@ -27,14 +32,25 @@ const ENDPOINTS = [
   { name: 'Dashboard my-week', path: '/api/dashboard/my-week' },
 ];
 
-function ensureDir() {
-  fs.mkdirSync(OUTPUT_DIR, { recursive: true });
+function parseArgs(argv) {
+  const result = { label: 'current' };
+  for (let i = 0; i < argv.length; i += 1) {
+    const arg = argv[i];
+    if (arg === '--label' && argv[i + 1]) {
+      result.label = argv[i + 1];
+      i += 1;
+    }
+  }
+  return result;
 }
 
-function readJsonSafe(filePath) {
-  if (!fs.existsSync(filePath)) return null;
+function getGitSha() {
   try {
-    return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    return execFileSync('git', ['rev-parse', '--short', 'HEAD'], {
+      cwd: ROOT,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    }).trim();
   } catch {
     return null;
   }
@@ -138,6 +154,86 @@ async function runAutocannon(url, connections, seconds, headers) {
   });
 }
 
+function parseServerTiming(headerValue) {
+  if (!headerValue) return null;
+
+  const phases = {};
+  for (const rawEntry of headerValue.split(',')) {
+    const entry = rawEntry.trim();
+    if (!entry) continue;
+    const [phase, ...attributes] = entry.split(';').map((part) => part.trim());
+    const durationAttribute = attributes.find((part) => part.startsWith('dur='));
+    if (!phase || !durationAttribute) continue;
+    const duration = Number.parseFloat(durationAttribute.slice(4));
+    if (Number.isFinite(duration)) {
+      phases[phase] = duration;
+    }
+  }
+
+  return Object.keys(phases).length > 0 ? phases : null;
+}
+
+function computePercentile(values, percentileValue) {
+  if (!Array.isArray(values) || values.length === 0) return null;
+  const sorted = [...values].sort((a, b) => a - b);
+  const index = Math.min(sorted.length - 1, Math.max(0, Math.ceil((percentileValue / 100) * sorted.length) - 1));
+  return toMs(sorted[index]);
+}
+
+function summarizeTimingSamples(samples) {
+  if (!Array.isArray(samples) || samples.length === 0) return null;
+
+  const phaseValues = new Map();
+  for (const sample of samples) {
+    for (const [phase, duration] of Object.entries(sample)) {
+      if (!phaseValues.has(phase)) {
+        phaseValues.set(phase, []);
+      }
+      phaseValues.get(phase).push(duration);
+    }
+  }
+
+  const phases = Object.fromEntries(
+    [...phaseValues.entries()]
+      .sort(([left], [right]) => left.localeCompare(right))
+      .map(([phase, values]) => [
+        phase,
+        {
+          avg_ms: toMs(values.reduce((sum, value) => sum + value, 0) / values.length),
+          p50_ms: computePercentile(values, 50),
+          p95_ms: computePercentile(values, 95),
+          samples: values.length,
+        },
+      ])
+  );
+
+  return { sample_count: samples.length, phases };
+}
+
+async function collectTimingBreakdown(endpointPath, headers) {
+  const samples = [];
+
+  for (let i = 0; i < TIMING_SAMPLE_COUNT; i += 1) {
+    const response = await fetch(`${API_URL}${endpointPath}`, {
+      method: 'GET',
+      headers,
+    });
+    if (!response.ok) {
+      throw new Error(`Timing sample failed for ${endpointPath} (${response.status})`);
+    }
+
+    const parsed = parseServerTiming(response.headers.get('server-timing'));
+    if (!parsed) {
+      return null;
+    }
+
+    samples.push(parsed);
+    await response.arrayBuffer();
+  }
+
+  return summarizeTimingSamples(samples);
+}
+
 function buildMarkdown(report) {
   const summaryRows = ENDPOINTS.map((endpoint) => {
     const c25 = report.results.find(r => r.path === endpoint.path && r.concurrency === 25);
@@ -156,8 +252,16 @@ function buildMarkdown(report) {
   const slowest = report.slowest_endpoints
     .map((s, idx) => `${idx + 1}. \`${s.path}\` (P95=${s.p95_ms}ms @ c=${s.concurrency}) - ${s.hypothesis}`)
     .join('\n');
+  const timingBreakdowns = Object.entries(report.route_breakdowns || {})
+    .map(([endpointPath, breakdown]) => {
+      const rows = Object.entries(breakdown.phases || {})
+        .map(([phase, metrics]) => `| ${phase} | ${metrics.avg_ms ?? 'N/A'} | ${metrics.p50_ms ?? 'N/A'} | ${metrics.p95_ms ?? 'N/A'} | ${metrics.samples ?? 0} |`)
+        .join('\n');
+      return `### ${endpointPath}\n\n| Phase | Avg (ms) | P50 (ms) | P95 (ms) | Samples |\n|---|---:|---:|---:|---:|\n${rows}`;
+    })
+    .join('\n\n');
 
-  return `# API Latency Audit Report\n\nGenerated: ${report.generated_at}\nAPI URL: ${report.api_url}\nWarmup: ${WARMUP_SECONDS}s @ c=10\nMeasured: ${DURATION_SECONDS}s @ c=10,25,50\n\n## Audit Deliverable Table (P95/P99 focus at c=25)\n\n| Endpoint | P50 | P95 | P99 |\n|---|---:|---:|---:|\n${summaryRows}\n\n## Trend\n\n- Overall status: **${report.delta_from_previous.status_band}**\n- Average P95 delta (ms): ${report.delta_from_previous.avg_p95_ms_delta ?? 'N/A'}\n\n## Detailed Results\n\n${perConcurrencySections}\n\n## Slowest Endpoints\n\n${slowest || '- None'}\n`;
+  return `# API Latency Audit Report\n\nGenerated: ${report.generated_at}\nLabel: ${report.label}\nGit SHA: ${report.git_sha ?? 'unknown'}\nAPI URL: ${report.api_url}\nWarmup: ${WARMUP_SECONDS}s @ c=10\nMeasured: ${DURATION_SECONDS}s @ c=10,25,50\n\n## Audit Deliverable Table (P95/P99 focus at c=25)\n\n| Endpoint | P50 | P95 | P99 |\n|---|---:|---:|---:|\n${summaryRows}\n\n## Trend\n\n- Overall status: **${report.delta_from_previous.status_band}**\n- Average P95 delta (ms): ${report.delta_from_previous.avg_p95_ms_delta ?? 'N/A'}\n\n## Root Cause Scope\n\n- Addressed in this pass: payload width, JSON serialization, auth/session overhead, and request-path duplication.\n- Deferred to separate SQL pass: query plan efficiency, indexes, and join/filter cost.\n\n## Detailed Results\n\n${perConcurrencySections}\n\n## Slowest Endpoints\n\n${slowest || '- None'}${timingBreakdowns ? `\n\n## Route Timing Breakdown\n\n${timingBreakdowns}\n` : '\n'}`;
 }
 
 function buildSlowEndpointsMarkdown(report) {
@@ -169,7 +273,9 @@ function buildSlowEndpointsMarkdown(report) {
 }
 
 async function main() {
-  ensureDir();
+  const { label } = parseArgs(process.argv.slice(2));
+  ensureDir(OUTPUT_DIR);
+  ensureDir(SNAPSHOTS_DIR);
 
   const health = await fetch(`${API_URL}/health`);
   if (!health.ok) {
@@ -207,7 +313,15 @@ async function main() {
     }
   }
 
-  const previous = readJsonSafe(LATEST_JSON_PATH);
+  const routeBreakdowns = {};
+  for (const endpoint of ENDPOINTS) {
+    const breakdown = await collectTimingBreakdown(endpoint.path, headers);
+    if (breakdown) {
+      routeBreakdowns[endpoint.path] = breakdown;
+    }
+  }
+
+  const previous = readJsonFileSafe(LATEST_JSON_PATH);
 
   const avgP95 = results.length > 0
     ? toMs(results.reduce((sum, row) => sum + (row.p95_ms || 0), 0) / results.length)
@@ -232,7 +346,15 @@ async function main() {
 
   const report = {
     generated_at: new Date().toISOString(),
+    label,
+    git_sha: getGitSha(),
     api_url: API_URL,
+    machine: {
+      hostname: os.hostname(),
+      platform: process.platform,
+      arch: process.arch,
+      cpus: os.cpus().length,
+    },
     seed_dataset: {
       strategy: 'dedicated perf seed',
       workspace: 'Perf Benchmark Workspace',
@@ -246,6 +368,7 @@ async function main() {
     },
     endpoints: ENDPOINTS,
     results,
+    route_breakdowns: routeBreakdowns,
     summary: {
       avg_p95_ms: avgP95,
     },
@@ -260,11 +383,16 @@ async function main() {
     },
   };
 
+  const snapshotName = `${report.generated_at.replaceAll(':', '-').replaceAll('.', '-')}--${slugify(label)}.json`;
+  const snapshotPath = path.join(SNAPSHOTS_DIR, snapshotName);
+
+  fs.writeFileSync(snapshotPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
   fs.writeFileSync(LATEST_JSON_PATH, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
   fs.appendFileSync(HISTORY_PATH, `${JSON.stringify(report)}\n`, 'utf8');
   fs.writeFileSync(LATEST_MD_PATH, buildMarkdown(report), 'utf8');
   fs.writeFileSync(SLOW_ENDPOINTS_PATH, buildSlowEndpointsMarkdown(report), 'utf8');
 
+  console.log(`Wrote ${path.relative(ROOT, snapshotPath)}`);
   console.log(`Wrote ${path.relative(ROOT, LATEST_MD_PATH)}`);
   console.log(`Wrote ${path.relative(ROOT, LATEST_JSON_PATH)}`);
   console.log(`Wrote ${path.relative(ROOT, SLOW_ENDPOINTS_PATH)}`);

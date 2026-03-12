@@ -1,0 +1,173 @@
+{
+  "generated_at": "2026-03-11T23:34:22.269Z",
+  "baseline": {
+    "label": "baseline",
+    "generated_at": "2026-03-10T17:00:13.771Z",
+    "path": "/Users/cadechristensen/Source/ship/reports/api-latency/snapshots/2026-03-10T17-00-13-771Z--baseline.json"
+  },
+  "current": {
+    "label": "current-benchmark",
+    "generated_at": "2026-03-11T23:34:07.906Z",
+    "path": "/Users/cadechristensen/Source/ship/reports/api-latency/snapshots/2026-03-11T23-34-07-906Z--current-benchmark.json"
+  },
+  "gate": {
+    "metric": "p95_ms",
+    "concurrency": 25,
+    "threshold_pct": -20
+  },
+  "c25": [
+    {
+      "path": "/api/documents?type=wiki",
+      "p95_ms": {
+        "label": "p95_ms",
+        "baseline": 53,
+        "current": 48,
+        "delta_ms": -5,
+        "delta_pct": -9.433962264150944
+      },
+      "p99_ms": {
+        "label": "p99_ms",
+        "baseline": 55,
+        "current": 50,
+        "delta_ms": -5,
+        "delta_pct": -9.090909090909092
+      }
+    },
+    {
+      "path": "/api/issues",
+      "p95_ms": {
+        "label": "p95_ms",
+        "baseline": 48,
+        "current": 48,
+        "delta_ms": 0,
+        "delta_pct": 0
+      },
+      "p99_ms": {
+        "label": "p99_ms",
+        "baseline": 56,
+        "current": 51,
+        "delta_ms": -5,
+        "delta_pct": -8.928571428571429
+      }
+    },
+    {
+      "path": "/api/projects",
+      "p95_ms": {
+        "label": "p95_ms",
+        "baseline": 23,
+        "current": 21,
+        "delta_ms": -2,
+        "delta_pct": -8.695652173913043
+      },
+      "p99_ms": {
+        "label": "p99_ms",
+        "baseline": 27,
+        "current": 23,
+        "delta_ms": -4,
+        "delta_pct": -14.814814814814813
+      }
+    },
+    {
+      "path": "/api/programs",
+      "p95_ms": {
+        "label": "p95_ms",
+        "baseline": 14,
+        "current": 24,
+        "delta_ms": 10,
+        "delta_pct": 71.42857142857143
+      },
+      "p99_ms": {
+        "label": "p99_ms",
+        "baseline": 16,
+        "current": 27,
+        "delta_ms": 11,
+        "delta_pct": 68.75
+      }
+    },
+    {
+      "path": "/api/dashboard/my-week",
+      "p95_ms": {
+        "label": "p95_ms",
+        "baseline": 23,
+        "current": 45,
+        "delta_ms": 22,
+        "delta_pct": 95.65217391304348
+      },
+      "p99_ms": {
+        "label": "p99_ms",
+        "baseline": 26,
+        "current": 49,
+        "delta_ms": 23,
+        "delta_pct": 88.46153846153845
+      }
+    }
+  ],
+  "docs_and_issues_by_concurrency": [
+    {
+      "path": "/api/documents?type=wiki",
+      "concurrency": 10,
+      "p95_ms": {
+        "label": "p95_ms",
+        "baseline": 26,
+        "current": 24,
+        "delta_ms": -2,
+        "delta_pct": -7.6923076923076925
+      }
+    },
+    {
+      "path": "/api/documents?type=wiki",
+      "concurrency": 25,
+      "p95_ms": {
+        "label": "p95_ms",
+        "baseline": 53,
+        "current": 48,
+        "delta_ms": -5,
+        "delta_pct": -9.433962264150944
+      }
+    },
+    {
+      "path": "/api/documents?type=wiki",
+      "concurrency": 50,
+      "p95_ms": {
+        "label": "p95_ms",
+        "baseline": 102,
+        "current": 98,
+        "delta_ms": -4,
+        "delta_pct": -3.9215686274509802
+      }
+    },
+    {
+      "path": "/api/issues",
+      "concurrency": 10,
+      "p95_ms": {
+        "label": "p95_ms",
+        "baseline": 23,
+        "current": 23,
+        "delta_ms": 0,
+        "delta_pct": 0
+      }
+    },
+    {
+      "path": "/api/issues",
+      "concurrency": 25,
+      "p95_ms": {
+        "label": "p95_ms",
+        "baseline": 48,
+        "current": 48,
+        "delta_ms": 0,
+        "delta_pct": 0
+      }
+    },
+    {
+      "path": "/api/issues",
+      "concurrency": 50,
+      "p95_ms": {
+        "label": "p95_ms",
+        "baseline": 88,
+        "current": 98,
+        "delta_ms": 10,
+        "delta_pct": 11.363636363636363
+      }
+    }
+  ]
+}

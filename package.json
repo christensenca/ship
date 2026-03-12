@@ -39,6 +39,8 @@
     "report:type-safety:charts": "node scripts/type-safety-charts.mjs",
     "report:type-safety:baseline": "node scripts/type-safety-baseline.mjs",
     "report:api-latency": "node scripts/api-latency-report.mjs",
+    "report:api-latency:compare": "node scripts/api-latency-compare.mjs",
+    "report:api-latency:charts": "node scripts/api-latency-charts.mjs",
     "report:db-efficiency": "pnpm --filter @ship/api exec node --import tsx/esm ../scripts/db-query-efficiency-report.mjs",
     "report:test-coverage": "node scripts/test-coverage-report.mjs",
     "report:accessibility": "node scripts/accessibility-report.mjs",

@@ -1,12 +1,13 @@
 import { Router, Request, Response } from 'express';
 import { pool } from '../db/client.js';
 import { z } from 'zod';
-import { getVisibilityContext, VISIBILITY_FILTER_SQL } from '../middleware/visibility.js';
+import { getVisibilityContext, VISIBILITY_FILTER_SQL, resolveVisibilityContextFromRequest } from '../middleware/visibility.js';
 import { authMiddleware } from '../middleware/auth.js';
 import { DEFAULT_PROJECT_PROPERTIES, computeICEScore } from '@ship/shared';
 import { checkDocumentCompleteness } from '../utils/extractHypothesis.js';
 import { logDocumentChange, getLatestDocumentFieldHistory } from '../utils/document-crud.js';
 import { broadcastToUser } from '../collaboration/index.js';
+import { measureRequestPerf, measureRequestPerfAsync } from '../middleware/request-performance.js';
 
 type RouterType = ReturnType<typeof Router>;
 const router: RouterType = Router();
@@ -336,8 +337,7 @@ router.get('/', authMiddleware, async (req: Request, res: Response): Promise<voi
       return;
     }
 
-    // Get visibility context for filtering
-    const { isAdmin } = await getVisibilityContext(userId, workspaceId);
+    const { isAdmin } = await resolveVisibilityContextFromRequest(req, userId, workspaceId);
 
     // Build ORDER BY clause - ice_score is computed, others are from properties or columns
     let orderByClause: string;
@@ -420,8 +420,8 @@ router.get('/', authMiddleware, async (req: Request, res: Response): Promise<voi
 
     query += ` ORDER BY ${orderByClause}`;
 
-    const result = await pool.query(query, params);
-    res.json(result.rows.map(extractProjectFromRow));
+    const result = await measureRequestPerfAsync(req, 'db_main', () => pool.query(query, params));
+    res.json(measureRequestPerf(req, 'mapping', () => result.rows.map(extractProjectFromRow)));
   } catch (err) {
     console.error('List projects error:', err);
     res.status(500).json({ error: 'Internal server error' });

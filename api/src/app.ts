@@ -35,6 +35,7 @@ import weeklyPlansRoutes, { weeklyRetrosRouter } from './routes/weekly-plans.js'
 import { documentCommentsRouter, commentsRouter } from './routes/comments.js';
 import { setupSwagger } from './swagger.js';
 import { initializeCAIA } from './services/caia.js';
+import { requestPerformanceMiddleware } from './middleware/request-performance.js';
 
 // Validate SESSION_SECRET in production
 if (process.env.NODE_ENV === 'production' && !process.env.SESSION_SECRET) {
@@ -51,6 +52,9 @@ const { csrfSynchronisedProtection, generateToken } = csrfSync({
 // Conditional CSRF middleware - skip for API token auth (Bearer tokens are not vulnerable to CSRF)
 import { Request, Response, NextFunction } from 'express';
 const conditionalCsrf = (req: Request, res: Response, next: NextFunction) => {
+  if (req.method === 'GET' || req.method === 'HEAD' || req.method === 'OPTIONS') {
+    return next();
+  }
   const authHeader = req.headers?.authorization;
   if (authHeader && authHeader.startsWith('Bearer ')) {
     // Skip CSRF for API token requests - Bearer tokens are not auto-attached by browsers
@@ -90,6 +94,29 @@ const apiLimiter = rateLimit({
 
 export function createApp(corsOrigin: string = 'http://localhost:5173'): express.Express {
   const app = express();
+  const jsonParser = express.json({ limit: '10mb' });
+  const urlencodedParser = express.urlencoded({ extended: true, limit: '10mb' });
+  const sessionMiddleware = session({
+    secret: sessionSecret,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 15 * 60 * 1000, // 15 minutes
+    },
+  });
+
+  const skipSafeMethods = (middleware: express.RequestHandler): express.RequestHandler => (
+    (req, res, next) => {
+      if (req.method === 'GET' || req.method === 'HEAD' || req.method === 'OPTIONS') {
+        next();
+        return;
+      }
+      middleware(req, res, next);
+    }
+  );
 
   // Trust proxy headers (CloudFront) for secure cookies and correct protocol detection
   if (process.env.NODE_ENV === 'production') {
@@ -136,29 +163,18 @@ export function createApp(corsOrigin: string = 'http://localhost:5173'): express
 
   // Apply rate limiting to all API routes
   app.use('/api/', apiLimiter);
+  app.use(requestPerformanceMiddleware);
   app.use(cors({
     origin: corsOrigin,
     credentials: true,
   }));
-  app.use(express.json({ limit: '10mb' }));  // Large wiki documents can be several MB
-  app.use(express.urlencoded({ extended: true, limit: '10mb' })); // For HTML form submissions
   app.use(cookieParser(sessionSecret));
-
-  // Session middleware for CSRF token storage
-  app.use(session({
-    secret: sessionSecret,
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 15 * 60 * 1000, // 15 minutes
-    },
-  }));
+  app.use('/api/', skipSafeMethods(jsonParser));  // Large wiki documents can be several MB
+  app.use('/api/', skipSafeMethods(urlencodedParser)); // For HTML form submissions
+  app.use('/api/', skipSafeMethods(sessionMiddleware));
 
   // CSRF token endpoint (must be before CSRF protection middleware)
-  app.get('/api/csrf-token', (req, res) => {
+  app.get('/api/csrf-token', sessionMiddleware, (req, res) => {
     res.json({ token: generateToken(req) });
   });
 

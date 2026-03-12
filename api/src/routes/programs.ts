@@ -1,9 +1,10 @@
 import { Router, Request, Response } from 'express';
 import { pool } from '../db/client.js';
 import { z } from 'zod';
-import { getVisibilityContext, VISIBILITY_FILTER_SQL } from '../middleware/visibility.js';
+import { getVisibilityContext, VISIBILITY_FILTER_SQL, resolveVisibilityContextFromRequest } from '../middleware/visibility.js';
 import { authMiddleware } from '../middleware/auth.js';
 import { logAuditEvent } from '../services/audit.js';
+import { measureRequestPerf, measureRequestPerfAsync } from '../middleware/request-performance.js';
 
 type RouterType = ReturnType<typeof Router>;
 const router: RouterType = Router();
@@ -64,8 +65,7 @@ router.get('/', authMiddleware, async (req: Request, res: Response) => {
     const userId = req.userId!;
     const workspaceId = req.workspaceId!;
 
-    // Get visibility context for filtering
-    const { isAdmin } = await getVisibilityContext(userId, workspaceId);
+    const { isAdmin } = await resolveVisibilityContextFromRequest(req, userId, workspaceId);
 
     // owner_id in properties takes precedence over created_by
     let query = `
@@ -91,8 +91,8 @@ router.get('/', authMiddleware, async (req: Request, res: Response) => {
 
     query += ` ORDER BY d.created_at DESC`;
 
-    const result = await pool.query(query, params);
-    res.json(result.rows.map(extractProgramFromRow));
+    const result = await measureRequestPerfAsync(req, 'db_main', () => pool.query(query, params));
+    res.json(measureRequestPerf(req, 'mapping', () => result.rows.map(extractProgramFromRow)));
   } catch (err) {
     console.error('List programs error:', err);
     res.status(500).json({ error: 'Internal server error' });

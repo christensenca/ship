@@ -1,0 +1,173 @@
+{
+  "generated_at": "2026-03-11T22:46:18.502Z",
+  "baseline": {
+    "label": "baseline",
+    "generated_at": "2026-03-10T17:00:13.771Z",
+    "path": "/Users/cadechristensen/Source/ship/reports/api-latency/latest.json"
+  },
+  "current": {
+    "label": "current",
+    "generated_at": "2026-03-10T17:00:13.771Z",
+    "path": "/Users/cadechristensen/Source/ship/reports/api-latency/latest.json"
+  },
+  "gate": {
+    "metric": "p95_ms",
+    "concurrency": 25,
+    "threshold_pct": -20
+  },
+  "c25": [
+    {
+      "path": "/api/documents?type=wiki",
+      "p95_ms": {
+        "label": "p95_ms",
+        "baseline": 53,
+        "current": 53,
+        "delta_ms": 0,
+        "delta_pct": 0
+      },
+      "p99_ms": {
+        "label": "p99_ms",
+        "baseline": 55,
+        "current": 55,
+        "delta_ms": 0,
+        "delta_pct": 0
+      }
+    },
+    {
+      "path": "/api/issues",
+      "p95_ms": {
+        "label": "p95_ms",
+        "baseline": 48,
+        "current": 48,
+        "delta_ms": 0,
+        "delta_pct": 0
+      },
+      "p99_ms": {
+        "label": "p99_ms",
+        "baseline": 56,
+        "current": 56,
+        "delta_ms": 0,
+        "delta_pct": 0
+      }
+    },
+    {
+      "path": "/api/projects",
+      "p95_ms": {
+        "label": "p95_ms",
+        "baseline": 23,
+        "current": 23,
+        "delta_ms": 0,
+        "delta_pct": 0
+      },
+      "p99_ms": {
+        "label": "p99_ms",
+        "baseline": 27,
+        "current": 27,
+        "delta_ms": 0,
+        "delta_pct": 0
+      }
+    },
+    {
+      "path": "/api/programs",
+      "p95_ms": {
+        "label": "p95_ms",
+        "baseline": 14,
+        "current": 14,
+        "delta_ms": 0,
+        "delta_pct": 0
+      },
+      "p99_ms": {
+        "label": "p99_ms",
+        "baseline": 16,
+        "current": 16,
+        "delta_ms": 0,
+        "delta_pct": 0
+      }
+    },
+    {
+      "path": "/api/dashboard/my-week",
+      "p95_ms": {
+        "label": "p95_ms",
+        "baseline": 23,
+        "current": 23,
+        "delta_ms": 0,
+        "delta_pct": 0
+      },
+      "p99_ms": {
+        "label": "p99_ms",
+        "baseline": 26,
+        "current": 26,
+        "delta_ms": 0,
+        "delta_pct": 0
+      }
+    }
+  ],
+  "docs_and_issues_by_concurrency": [
+    {
+      "path": "/api/documents?type=wiki",
+      "concurrency": 10,
+      "p95_ms": {
+        "label": "p95_ms",
+        "baseline": 26,
+        "current": 26,
+        "delta_ms": 0,
+        "delta_pct": 0
+      }
+    },
+    {
+      "path": "/api/documents?type=wiki",
+      "concurrency": 25,
+      "p95_ms": {
+        "label": "p95_ms",
+        "baseline": 53,
+        "current": 53,
+        "delta_ms": 0,
+        "delta_pct": 0
+      }
+    },
+    {
+      "path": "/api/documents?type=wiki",
+      "concurrency": 50,
+      "p95_ms": {
+        "label": "p95_ms",
+        "baseline": 102,
+        "current": 102,
+        "delta_ms": 0,
+        "delta_pct": 0
+      }
+    },
+    {
+      "path": "/api/issues",
+      "concurrency": 10,
+      "p95_ms": {
+        "label": "p95_ms",
+        "baseline": 23,
+        "current": 23,
+        "delta_ms": 0,
+        "delta_pct": 0
+      }
+    },
+    {
+      "path": "/api/issues",
+      "concurrency": 25,
+      "p95_ms": {
+        "label": "p95_ms",
+        "baseline": 48,
+        "current": 48,
+        "delta_ms": 0,
+        "delta_pct": 0
+      }
+    },
+    {
+      "path": "/api/issues",
+      "concurrency": 50,
+      "p95_ms": {
+        "label": "p95_ms",
+        "baseline": 88,
+        "current": 88,
+        "delta_ms": 0,
+        "delta_pct": 0
+      }
+    }
+  ]
+}

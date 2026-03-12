@@ -1,4 +1,6 @@
+import type { Request } from 'express';
 import { pool } from '../db/client.js';
+import { measureRequestPerfAsync } from './request-performance.js';
 
 /**
  * Check if user is a workspace admin
@@ -29,6 +31,24 @@ export async function getVisibilityContext(
 ): Promise<{ isAdmin: boolean }> {
   const isAdmin = await isWorkspaceAdmin(userId, workspaceId);
   return { isAdmin };
+}
+
+export function getVisibilityContextFromRequest(req: Request): { isAdmin: boolean } {
+  return {
+    isAdmin: Boolean(req.isSuperAdmin || req.workspaceRole === 'admin'),
+  };
+}
+
+export async function resolveVisibilityContextFromRequest(
+  req: Request,
+  userId: string,
+  workspaceId: string
+): Promise<{ isAdmin: boolean }> {
+  if (req.workspaceRole || req.isSuperAdmin) {
+    return getVisibilityContextFromRequest(req);
+  }
+
+  return measureRequestPerfAsync(req, 'visibility', () => getVisibilityContext(userId, workspaceId));
 }
 
 /**
