@@ -69,17 +69,31 @@ router.get('/', authMiddleware, async (req: Request, res: Response) => {
 
     // owner_id in properties takes precedence over created_by
     let query = `
+      WITH program_issue_counts AS (
+        SELECT da.related_id AS program_id, COUNT(*)::int AS issue_count
+        FROM document_associations da
+        JOIN documents i ON i.id = da.document_id
+        WHERE da.relationship_type = 'program'
+          AND i.document_type = 'issue'
+        GROUP BY da.related_id
+      ),
+      program_sprint_counts AS (
+        SELECT da.related_id AS program_id, COUNT(*)::int AS sprint_count
+        FROM document_associations da
+        JOIN documents s ON s.id = da.document_id
+        WHERE da.relationship_type = 'program'
+          AND s.document_type = 'sprint'
+        GROUP BY da.related_id
+      )
       SELECT d.id, d.title, d.properties, d.archived_at, d.created_at, d.updated_at,
              COALESCE((d.properties->>'owner_id')::uuid, d.created_by) as owner_id,
              u.name as owner_name, u.email as owner_email,
-             (SELECT COUNT(*) FROM documents i
-              JOIN document_associations da ON da.document_id = i.id AND da.related_id = d.id AND da.relationship_type = 'program'
-              WHERE i.document_type = 'issue') as issue_count,
-             (SELECT COUNT(*) FROM documents s
-              JOIN document_associations da ON da.document_id = s.id AND da.related_id = d.id AND da.relationship_type = 'program'
-              WHERE s.document_type = 'sprint') as sprint_count
+             COALESCE(pic.issue_count, 0) AS issue_count,
+             COALESCE(psc.sprint_count, 0) AS sprint_count
       FROM documents d
       LEFT JOIN users u ON u.id = COALESCE((d.properties->>'owner_id')::uuid, d.created_by)
+      LEFT JOIN program_issue_counts pic ON pic.program_id = d.id
+      LEFT JOIN program_sprint_counts psc ON psc.program_id = d.id
       WHERE d.workspace_id = $1 AND d.document_type = 'program'
         AND ${VISIBILITY_FILTER_SQL('d', '$2', '$3')}
     `;

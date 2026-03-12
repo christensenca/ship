@@ -42,6 +42,8 @@
     "report:api-latency:compare": "node scripts/api-latency-compare.mjs",
     "report:api-latency:charts": "node scripts/api-latency-charts.mjs",
     "report:db-efficiency": "pnpm --filter @ship/api exec node --import tsx/esm ../scripts/db-query-efficiency-report.mjs",
+    "report:db-efficiency:compare": "node scripts/db-query-efficiency-compare.mjs",
+    "report:db-efficiency:charts": "node scripts/db-query-efficiency-charts.mjs",
     "report:test-coverage": "node scripts/test-coverage-report.mjs",
     "report:accessibility": "node scripts/accessibility-report.mjs",
     "audit:api-latency": "pnpm db:seed:perf && pnpm report:api-latency",
