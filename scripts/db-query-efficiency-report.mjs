@@ -22,6 +22,7 @@ import path from 'node:path';
 import request from 'supertest';
 import { createApp } from '../api/src/app.ts';
 import { pool } from '../api/src/db/client.ts';
+import { ensureDir as ensureSharedDir, slugify } from './api-latency-lib.mjs';
 
 process.env.NODE_ENV ??= 'development';
 process.env.API_BENCHMARK = '1';
@@ -29,12 +30,14 @@ process.env.API_BENCHMARK = '1';
 const SCRIPT_DIR = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(SCRIPT_DIR, '..');
 const OUTPUT_DIR = path.join(ROOT, 'reports', 'db-query-efficiency');
+const SNAPSHOTS_DIR = path.join(OUTPUT_DIR, 'snapshots');
 const LATEST_JSON_PATH = path.join(OUTPUT_DIR, 'latest.json');
 const LATEST_MD_PATH = path.join(OUTPUT_DIR, 'latest.md');
 const HISTORY_PATH = path.join(OUTPUT_DIR, 'history.jsonl');
 
 function ensureDir() {
-  fs.mkdirSync(OUTPUT_DIR, { recursive: true });
+  ensureSharedDir(OUTPUT_DIR);
+  ensureSharedDir(SNAPSHOTS_DIR);
 }
 
 function readJsonSafe(filePath) {
@@ -92,6 +95,21 @@ function summarizeSql(sql) {
 function buildSearchTerm(source) {
   const matches = source.match(/[A-Za-z0-9]{3,}/g) || [];
   return (matches[0] || source.slice(0, 3) || 'ship').slice(0, 12);
+}
+
+function parseArgs(argv) {
+  const result = { label: 'current', refresh: null };
+  for (let i = 0; i < argv.length; i += 1) {
+    const arg = argv[i];
+    if (arg === '--label' && argv[i + 1]) {
+      result.label = argv[i + 1];
+      i += 1;
+    } else if (arg === '--refresh' && argv[i + 1]) {
+      result.refresh = argv[i + 1];
+      i += 1;
+    }
+  }
+  return result;
 }
 
 let activeCapture = null;
@@ -210,20 +228,70 @@ function collectSeqScanNodes(node, acc = []) {
   return acc;
 }
 
-function detectRepeatedQueryTemplates(requestResult) {
+function groupRepeatedReadQueries(queries) {
   const grouped = new Map();
 
-  for (const query of requestResult.queries) {
+  for (const [index, query] of queries.entries()) {
     if (!isReadQuery(query.sql)) continue;
     const key = query.sql_template;
-    const bucket = grouped.get(key) || { count: 0, params: new Set(), sql_summary: query.sql_summary };
+    const bucket = grouped.get(key) || {
+      count: 0,
+      params: new Set(),
+      sql_summary: query.sql_summary,
+      first_index: index,
+      indexes: [],
+    };
     bucket.count += 1;
     bucket.params.add(JSON.stringify(query.params));
+    bucket.indexes.push(index);
+    bucket.first_index = Math.min(bucket.first_index, index);
     grouped.set(key, bucket);
   }
 
   return [...grouped.values()]
-    .filter((item) => item.count >= 3 && item.params.size >= 3)
+    .filter((item) => item.count >= 3 && item.params.size >= 3);
+}
+
+function detectRequestFanoutN1(requestResult) {
+  const repeatedGroups = groupRepeatedReadQueries(requestResult.queries);
+  const findings = [];
+
+  for (const group of repeatedGroups) {
+    const parentCandidates = requestResult.queries
+      .slice(0, group.first_index)
+      .filter((query) => isReadQuery(query.sql) && Number.isFinite(query.row_count) && query.row_count >= 2);
+
+    if (parentCandidates.length === 0) continue;
+
+    const parent = parentCandidates
+      .map((query) => ({
+        query,
+        distance: Math.abs((query.row_count || 0) - group.count),
+      }))
+      .sort((a, b) => a.distance - b.distance)[0]?.query;
+
+    if (!parent?.row_count) continue;
+
+    const lowerBound = Math.max(3, Math.floor(parent.row_count * 0.6));
+    const upperBound = Math.max(parent.row_count + 2, Math.ceil(parent.row_count * 1.5));
+    if (group.count < lowerBound || group.count > upperBound) continue;
+
+    findings.push({
+      type: 'fanout_n1',
+      description: `${group.count} child lookups executed after a parent query returned ${parent.row_count} rows`,
+      sql_summary: group.sql_summary,
+      executions: group.count,
+      distinct_param_sets: group.params.size,
+      parent_sql_summary: parent.sql_summary,
+      parent_row_count: parent.row_count,
+    });
+  }
+
+  return findings;
+}
+
+function detectRepeatedQueryTemplates(requestResult) {
+  return groupRepeatedReadQueries(requestResult.queries)
     .map((item) => ({
       type: 'repeated_query_template',
       description: `${item.count} repeated executions of the same query template within one request`,
@@ -570,8 +638,9 @@ async function analyzeObservedQueries(flowResults) {
     const queryDetails = [];
 
     for (const requestResult of flow.requests) {
-      if (requestResult.request_n1_findings.length > 0) {
-        requestLevelN1.push(...requestResult.request_n1_findings.map((finding) => ({
+      const fanoutFindings = detectRequestFanoutN1(requestResult);
+      if (fanoutFindings.length > 0) {
+        requestLevelN1.push(...fanoutFindings.map((finding) => ({
           ...finding,
           request_label: requestResult.label,
         })));
@@ -613,6 +682,8 @@ async function analyzeObservedQueries(flowResults) {
           request_label: requestResult.label,
           path: requestResult.path,
           observed_duration_ms: query.duration_ms,
+          sql: query.sql,
+          params: query.params,
           sql_summary: query.sql_summary,
           query_type: query.query_type,
           row_count: query.row_count,
@@ -646,12 +717,50 @@ async function analyzeObservedQueries(flowResults) {
   return { flowResults, indexFindings };
 }
 
+function recalculateFlowN1(flowResults) {
+  for (const flow of flowResults) {
+    const requestLevelN1 = [];
+
+    for (const requestResult of flow.requests || []) {
+      const fanoutFindings = detectRequestFanoutN1(requestResult);
+      if (fanoutFindings.length > 0) {
+        requestLevelN1.push(...fanoutFindings.map((finding) => ({
+          ...finding,
+          request_label: requestResult.label,
+        })));
+      }
+    }
+
+    const planN1 = (flow.query_details || []).flatMap((detail) =>
+      (detail.n1_findings || []).map((finding) => ({
+        ...finding,
+        request_label: detail.request_label,
+        sql_summary: detail.sql_summary,
+      }))
+    );
+
+    flow.n1_findings = [...requestLevelN1, ...planN1];
+    flow.n1_detected = flow.n1_findings.length > 0;
+  }
+
+  return flowResults;
+}
+
 function buildMarkdown(report) {
   const lines = [];
   lines.push('# Database Query Efficiency Report');
   lines.push('');
   lines.push(`Generated: ${report.generated_at}`);
+  lines.push(`Label: ${report.label}`);
   lines.push(`Database: ${report.database}`);
+  lines.push('');
+  lines.push('## How To Read This Report');
+  lines.push('');
+  lines.push('- **Workflow** = a full user action, such as loading a page.');
+  lines.push('- **Request** = one HTTP call made during that workflow.');
+  lines.push('- **SQL query** = one database statement executed inside a request.');
+  lines.push('- Workflow DB time is the sum of SQL query time across all requests in that workflow.');
+  lines.push('- Request DB time is the sum of SQL query time inside that single request.');
   lines.push('');
   lines.push('## Methodology');
   lines.push('');
@@ -659,27 +768,30 @@ function buildMarkdown(report) {
   lines.push('- Authentication: session cookie auth, so auth middleware queries are included.');
   lines.push('- Query capture: every `pool.query()` emitted during each request.');
   lines.push('- Plan analysis: `EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON)` rerun only for observed read queries.');
+  lines.push('- N+1 detection: flags correlated SQL subplans and repeated child lookups whose count scales with parent rows inside a request.');
   lines.push('- Flow mapping uses the frontend routes and API calls the UI actually makes on initial load.');
   lines.push('');
-  lines.push('## Audit Deliverable');
+  lines.push('## Workflow Summary');
   lines.push('');
-  lines.push('| User Flow | Total Queries | Slowest Query (ms) | N+1 Detected? |');
+  lines.push('| Workflow | Total SQL Queries | Slowest SQL Query (ms) | N+1 Detected? |');
   lines.push('|---|---:|---:|---|');
   for (const flow of report.flow_results) {
     lines.push(`| ${flow.flow} | ${flow.query_count} | ${flow.slowest_query_ms}ms | ${flow.n1_detected ? 'Yes' : 'No'} |`);
   }
   lines.push('');
 
-  lines.push('## Flow Details');
+  lines.push('## Workflow Breakdown');
   lines.push('');
   for (const flow of report.flow_results) {
     lines.push(`### ${flow.flow}`);
     lines.push(`_${flow.description}_`);
     lines.push('');
+    lines.push('**Workflow Overview**');
+    lines.push('');
     lines.push(`- Frontend route: \`${flow.frontend_route}\``);
-    lines.push(`- Total queries: ${flow.query_count}`);
+    lines.push(`- Total SQL queries: ${flow.query_count}`);
     lines.push(`- Total DB time: ${flow.total_time_ms}ms`);
-    lines.push(`- Slowest observed query: ${flow.slowest_query_ms}ms`);
+    lines.push(`- Slowest observed SQL query: ${flow.slowest_query_ms}ms`);
     lines.push(`- Sequential scans: ${flow.has_seq_scan ? 'Yes' : 'No'}`);
     lines.push(`- Nested loops: ${flow.has_nested_loop ? 'Yes' : 'No'}`);
     if (flow.n1_findings.length > 0) {
@@ -696,11 +808,13 @@ function buildMarkdown(report) {
       }
     }
     lines.push('');
-    lines.push('| Request | Status | Query Count | DB Time (ms) |');
-    lines.push('|---|---:|---:|---:|');
+    lines.push('**Requests In This Workflow**');
+    lines.push('');
+    lines.push('| Request | Path | Status | SQL Query Count | DB Time (ms) |');
+    lines.push('|---|---|---:|---:|---:|');
     for (const requestResult of flow.requests) {
       const dbTime = round(requestResult.queries.reduce((sum, query) => sum + query.duration_ms, 0));
-      lines.push(`| ${requestResult.label} | ${requestResult.status} | ${requestResult.queries.length} | ${dbTime} |`);
+      lines.push(`| ${requestResult.label} | \`${requestResult.path}\` | ${requestResult.status} | ${requestResult.queries.length} | ${dbTime} |`);
     }
     lines.push('');
   }
@@ -712,10 +826,12 @@ function buildMarkdown(report) {
     .slice(0, 8);
 
   if (slowQueries.length > 0) {
-    lines.push('## Slow Query Plans');
+    lines.push('## Individual SQL Query Plans');
     lines.push('');
     for (const query of slowQueries) {
       lines.push(`### ${query.flow} / ${query.request_label} (${query.observed_duration_ms}ms)`);
+      lines.push('');
+      lines.push(`Workflow request: \`${query.request_label}\``);
       lines.push('');
       lines.push(`SQL: \`${query.sql_summary}\``);
       lines.push('');
@@ -760,6 +876,30 @@ function buildMarkdown(report) {
 
 async function main() {
   ensureDir();
+  const { label, refresh } = parseArgs(process.argv.slice(2));
+
+  if (refresh) {
+    const refreshPath = path.isAbsolute(refresh) ? refresh : path.join(ROOT, refresh);
+    const existing = readJsonSafe(refreshPath);
+    if (!existing) {
+      throw new Error(`Unable to read report JSON from ${refreshPath}`);
+    }
+
+    existing.label ??= path.basename(refreshPath, '.json');
+    existing.flow_results = recalculateFlowN1(existing.flow_results || []);
+    const refreshedMarkdown = buildMarkdown(existing);
+    fs.writeFileSync(refreshPath, `${JSON.stringify(existing, null, 2)}\n`, 'utf8');
+
+    const markdownPath = refreshPath.endsWith('.json')
+      ? refreshPath.slice(0, -5) + '.md'
+      : `${refreshPath}.md`;
+    fs.writeFileSync(markdownPath, `${refreshedMarkdown}\n`, 'utf8');
+
+    console.log(`Refreshed ${path.relative(ROOT, refreshPath)}`);
+    console.log(`Refreshed ${path.relative(ROOT, markdownPath)}`);
+    return;
+  }
+
   console.log('Database Query Efficiency Report');
   console.log('================================\n');
 
@@ -796,6 +936,7 @@ async function main() {
     }
 
     const report = {
+      label,
       generated_at: new Date().toISOString(),
       database: maskDatabaseUrl(databaseUrl),
       methodology: {
@@ -824,11 +965,19 @@ async function main() {
       },
     };
 
+    const snapshotSlug = `${report.generated_at.replaceAll(':', '-').replaceAll('.', '-') }--${slugify(label)}`;
+    const snapshotJsonPath = path.join(SNAPSHOTS_DIR, `${snapshotSlug}.json`);
+    const snapshotMdPath = path.join(SNAPSHOTS_DIR, `${snapshotSlug}.md`);
+
     fs.writeFileSync(LATEST_JSON_PATH, JSON.stringify(report, null, 2) + '\n', 'utf8');
     fs.appendFileSync(HISTORY_PATH, JSON.stringify(report) + '\n', 'utf8');
-    fs.writeFileSync(LATEST_MD_PATH, buildMarkdown(report), 'utf8');
+    const markdown = buildMarkdown(report);
+    fs.writeFileSync(LATEST_MD_PATH, markdown, 'utf8');
+    fs.writeFileSync(snapshotJsonPath, JSON.stringify(report, null, 2) + '\n', 'utf8');
+    fs.writeFileSync(snapshotMdPath, markdown, 'utf8');
 
     console.log(`\nWrote ${path.relative(ROOT, LATEST_MD_PATH)}`);
+    console.log(`Wrote ${path.relative(ROOT, snapshotJsonPath)}`);
   } finally {
     await originalQuery('DELETE FROM sessions WHERE id = $1', [sessionId]).catch(() => {});
     await pool.end().catch(() => {});

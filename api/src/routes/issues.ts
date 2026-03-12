@@ -221,62 +221,85 @@ router.get('/', authMiddleware, async (req: Request, res: Response): Promise<voi
     const { isAdmin } = await resolveVisibilityContextFromRequest(req, userId, workspaceId);
 
     let query = `
-      SELECT d.id, d.title, d.ticket_number,
-             d.properties->>'state' as state,
-             d.properties->>'priority' as priority,
-             d.properties->>'assignee_id' as assignee_id,
-             CASE
-               WHEN d.properties ? 'estimate' AND d.properties->>'estimate' <> ''
-               THEN (d.properties->>'estimate')::numeric
-               ELSE NULL
-             END as estimate,
-             d.properties->>'source' as source,
-             d.properties->>'rejection_reason' as rejection_reason,
-             d.properties->>'due_date' as due_date,
-             COALESCE((d.properties->>'is_system_generated')::boolean, false) as is_system_generated,
-             d.properties->>'accountability_target_id' as accountability_target_id,
-             d.properties->>'accountability_type' as accountability_type,
-             d.created_at, d.updated_at, d.created_by,
-             d.started_at, d.completed_at, d.cancelled_at, d.reopened_at,
-             d.converted_from_id,
-             u.name as assignee_name,
-             CASE WHEN person_doc.archived_at IS NOT NULL THEN true ELSE false END as assignee_archived
-      FROM documents d
-      LEFT JOIN users u ON (d.properties->>'assignee_id')::uuid = u.id
-      LEFT JOIN documents person_doc ON person_doc.workspace_id = d.workspace_id
-        AND person_doc.document_type = 'person'
-        AND person_doc.properties->>'user_id' = d.properties->>'assignee_id'
-      WHERE d.workspace_id = $1 AND d.document_type = 'issue'
-        AND ${VISIBILITY_FILTER_SQL('d', '$2', '$3')}
+      WITH filtered_issues AS (
+        SELECT d.id, d.workspace_id, d.title, d.ticket_number,
+               d.properties->>'state' as state,
+               d.properties->>'priority' as priority,
+               d.properties->>'assignee_id' as assignee_id,
+               CASE
+                 WHEN d.properties ? 'estimate' AND d.properties->>'estimate' <> ''
+                 THEN (d.properties->>'estimate')::numeric
+                 ELSE NULL
+               END as estimate,
+               d.properties->>'source' as source,
+               d.properties->>'rejection_reason' as rejection_reason,
+               d.properties->>'due_date' as due_date,
+               COALESCE((d.properties->>'is_system_generated')::boolean, false) as is_system_generated,
+               d.properties->>'accountability_target_id' as accountability_target_id,
+               d.properties->>'accountability_type' as accountability_type,
+               d.created_at, d.updated_at, d.created_by,
+               d.started_at, d.completed_at, d.cancelled_at, d.reopened_at,
+               d.converted_from_id
+        FROM documents d
+        WHERE d.workspace_id = $1 AND d.document_type = 'issue'
+          AND d.archived_at IS NULL
+          AND d.deleted_at IS NULL
+          AND ${VISIBILITY_FILTER_SQL('d', '$2', '$3')}
+      ),
+      assignee_lookup AS (
+        SELECT DISTINCT fi.assignee_id
+        FROM filtered_issues fi
+        WHERE fi.assignee_id IS NOT NULL AND fi.assignee_id <> ''
+      ),
+      assignee_details AS (
+        SELECT al.assignee_id,
+               u.name AS assignee_name,
+               CASE WHEN person_doc.archived_at IS NOT NULL THEN true ELSE false END AS assignee_archived
+        FROM assignee_lookup al
+        LEFT JOIN users u ON al.assignee_id::uuid = u.id
+        LEFT JOIN documents person_doc ON person_doc.workspace_id = $1
+          AND person_doc.document_type = 'person'
+          AND person_doc.properties->>'user_id' = al.assignee_id
+      )
+      SELECT fi.id, fi.title, fi.ticket_number,
+             fi.state, fi.priority, fi.assignee_id, fi.estimate,
+             fi.source, fi.rejection_reason, fi.due_date, fi.is_system_generated,
+             fi.accountability_target_id, fi.accountability_type,
+             fi.created_at, fi.updated_at, fi.created_by,
+             fi.started_at, fi.completed_at, fi.cancelled_at, fi.reopened_at,
+             fi.converted_from_id,
+             ad.assignee_name,
+             COALESCE(ad.assignee_archived, false) AS assignee_archived
+      FROM filtered_issues fi
+      LEFT JOIN assignee_details ad ON ad.assignee_id = fi.assignee_id
+      WHERE 1 = 1
     `;
     const params: (string | boolean | null)[] = [workspaceId, userId, isAdmin];
 
     // Exclude archived and deleted issues by default
-    query += ` AND d.archived_at IS NULL AND d.deleted_at IS NULL`;
-
     // Filter by source if specified (internal or external)
     if (source) {
-      query += ` AND d.properties->>'source' = $${params.length + 1}`;
+      query += ` AND fi.source = $${params.length + 1}`;
       params.push(source as string);
     }
     // No default filtering - show all issues regardless of source
 
     if (state) {
       const states = (state as string).split(',');
-      query += ` AND d.properties->>'state' = ANY($${params.length + 1})`;
+      query += ` AND fi.state = ANY($${params.length + 1})`;
       params.push(states as any);
     }
 
     if (priority) {
-      query += ` AND d.properties->>'priority' = $${params.length + 1}`;
+      query += ` AND fi.priority = $${params.length + 1}`;
       params.push(priority as string);
     }
 
     if (assignee_id) {
       if (assignee_id === 'null' || assignee_id === 'unassigned') {
-        query += ` AND (d.properties->>'assignee_id' IS NULL OR d.properties->>'assignee_id' = '')`;
+        query += ` AND (fi.assignee_id IS NULL OR fi.assignee_id = '')`;
       } else {
-        query += ` AND d.properties->>'assignee_id' = $${params.length + 1}`;
+        query += ` AND fi.assignee_id = $${params.length + 1}`;
         params.push(assignee_id as string);
       }
     }
@@ -285,7 +308,7 @@ router.get('/', authMiddleware, async (req: Request, res: Response): Promise<voi
     if (program_id) {
       query += ` AND EXISTS (
         SELECT 1 FROM document_associations da
-        WHERE da.document_id = d.id AND da.related_id = $${params.length + 1} AND da.relationship_type = 'program'
+        WHERE da.document_id = fi.id AND da.related_id = $${params.length + 1} AND da.relationship_type = 'program'
       )`;
       params.push(program_id as string);
     }
@@ -294,7 +317,7 @@ router.get('/', authMiddleware, async (req: Request, res: Response): Promise<voi
     if (sprint_id) {
       query += ` AND EXISTS (
         SELECT 1 FROM document_associations da
-        WHERE da.document_id = d.id AND da.related_id = $${params.length + 1} AND da.relationship_type = 'sprint'
+        WHERE da.document_id = fi.id AND da.related_id = $${params.length + 1} AND da.relationship_type = 'sprint'
       )`;
       params.push(sprint_id as string);
     }
@@ -305,32 +328,32 @@ router.get('/', authMiddleware, async (req: Request, res: Response): Promise<voi
         // Issues that have NO parent (not a sub-issue)
         query += ` AND NOT EXISTS (
           SELECT 1 FROM document_associations da
-          WHERE da.document_id = d.id AND da.relationship_type = 'parent'
+          WHERE da.document_id = fi.id AND da.relationship_type = 'parent'
         )`;
       } else if (parent_filter === 'has_children') {
         // Issues that HAVE at least one child (sub-issue)
         query += ` AND EXISTS (
           SELECT 1 FROM document_associations da
-          WHERE da.related_id = d.id AND da.relationship_type = 'parent'
+          WHERE da.related_id = fi.id AND da.relationship_type = 'parent'
         )`;
       } else if (parent_filter === 'is_sub_issue') {
         // Issues that ARE sub-issues (have a parent)
         query += ` AND EXISTS (
           SELECT 1 FROM document_associations da
-          WHERE da.document_id = d.id AND da.relationship_type = 'parent'
+          WHERE da.document_id = fi.id AND da.relationship_type = 'parent'
         )`;
       }
     }
 
     query += ` ORDER BY
-      CASE d.properties->>'priority'
+      CASE fi.priority
         WHEN 'urgent' THEN 1
         WHEN 'high' THEN 2
         WHEN 'medium' THEN 3
         WHEN 'low' THEN 4
         ELSE 5
       END,
-      d.updated_at DESC`;
+      fi.updated_at DESC`;
 
     const result = await measureRequestPerfAsync(req, 'db_main', () => pool.query<IssueListRow>(query, params));
 
