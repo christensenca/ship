@@ -119,18 +119,18 @@ Local dev uses `.env.local` for DB connection.
 
 ## Deployment
 
-**Just run the scripts.** Use `/workflows:deploy` for the full workflow, or run manually:
+**AWS (Elastic Beanstalk + S3/CloudFront):** Use `/ship-deploy` or run manually:
 
 ```bash
 ./scripts/deploy.sh prod           # Backend → Elastic Beanstalk
 ./scripts/deploy-frontend.sh prod  # Frontend → S3/CloudFront
 ```
 
-**After deploy, verify with browser** (curl can't catch JS errors). Health checks:
-- Prod API: `http://ship-api-prod.eba-xsaqsg9h.us-east-1.elasticbeanstalk.com/health`
-- Prod Web: `https://ship.awsdev.treasury.gov`
+**Railway:** Use `/railway-deploy` for the full Railway workflow. Services:
+- API: https://api-production-afed.up.railway.app
+- Web: https://web-production-2625cd.up.railway.app
 
-**Shadow (UAT):** Deploy to shadow from `feat/unified-document-model-v2` before merging to master.
+**After deploy, verify with browser** (curl can't catch JS errors).
 
 ## Philosophy Enforcement
 
