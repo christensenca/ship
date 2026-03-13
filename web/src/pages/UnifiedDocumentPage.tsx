@@ -14,6 +14,7 @@ import { issueKeys } from '@/hooks/useIssuesQuery';
 import { projectKeys, useProjectWeeksQuery } from '@/hooks/useProjectsQuery';
 import { TabBar } from '@/components/ui/TabBar';
 import { useCurrentDocument } from '@/contexts/CurrentDocumentContext';
+import { useRealtimeEvent } from '@/hooks/useRealtimeEvents';
 import {
   getTabsForDocument,
   documentTypeHasTabs,
@@ -42,6 +43,23 @@ export function UnifiedDocumentPage(): JSX.Element | null {
   const { user } = useAuth();
   const { showToast } = useToast();
   const { setCurrentDocument, clearCurrentDocument } = useCurrentDocument();
+
+  const handleRealtimeDocumentUpdate = useCallback((event: { data: Record<string, unknown> }): void => {
+    if (!id) return;
+    if (event.data.documentId !== id) return;
+
+    queryClient.setQueryData<DocumentResponse | undefined>(['document', id], (current) => {
+      if (!current) return current;
+
+      return {
+        ...current,
+        ...(typeof event.data.title === 'string' ? { title: event.data.title } : {}),
+        updated_at: new Date().toISOString(),
+      };
+    });
+  }, [id, queryClient]);
+
+  useRealtimeEvent('document:updated', handleRealtimeDocumentUpdate);
 
   // Fetch the document by ID
   const { data: document, isLoading, error } = useQuery<DocumentResponse>({
@@ -243,6 +261,11 @@ export function UnifiedDocumentPage(): JSX.Element | null {
     documentId: string;
   }
 
+  const isTitleOnlyUpdate = useCallback((updates: Partial<DocumentResponse>): boolean => {
+    const keys = Object.keys(updates);
+    return keys.length === 1 && keys[0] === 'title';
+  }, []);
+
   // Update mutation with optimistic updates
   const updateMutation = useMutation({
     mutationFn: async ({ documentId, updates }: UpdateMutationVariables): Promise<DocumentResponse> => {
@@ -273,8 +296,12 @@ export function UnifiedDocumentPage(): JSX.Element | null {
         queryClient.setQueryData(['document', context.documentId], context.previousDocument);
       }
     },
-    onSuccess: (_data: DocumentResponse, { documentId }: UpdateMutationVariables): void => {
-      queryClient.invalidateQueries({ queryKey: ['document', documentId] });
+    onSuccess: (data: DocumentResponse, { documentId, updates }: UpdateMutationVariables): void => {
+      if (isTitleOnlyUpdate(updates)) {
+        queryClient.setQueryData(['document', documentId], data);
+      } else {
+        queryClient.invalidateQueries({ queryKey: ['document', documentId] });
+      }
       // Also invalidate type-specific queries for list views
       if (document?.document_type) {
         queryClient.invalidateQueries({ queryKey: [document.document_type + 's', 'list'] });

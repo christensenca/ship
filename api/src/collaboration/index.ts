@@ -600,6 +600,20 @@ export function broadcastToUser(userId: string, eventType: string, data?: Record
   }
 }
 
+export function broadcastToDocumentUsers(docId: string, eventType: string, data?: Record<string, unknown>): void {
+  const userIds = new Set<string>();
+
+  conns.forEach((conn) => {
+    if (parseDocId(conn.docName) === docId) {
+      userIds.add(conn.userId);
+    }
+  });
+
+  userIds.forEach((userId) => {
+    broadcastToUser(userId, eventType, data);
+  });
+}
+
 // DDoS protection: Max WebSocket message size (10MB, matches REST API limit)
 const MAX_WS_MESSAGE_SIZE = 10 * 1024 * 1024;
 

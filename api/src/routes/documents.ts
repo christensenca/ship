@@ -3,7 +3,7 @@ import { pool } from '../db/client.js';
 import { z } from 'zod';
 import { authMiddleware } from '../middleware/auth.js';
 import { resolveVisibilityContextFromRequest, isWorkspaceAdmin } from '../middleware/visibility.js';
-import { handleVisibilityChange, handleDocumentConversion, invalidateDocumentCache, broadcastToUser } from '../collaboration/index.js';
+import { handleVisibilityChange, handleDocumentConversion, invalidateDocumentCache, broadcastToUser, broadcastToDocumentUsers } from '../collaboration/index.js';
 import { extractHypothesisFromContent, extractSuccessCriteriaFromContent, extractVisionFromContent, extractGoalsFromContent, checkDocumentCompleteness } from '../utils/extractHypothesis.js';
 import { loadContentFromYjsState } from '../utils/yjsConverter.js';
 import { measureRequestPerf, measureRequestPerfAsync } from '../middleware/request-performance.js';
@@ -1043,6 +1043,13 @@ router.patch('/:id', authMiddleware, async (req: Request, res: Response) => {
     // Invalidate collaboration cache when content is updated via API
     if (contentUpdated) {
       invalidateDocumentCache(id);
+    }
+
+    if (data.title !== undefined && data.title !== existing.title) {
+      broadcastToDocumentUsers(id, 'document:updated', {
+        documentId: id,
+        title: data.title,
+      });
     }
 
     // Notify WebSocket collaboration server to disconnect users who lost access

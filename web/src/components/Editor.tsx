@@ -186,6 +186,7 @@ export function Editor({
 }: EditorProps): React.JSX.Element {
   const [title, setTitle] = useState(initialTitle === 'Untitled' ? '' : initialTitle);
   const titleInputRef = useRef<HTMLTextAreaElement>(null);
+  const isTitleFocusedRef = useRef(false);
 
   // Track if user has made local changes (to prevent stale server responses from overwriting)
   const hasLocalChangesRef = useRef(false);
@@ -197,15 +198,14 @@ export function Editor({
   // that contains content from a different document (cross-document contamination bug)
   const ydoc = useMemo((): Y.Doc => new Y.Doc(), [documentId]);
 
-  // Sync title when initialTitle prop changes (e.g., from context update)
-  // Only update if user hasn't made local changes (prevents stale responses from overwriting)
+  // Sync title when initialTitle prop changes (e.g., from context update).
+  // Only suppress remote updates while the title field is actively focused.
   useEffect((): void => {
     const newTitle = initialTitle === 'Untitled' ? '' : initialTitle;
-    // Only update if this is a genuinely new value from server
-    // AND user hasn't made local changes since
-    if (!hasLocalChangesRef.current && initialTitle !== lastSyncedTitleRef.current) {
+    if (!isTitleFocusedRef.current && initialTitle !== lastSyncedTitleRef.current) {
       setTitle(newTitle);
       lastSyncedTitleRef.current = initialTitle;
+      hasLocalChangesRef.current = false;
     }
   }, [initialTitle]);
 
@@ -233,10 +233,20 @@ export function Editor({
     return localStorage.getItem('ship:rightSidebarCollapsed') === 'true';
   });
   const [portalTarget, setPortalTarget] = useState<HTMLElement | null>(null);
+  const onBackRef = useRef(onBack);
+  const onDocumentConvertedRef = useRef(onDocumentConverted);
 
   // AbortController for cancelling async uploads (images, files) when navigating away
   // This prevents uploads from completing into a different document after navigation
   const imageUploadAbortRef = useRef<AbortController>(new AbortController());
+
+  useEffect((): void => {
+    onBackRef.current = onBack;
+  }, [onBack]);
+
+  useEffect((): void => {
+    onDocumentConvertedRef.current = onDocumentConverted;
+  }, [onDocumentConverted]);
 
   // Find portal target for properties sidebar (for proper landmark order)
   useLayoutEffect((): void => {
@@ -403,7 +413,7 @@ export function Editor({
           // Show user-friendly message
           alert('Access to this document has been revoked. The document is now private.');
           // Navigate back if possible
-          onBack?.();
+          onBackRef.current?.();
         } else if (event?.code === 4100) {
           console.log(`[Editor] Document ${documentId} was converted`);
           // Disable auto-reconnect since document was converted
@@ -411,17 +421,17 @@ export function Editor({
           // Parse conversion info from close reason
           try {
             const conversionInfo = JSON.parse(event.reason || '{}');
-            if (conversionInfo.newDocId && conversionInfo.newDocType && onDocumentConverted) {
-              onDocumentConverted(conversionInfo.newDocId, conversionInfo.newDocType);
+            if (conversionInfo.newDocId && conversionInfo.newDocType && onDocumentConvertedRef.current) {
+              onDocumentConvertedRef.current(conversionInfo.newDocId, conversionInfo.newDocType);
             } else {
               // Fallback if callback not provided or info missing
               alert('This document was converted. Please refresh to view the new document.');
-              onBack?.();
+              onBackRef.current?.();
             }
           } catch {
             console.error('[Editor] Failed to parse conversion info:', event.reason);
             alert('This document was converted. Please refresh to view the new document.');
-            onBack?.();
+            onBackRef.current?.();
           }
         } else if (event?.code === 4101) {
           // Content updated via API - clear IndexedDB cache to prevent stale content merge
@@ -500,7 +510,7 @@ export function Editor({
       setProvider(null);
       setConnectedUsers([]);
     };
-  }, [documentId, userName, color, ydoc, roomPrefix, onBack, onDocumentConverted]);
+  }, [documentId, userName, color, ydoc, roomPrefix]);
 
   // Create slash commands extension (memoized to avoid recreation)
   // documentId is in deps to ensure fresh AbortSignal when switching documents
@@ -810,8 +820,19 @@ export function Editor({
     const newTitle = e.target.value;
     hasLocalChangesRef.current = true; // Mark as having local changes to prevent stale overwrites
     setTitle(newTitle);
-    onTitleChange?.(newTitle);
   }, [onTitleChange]);
+
+  const handleTitleCommit = useCallback((): void => {
+    if (!hasLocalChangesRef.current) return;
+
+    const normalizedTitle = title || 'Untitled';
+    if (normalizedTitle === lastSyncedTitleRef.current) {
+      hasLocalChangesRef.current = false;
+      return;
+    }
+
+    onTitleChange?.(title);
+  }, [documentId, onTitleChange, roomPrefix, title]);
 
   return (
     <div className="flex h-full flex-col">
@@ -928,11 +949,20 @@ export function Editor({
               ref={titleInputRef}
               value={title}
               onChange={titleReadOnly ? undefined : handleTitleChange}
+              onFocus={titleReadOnly ? undefined : (): void => {
+                isTitleFocusedRef.current = true;
+              }}
               onKeyDown={(e: React.KeyboardEvent<HTMLTextAreaElement>): void => {
                 if (e.key === 'Enter') {
                   e.preventDefault();
+                  isTitleFocusedRef.current = false;
+                  handleTitleCommit();
                   editor?.commands.focus('start');
                 }
+              }}
+              onBlur={titleReadOnly ? undefined : (): void => {
+                isTitleFocusedRef.current = false;
+                handleTitleCommit();
               }}
               onInput={(e: React.FormEvent<HTMLTextAreaElement>): void => {
                 const el = e.currentTarget;
