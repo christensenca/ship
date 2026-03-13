@@ -1,0 +1,54 @@
+# syntax=docker/dockerfile:1
+# ─────────────────────────────────────────────
+# Stage 1: builder — install all deps and compile TypeScript
+# ─────────────────────────────────────────────
+FROM node:20-slim AS builder
+
+WORKDIR /app
+
+RUN npm install -g pnpm@9.15.4
+
+# Copy workspace manifests first for layer caching
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY api/package.json ./api/
+COPY shared/package.json ./shared/
+COPY web/package.json ./web/
+
+RUN pnpm install --frozen-lockfile --ignore-scripts
+
+COPY tsconfig.json ./
+COPY shared/ ./shared/
+COPY api/ ./api/
+
+# Build shared first (api imports from shared/dist)
+RUN pnpm --filter @ship/shared build
+
+# api build: tsc + copies schema.sql + migrations/ to dist/db/
+RUN pnpm --filter @ship/api build
+
+# ─────────────────────────────────────────────
+# Stage 2: runner — production deps only
+# ─────────────────────────────────────────────
+FROM node:20-slim AS runner
+
+WORKDIR /app
+
+RUN npm install -g pnpm@9.15.4
+
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY api/package.json ./api/
+COPY shared/package.json ./shared/
+COPY web/package.json ./web/
+
+RUN pnpm install --frozen-lockfile --prod --ignore-scripts && pnpm store prune
+
+COPY --from=builder /app/shared/dist ./shared/dist/
+COPY --from=builder /app/api/dist ./api/dist/
+
+WORKDIR /app/api
+
+ENV NODE_ENV=production
+
+# Railway injects PORT automatically at runtime
+# Migrations run automatically on every start (idempotent)
+CMD ["sh", "-c", "node dist/db/migrate.js && node dist/index.js"]

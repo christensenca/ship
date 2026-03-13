@@ -48,6 +48,8 @@ Thumbs.db
 # Evidence/verification screenshots
 evidence/
 *.png
+# Keep app icons (tracked in git, needed for Docker build)
+!web/public/**/*.png
 
 # Playwright test artifacts
 playwright-report/
