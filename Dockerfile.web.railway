@@ -38,5 +38,6 @@ COPY nginx.railway.conf /etc/nginx/railway-template.conf
 ENV PORT=80
 ENV API_INTERNAL_PORT=3000
 
-# Only substitute $PORT and $API_INTERNAL_PORT; leave nginx vars ($host, $scheme, etc.) intact
-CMD ["/bin/sh", "-c", "envsubst '$PORT $API_INTERNAL_PORT' < /etc/nginx/railway-template.conf > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"]
+# Substitute $PORT and $API_INTERNAL_PORT, then inject the container's DNS resolver for private networking
+# Wrap IPv6 resolvers in brackets for nginx syntax; IPv4 addresses are left as-is
+CMD ["/bin/sh", "-c", "NS=$(awk '/^nameserver/{print $2; exit}' /etc/resolv.conf) && case $NS in *:*) NS=\"[$NS]\";; esac && envsubst '$PORT $API_INTERNAL_PORT' < /etc/nginx/railway-template.conf | sed \"s/__NAMESERVER__/$NS/g\" > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"]
