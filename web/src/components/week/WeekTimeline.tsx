@@ -429,7 +429,7 @@ export function WeekTimeline({
                 <div className="absolute top-0 bottom-0 w-0.5 bg-accent" />
                 {/* Today label */}
                 <div className="absolute -top-5 left-1/2 -translate-x-1/2 whitespace-nowrap">
-                  <span className="text-xs font-medium text-accent bg-background px-1 rounded">
+                  <span className="text-xs font-medium text-sky-400 bg-background px-1 rounded">
                     Today
                   </span>
                 </div>

@@ -1,20 +1,20 @@
 {
-  "generated_at": "2026-03-10T22:32:32.951Z",
-  "raw_audit_generated_at": "2026-03-10T22:26:31.911Z",
+  "generated_at": "2026-03-13T17:47:32.441Z",
+  "raw_audit_generated_at": "2026-03-13T17:47:31.867Z",
   "totals": {
-    "total_violations": 26,
-    "critical": 1,
-    "serious": 25,
+    "total_violations": 0,
+    "critical": 0,
+    "serious": 0,
     "moderate": 0,
     "minor": 0,
-    "color_contrast_failures": 25,
-    "aria_failures": 1,
+    "color_contrast_failures": 0,
+    "aria_failures": 0,
     "pages_audited": 13
   },
   "lighthouse": {
-    "average_score": 99,
-    "lowest_score": 96,
-    "lowest_page": "My Week",
+    "average_score": 100,
+    "lowest_score": 98,
+    "lowest_page": "Login",
     "scores": [
       {
         "name": "Login",
@@ -24,12 +24,12 @@
       {
         "name": "My Week",
         "url": "/my-week",
-        "score": 96
+        "score": 100
       },
       {
         "name": "Dashboard",
         "url": "/dashboard",
-        "score": 96
+        "score": 100
       },
       {
         "name": "Documents",
@@ -59,12 +59,12 @@
       {
         "name": "Team Allocation",
         "url": "/team/allocation",
-        "score": 96
+        "score": 100
       },
       {
         "name": "Status Overview",
         "url": "/team/status",
-        "score": 96
+        "score": 100
       },
       {
         "name": "Org Chart",
@@ -101,28 +101,28 @@
     {
       "name": "My Week",
       "url": "/my-week",
-      "lighthouse_score": 96,
+      "lighthouse_score": 100,
       "violation_counts": {
         "critical": 0,
-        "serious": 1,
+        "serious": 0,
         "moderate": 0,
         "minor": 0
       },
-      "total": 1,
+      "total": 0,
       "passes": 19,
       "incomplete": 1
     },
     {
       "name": "Dashboard",
       "url": "/dashboard",
-      "lighthouse_score": 96,
+      "lighthouse_score": 100,
       "violation_counts": {
         "critical": 0,
-        "serious": 21,
+        "serious": 0,
         "moderate": 0,
         "minor": 0
       },
-      "total": 21,
+      "total": 0,
       "passes": 19,
       "incomplete": 1
     },
@@ -199,28 +199,28 @@
     {
       "name": "Team Allocation",
       "url": "/team/allocation",
-      "lighthouse_score": 96,
+      "lighthouse_score": 100,
       "violation_counts": {
         "critical": 0,
-        "serious": 1,
+        "serious": 0,
         "moderate": 0,
         "minor": 0
       },
-      "total": 1,
+      "total": 0,
       "passes": 24,
       "incomplete": 2
     },
     {
       "name": "Status Overview",
       "url": "/team/status",
-      "lighthouse_score": 96,
+      "lighthouse_score": 100,
       "violation_counts": {
         "critical": 0,
-        "serious": 1,
+        "serious": 0,
         "moderate": 0,
         "minor": 0
       },
-      "total": 1,
+      "total": 0,
       "passes": 24,
       "incomplete": 1
     },
@@ -244,11 +244,11 @@
       "lighthouse_score": 100,
       "violation_counts": {
         "critical": 0,
-        "serious": 1,
+        "serious": 0,
         "moderate": 0,
         "minor": 0
       },
-      "total": 1,
+      "total": 0,
       "passes": 24,
       "incomplete": 1
     },
@@ -257,39 +257,26 @@
       "url": "/settings",
       "lighthouse_score": 100,
       "violation_counts": {
-        "critical": 1,
+        "critical": 0,
         "serious": 0,
         "moderate": 0,
         "minor": 0
       },
-      "total": 1,
+      "total": 0,
       "passes": 23,
       "incomplete": 1
     }
   ],
-  "top_violations": [
-    {
-      "id": "color-contrast",
-      "count": 25,
-      "impact": "serious",
-      "description": "Elements must meet minimum color contrast ratio thresholds"
-    },
-    {
-      "id": "select-name",
-      "count": 1,
-      "impact": "critical",
-      "description": "Select element must have an accessible name"
-    }
-  ],
+  "top_violations": [],
   "delta_from_previous": {
-    "overall": null,
+    "overall": -1,
     "by_severity": {
-      "critical": null,
-      "serious": null,
-      "moderate": null,
-      "minor": null
+      "critical": 0,
+      "serious": -1,
+      "moderate": 0,
+      "minor": 0
     },
-    "status_band": "Baseline"
+    "status_band": "Stable"
   },
   "deliverable": {
     "lighthouse_per_page": [
@@ -301,12 +288,12 @@
       {
         "name": "My Week",
         "url": "/my-week",
-        "score": 96
+        "score": 100
       },
       {
         "name": "Dashboard",
         "url": "/dashboard",
-        "score": 96
+        "score": 100
       },
       {
         "name": "Documents",
@@ -336,12 +323,12 @@
       {
         "name": "Team Allocation",
         "url": "/team/allocation",
-        "score": 96
+        "score": 100
       },
       {
         "name": "Status Overview",
         "url": "/team/status",
-        "score": 96
+        "score": 100
       },
       {
         "name": "Org Chart",
@@ -359,12 +346,10 @@
         "score": 100
       }
     ],
-    "total_critical_serious_violations": 26,
+    "total_critical_serious_violations": 0,
     "keyboard_navigation_completeness": "Manual assessment required by user (Full / Partial / Broken)",
-    "color_contrast_failures": 25,
-    "missing_aria_labels_or_roles": [
-      "Settings: tr:nth-child(1) > td:nth-child(3) > select"
-    ],
+    "color_contrast_failures": 0,
+    "missing_aria_labels_or_roles": [],
     "screen_reader_testing": "Manual VoiceOver/NVDA assessment required"
   }
 }

@@ -749,7 +749,7 @@ export function TeamModePage(): React.JSX.Element {
                   >
                     <span className={cn(
                       'text-xs font-medium',
-                      sprint.isCurrent ? 'text-accent' : 'text-foreground'
+                      sprint.isCurrent ? 'text-sky-400' : 'text-foreground'
                     )}>
                       {sprint.name}
                     </span>

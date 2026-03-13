@@ -140,7 +140,7 @@ export function DashboardPage() {
                 <span className="font-medium">
                   {overdueItems[0].program_name} Week {overdueItems[0].sprint_number} is missing a {overdueItems[0].type}
                 </span>
-                <span className="text-red-200">&rarr; Write now</span>
+                <span className="text-white">&rarr; Write now</span>
               </Link>
             ) : (
               <div className="space-y-1">
@@ -152,7 +152,7 @@ export function DashboardPage() {
                     <Link
                       key={item.id}
                       to={`/documents/${item.sprint_id}`}
-                      className="text-sm hover:underline text-red-100"
+                      className="text-sm hover:underline text-white"
                     >
                       {item.program_name} Week {item.sprint_number} ({item.type}) &rarr;
                     </Link>
