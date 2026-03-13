@@ -68,6 +68,8 @@ interface ProjectSidebarProps {
   onUndoConversion?: () => void;
   isConverting?: boolean;
   isUndoing?: boolean;
+  canConvert?: boolean;
+  conversionDisabledReason?: string;
   /** Fields to highlight as missing (e.g., after type conversion) */
   highlightedFields?: string[];
   /** Whether current user can approve (is accountable or workspace admin) */
@@ -87,6 +89,8 @@ export function ProjectSidebar({
   onUndoConversion,
   isConverting = false,
   isUndoing = false,
+  canConvert = true,
+  conversionDisabledReason,
   highlightedFields = [],
   canApprove = false,
   userNames = {},
@@ -352,7 +356,7 @@ export function ProjectSidebar({
         <div className="pt-4 mt-4 border-t border-border">
           <button
             onClick={onConvert}
-            disabled={isConverting}
+            disabled={isConverting || !canConvert}
             className="w-full rounded bg-border px-3 py-2 text-sm font-medium text-muted hover:bg-border/80 hover:text-foreground disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
           >
             {isConverting ? (
@@ -372,7 +376,9 @@ export function ProjectSidebar({
               </>
             )}
           </button>
-          <p className="mt-1 text-xs text-muted text-center">Convert this project into an issue</p>
+          <p className="mt-1 text-xs text-muted text-center">
+            {canConvert ? 'Convert this project into an issue' : conversionDisabledReason}
+          </p>
         </div>
       )}
     </div>

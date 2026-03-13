@@ -62,6 +62,8 @@ async function quietPatch(endpoint: string, body: object): Promise<Response> {
   });
 }
 
+type AiAvailabilityState = 'checking' | 'ready' | 'unavailable';
+
 interface PlanItemAnalysis {
   text: string;
   score: number;
@@ -318,7 +320,7 @@ export function RetroQualityBanner({
   const [planContent, setPlanContent] = useState<Record<string, unknown> | null>(externalPlanContent);
   const [analysis, setAnalysisRaw] = useState<RetroAnalysis | null>(null);
   const [loading, setLoading] = useState(false);
-  const [aiAvailable, setAiAvailable] = useState<boolean | null>(null);
+  const [aiState, setAiState] = useState<AiAvailabilityState>('checking');
   const lastContentRef = useRef<string>('');
   const requestIdRef = useRef(0);
   const persistedHashRef = useRef<string | null>(null);
@@ -348,7 +350,7 @@ export function RetroQualityBanner({
     lastContentRef.current = '';
     persistedHashRef.current = null;
     setLoading(false);
-    setAiAvailable(null);
+    setAiState('checking');
     setAnalysis(null);
     setPlanContent(externalPlanContentRef.current);
 
@@ -356,11 +358,11 @@ export function RetroQualityBanner({
       .then(r => r.ok ? r.json() : null)
       .then(data => {
         if (cancelled) return;
-        setAiAvailable(data?.available ?? false);
+        setAiState(data?.available ? 'ready' : 'unavailable');
       })
       .catch(() => {
         if (cancelled) return;
-        setAiAvailable(false);
+        setAiState('unavailable');
       });
 
     // Load retro doc to get persisted analysis AND plan content
@@ -437,9 +439,13 @@ export function RetroQualityBanner({
         if (data && !data.error) {
           setAnalysis(data);
           persistAnalysis(data);
+        } else if (data?.error === 'ai_unavailable') {
+          setAiState('unavailable');
         }
       })
-      .catch(() => {})
+      .catch(() => {
+        setAiState('unavailable');
+      })
       .finally(() => {
         if (thisRequestId !== requestIdRef.current) return;
         setLoading(false);
@@ -448,13 +454,13 @@ export function RetroQualityBanner({
 
   // Analyze on editor content change
   useEffect(() => {
-    if (!aiAvailable || !editorContent || !planContent) return;
+    if (aiState !== 'ready' || !editorContent || !planContent) return;
     runAnalysis(editorContent, planContent);
-  }, [editorContent, aiAvailable, planContent, runAnalysis]);
+  }, [editorContent, aiState, planContent, runAnalysis]);
 
   // On mount: if no persisted result and plan is loaded, run initial analysis
   useEffect(() => {
-    if (!aiAvailable || analysis || !planContent) return;
+    if (aiState !== 'ready' || analysis || !planContent) return;
     let cancelled = false;
     quietGet(`/api/documents/${documentId}`)
       .then(r => r.ok ? r.json() : null)
@@ -466,9 +472,9 @@ export function RetroQualityBanner({
     return () => {
       cancelled = true;
     };
-  }, [aiAvailable, documentId, analysis, planContent, runAnalysis]);
+  }, [aiState, documentId, analysis, planContent, runAnalysis]);
 
-  if (aiAvailable === false) return null;
+  if (aiState === 'checking') return null;
 
   if (!analysis && !loading) {
     return (
@@ -479,7 +485,11 @@ export function RetroQualityBanner({
             <div className="flex-1 h-2 rounded-full bg-border/20 overflow-hidden max-w-xs">
               <div className="h-full w-1/3 rounded-full bg-border/30 animate-pulse" />
             </div>
-            <span className="text-xs text-muted/50">AI quality check will appear as you write</span>
+            <span className="text-xs text-muted/50">
+              {aiState === 'unavailable'
+                ? 'AI feedback is temporarily unavailable. You can still write and submit your retro normally.'
+                : 'AI quality check will appear as you write'}
+            </span>
           </div>
         </div>
       </div>

@@ -5,6 +5,7 @@ import { apiPost } from '@/lib/api';
 import { issueKeys } from '@/hooks/useIssuesQuery';
 import { projectKeys } from '@/hooks/useProjectsQuery';
 import { useToast } from '@/components/ui/Toast';
+import { getDocumentConversionErrorMessage } from '@/lib/documentConversion';
 
 export type DocumentType = 'issue' | 'project';
 
@@ -60,8 +61,10 @@ export function useDocumentConversion(options: UseDocumentConversionOptions = {}
         return data as ConversionResult;
       } else {
         const error = await res.json();
-        const errorMessage = error.error || `Failed to convert ${sourceType} to ${targetType}`;
-        console.error(`Failed to convert ${sourceType}:`, error);
+        const errorMessage = getDocumentConversionErrorMessage(
+          error.error || `Failed to convert ${sourceType} to ${targetType}`,
+          res.status
+        );
         showToast(errorMessage, 'error');
         onError?.(errorMessage);
         return null;

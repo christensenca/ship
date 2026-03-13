@@ -10,6 +10,7 @@ interface DocumentTypeSelectorProps {
    * Document types that should be disabled (e.g., when conversion is restricted)
    */
   disabledTypes?: DocumentType[];
+  helperText?: string;
 }
 
 const TYPE_OPTIONS: { value: DocumentType; label: string; icon: React.ReactNode }[] = [
@@ -24,6 +25,7 @@ export function DocumentTypeSelector({
   onChange,
   disabled = false,
   disabledTypes = [],
+  helperText,
 }: DocumentTypeSelectorProps) {
   return (
     <div className="space-y-1.5">
@@ -49,6 +51,9 @@ export function DocumentTypeSelector({
           </option>
         ))}
       </select>
+      {helperText ? (
+        <p className="text-xs text-muted">{helperText}</p>
+      ) : null}
     </div>
   );
 }

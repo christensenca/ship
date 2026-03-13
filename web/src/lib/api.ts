@@ -20,6 +20,19 @@ function isJsonResponse(response: Response): boolean {
   return contentType?.includes('application/json') ?? false;
 }
 
+async function isCsrfErrorResponse(response: Response): Promise<boolean> {
+  if (response.status !== 403 || !isJsonResponse(response)) {
+    return false;
+  }
+
+  try {
+    const data = await response.clone().json() as { error?: { code?: string } };
+    return data.error?.code === 'CSRF_ERROR';
+  } catch {
+    return false;
+  }
+}
+
 /**
  * Handle session expiration - redirect to login with expired=true flag
  *
@@ -98,8 +111,8 @@ async function fetchWithCsrf(
     handleSessionExpired(); // never returns
   }
 
-  // If CSRF token invalid (403 with JSON), retry once
-  if (res.status === 403 && isJson) {
+  // Retry only when the server explicitly reports a CSRF token problem.
+  if (await isCsrfErrorResponse(res)) {
     clearCsrfToken();
     const newToken = await ensureCsrfToken();
     return fetch(`${API_URL}${endpoint}`, {

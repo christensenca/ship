@@ -12,6 +12,10 @@ import { issueKeys } from '@/hooks/useIssuesQuery';
 import { projectKeys } from '@/hooks/useProjectsQuery';
 import type { DocumentTabProps } from '@/lib/document-tabs';
 import { computeICEScore } from '@ship/shared';
+import {
+  getDocumentConversionErrorMessage,
+  getDocumentConversionPermission,
+} from '@/lib/documentConversion';
 
 /**
  * ProjectDetailsTab - Renders the project document in the UnifiedEditor
@@ -45,6 +49,11 @@ export default function ProjectDetailsTab({ documentId, document }: DocumentTabP
     color: p.color,
     emoji: p.emoji,
   })), [programsData]);
+  const conversionPermission = useMemo(() => getDocumentConversionPermission({
+    documentType: document.document_type,
+    createdBy: document.created_by as string | null | undefined,
+    currentUserId: user?.id,
+  }), [document.created_by, document.document_type, user?.id]);
 
   // Update mutation with optimistic updates
   const updateMutation = useMutation({
@@ -115,6 +124,10 @@ export default function ProjectDetailsTab({ documentId, document }: DocumentTabP
       showToast(`Converting project to ${newType} is not supported`, 'error');
       return;
     }
+    if (!conversionPermission.canConvert) {
+      showToast(conversionPermission.reason || 'Failed to convert document', 'error');
+      return;
+    }
 
     try {
       const res = await apiPost(`/api/documents/${documentId}/convert`, { target_type: newType });
@@ -128,12 +141,12 @@ export default function ProjectDetailsTab({ documentId, document }: DocumentTabP
         navigate(`/documents/${data.id}`, { replace: true });
       } else {
         const error = await res.json();
-        showToast(error.error || 'Failed to convert document', 'error');
+        showToast(getDocumentConversionErrorMessage(error.error, res.status), 'error');
       }
     } catch (err) {
       showToast('Failed to convert document', 'error');
     }
-  }, [documentId, navigate, queryClient, showToast]);
+  }, [conversionPermission.canConvert, conversionPermission.reason, documentId, navigate, queryClient, showToast]);
 
   // Handle conversion callbacks
   const handleConvert = useCallback(async () => {
@@ -196,7 +209,9 @@ export default function ProjectDetailsTab({ documentId, document }: DocumentTabP
     onUndoConversion: handleUndoConversion,
     isConverting,
     isUndoing,
-  }), [programs, teamMembers, handleConvert, handleUndoConversion, isConverting, isUndoing]);
+    canConvert: conversionPermission.canConvert,
+    conversionDisabledReason: conversionPermission.reason,
+  }), [programs, teamMembers, handleConvert, handleUndoConversion, isConverting, isUndoing, conversionPermission.canConvert, conversionPermission.reason]);
 
   // Get program_id from belongs_to array (project's parent program via document_associations)
   const belongsTo = (document as { belongs_to?: Array<{ id: string; type: string }> }).belongs_to;

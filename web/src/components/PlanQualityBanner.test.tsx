@@ -96,4 +96,46 @@ describe('RetroQualityBanner', () => {
     expect(screen.queryByText('25%')).not.toBeInTheDocument();
     expect(fetchMock.mock.calls.some(([input]) => requestUrl(input).includes('/api/documents/doc-2'))).toBe(true);
   });
+
+  it('shows an unavailable notice when retro analysis falls back to ai_unavailable', async () => {
+    const fetchMock = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+      const url = requestUrl(input);
+      const method = init?.method || 'GET';
+
+      if (url.endsWith('/api/ai/status')) {
+        return jsonResponse({ available: true });
+      }
+
+      if (url.endsWith('/api/csrf-token')) {
+        return jsonResponse({ token: 'token-1' });
+      }
+
+      if (method === 'GET' && url.includes('/api/documents/doc-retro')) {
+        return jsonResponse({
+          content: { type: 'doc', content: [{ type: 'paragraph', content: [{ type: 'text', text: 'Retro content' }] }] },
+          properties: {},
+        });
+      }
+
+      if (method === 'POST' && url.endsWith('/api/ai/analyze-retro')) {
+        return jsonResponse({ error: 'ai_unavailable' });
+      }
+
+      throw new Error(`Unexpected fetch call: ${method} ${url}`);
+    });
+
+    global.fetch = fetchMock as typeof fetch;
+
+    render(
+      <RetroQualityBanner
+        documentId="doc-retro"
+        editorContent={{ type: 'doc', content: [{ type: 'paragraph', content: [{ type: 'text', text: 'Retro content' }] }] }}
+        planContent={{ type: 'doc', content: [{ type: 'paragraph', content: [{ type: 'text', text: 'Plan item' }] }] }}
+      />
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('AI feedback is temporarily unavailable. You can still write and submit your retro normally.')).toBeInTheDocument();
+    });
+  });
 });
