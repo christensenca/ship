@@ -858,7 +858,7 @@ export function ReviewsPage(): React.JSX.Element | null {
                       week.isCurrent && 'ring-1 ring-inset ring-accent/30'
                     )}
                   >
-                    <span className={cn('text-xs font-medium', week.isCurrent ? 'text-accent' : 'text-foreground')}>
+                    <span className={cn('text-xs font-medium', week.isCurrent ? 'text-sky-400' : 'text-foreground')}>
                       {week.name}
                     </span>
                     <span className="text-[10px] text-muted">

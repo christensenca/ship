@@ -339,6 +339,7 @@ function MembersTab({
                       <span className="text-muted">-</span>
                     ) : (
                       <select
+                        aria-label={`Role for ${member.name || member.email}`}
                         value={nextRole}
                         onChange={(e: React.ChangeEvent<HTMLSelectElement>): void =>
                           onUpdateRole(member.userId, e.target.value === 'admin' ? 'admin' : 'member')

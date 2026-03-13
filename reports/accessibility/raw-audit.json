@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-10T22:26:31.911Z",
+  "generated_at": "2026-03-13T17:47:31.867Z",
   "pages": [
     {
       "name": "Login",
@@ -18,27 +18,11 @@
     {
       "name": "My Week",
       "url": "/my-week",
-      "lighthouse_score": 96,
-      "violations": [
-        {
-          "id": "color-contrast",
-          "impact": "serious",
-          "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
-          "help": "Elements must meet minimum color contrast ratio thresholds",
-          "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/color-contrast?application=playwright",
-          "nodes": [
-            {
-              "html": "<span class=\"text-xs bg-accent/20 text-accent px-1.5 py-0.5 rounded\">Current</span>",
-              "target": [
-                ".bg-accent\\/20.py-0\\.5.px-1\\.5"
-              ]
-            }
-          ]
-        }
-      ],
+      "lighthouse_score": 100,
+      "violations": [],
       "violation_counts": {
         "critical": 0,
-        "serious": 1,
+        "serious": 0,
         "moderate": 0,
         "minor": 0
       },
@@ -48,147 +32,11 @@
     {
       "name": "Dashboard",
       "url": "/dashboard",
-      "lighthouse_score": 96,
-      "violations": [
-        {
-          "id": "color-contrast",
-          "impact": "serious",
-          "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
-          "help": "Elements must meet minimum color contrast ratio thresholds",
-          "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/color-contrast?application=playwright",
-          "nodes": [
-            {
-              "html": "<button class=\"flex items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors bg-accent/10 text-accent font-medium\">",
-              "target": [
-                ".bg-accent\\/10"
-              ]
-            },
-            {
-              "html": "<a class=\"text-sm hover:underline text-red-100\" href=\"/documents/c1458c2f-26e2-4370-9b6e-580deb7a02ef\" data-discover=\"true\">Ship Core Week 13 (plan) →</a>",
-              "target": [
-                ".text-red-100.hover\\:underline[data-discover=\"true\"]:nth-child(1)"
-              ]
-            },
-            {
-              "html": "<a class=\"text-sm hover:underline text-red-100\" href=\"/documents/cabb4e74-be71-41a4-965c-246a0c7c1e23\" data-discover=\"true\">Ship Core Week 13 (plan) →</a>",
-              "target": [
-                ".text-red-100.hover\\:underline[data-discover=\"true\"]:nth-child(2)"
-              ]
-            },
-            {
-              "html": "<a class=\"text-sm hover:underline text-red-100\" href=\"/documents/969d63e8-fea8-4fb0-a170-1818a9abd9af\" data-discover=\"true\">Authentication Week 13 (plan) →</a>",
-              "target": [
-                ".text-red-100.hover\\:underline[data-discover=\"true\"]:nth-child(3)"
-              ]
-            },
-            {
-              "html": "<a class=\"text-sm hover:underline text-red-100\" href=\"/documents/388272e3-7f13-4249-9e56-0f00e4993cd3\" data-discover=\"true\">API Platform Week 13 (plan) →</a>",
-              "target": [
-                ".text-red-100.hover\\:underline[data-discover=\"true\"]:nth-child(4)"
-              ]
-            },
-            {
-              "html": "<a class=\"text-sm hover:underline text-red-100\" href=\"/documents/c47a52f4-9010-4581-abf9-660841e02f20\" data-discover=\"true\">Design System Week 13 (plan) →</a>",
-              "target": [
-                ".text-red-100.hover\\:underline[data-discover=\"true\"]:nth-child(5)"
-              ]
-            },
-            {
-              "html": "<a class=\"text-sm hover:underline text-red-100\" href=\"/documents/968f6bd5-95d5-47c5-9a77-ac5f44674ed3\" data-discover=\"true\">Infrastructure Week 13 (plan) →</a>",
-              "target": [
-                ".text-red-100.hover\\:underline[data-discover=\"true\"]:nth-child(6)"
-              ]
-            },
-            {
-              "html": "<a class=\"text-sm hover:underline text-red-100\" href=\"/documents/2e93f0d2-2286-4914-898f-7b55e5f2d3c5\" data-discover=\"true\">Design System Week 12 (retro) →</a>",
-              "target": [
-                ".text-red-100.hover\\:underline[data-discover=\"true\"]:nth-child(7)"
-              ]
-            },
-            {
-              "html": "<a class=\"text-sm hover:underline text-red-100\" href=\"/documents/1a0d24f1-fb96-4391-ba05-52167a6959aa\" data-discover=\"true\">Authentication Week 12 (retro) →</a>",
-              "target": [
-                ".text-red-100.hover\\:underline[data-discover=\"true\"]:nth-child(8)"
-              ]
-            },
-            {
-              "html": "<a class=\"text-sm hover:underline text-red-100\" href=\"/documents/f1c0adbd-aab8-4f81-a2b6-5e6c57dba6de\" data-discover=\"true\">Ship Core Week 12 (retro) →</a>",
-              "target": [
-                ".text-red-100.hover\\:underline[data-discover=\"true\"]:nth-child(9)"
-              ]
-            },
-            {
-              "html": "<a class=\"text-sm hover:underline text-red-100\" href=\"/documents/36bdba77-4dc5-4d93-a97d-82b08225776b\" data-discover=\"true\">API Platform Week 12 (retro) →</a>",
-              "target": [
-                ".text-red-100.hover\\:underline[data-discover=\"true\"]:nth-child(10)"
-              ]
-            },
-            {
-              "html": "<a class=\"text-sm hover:underline text-red-100\" href=\"/documents/72ce393b-da80-4f71-9b5e-24d3b15442aa\" data-discover=\"true\">Infrastructure Week 12 (retro) →</a>",
-              "target": [
-                ".text-red-100.hover\\:underline[data-discover=\"true\"]:nth-child(11)"
-              ]
-            },
-            {
-              "html": "<div class=\"text-[10px] font-semibold uppercase tracking-wider mb-1.5 text-muted/50\">Mon</div>",
-              "target": [
-                ".border-border\\/50.last\\:border-r-0.px-3:nth-child(1) > .text-muted\\/50.text-\\[10px\\].mb-1\\.5"
-              ]
-            },
-            {
-              "html": "<div class=\"text-[10px] font-semibold uppercase tracking-wider mb-1.5 text-accent\">Tue</div>",
-              "target": [
-                ".text-accent.text-\\[10px\\].mb-1\\.5"
-              ]
-            },
-            {
-              "html": "<div class=\"text-[10px] font-semibold uppercase tracking-wider mb-1.5 text-muted/50\">Wed</div>",
-              "target": [
-                ".border-border\\/50.last\\:border-r-0.px-3:nth-child(3) > .text-muted\\/50.text-\\[10px\\].mb-1\\.5"
-              ]
-            },
-            {
-              "html": "<div class=\"text-[10px] font-semibold uppercase tracking-wider mb-1.5 text-muted/50\">Thu</div>",
-              "target": [
-                ".border-border\\/50.last\\:border-r-0.px-3:nth-child(4) > .text-muted\\/50.text-\\[10px\\].mb-1\\.5"
-              ]
-            },
-            {
-              "html": "<div class=\"flex items-center gap-1.5 text-[11px] font-medium mt-1 text-muted/50\"><span class=\"h-1.5 w-1.5 rounded-full bg-muted/50\"></span>Retro W13</div>",
-              "target": [
-                ".text-\\[11px\\].mt-1.text-muted\\/50"
-              ]
-            },
-            {
-              "html": "<div class=\"text-[10px] font-semibold uppercase tracking-wider mb-1.5 text-muted/50\">Fri</div>",
-              "target": [
-                ".border-border\\/50.last\\:border-r-0.px-3:nth-child(5) > .text-muted\\/50.text-\\[10px\\].mb-1\\.5"
-              ]
-            },
-            {
-              "html": "<div class=\"text-[10px] font-semibold uppercase tracking-wider mb-1.5 text-muted/50\">Sat</div>",
-              "target": [
-                ".border-border\\/50.last\\:border-r-0.px-3:nth-child(6) > .text-muted\\/50.text-\\[10px\\].mb-1\\.5"
-              ]
-            },
-            {
-              "html": "<div class=\"text-[10px] font-semibold uppercase tracking-wider mb-1.5 text-muted/50\">Sun</div>",
-              "target": [
-                ".border-border\\/50.last\\:border-r-0.px-3:nth-child(7) > .text-muted\\/50.text-\\[10px\\].mb-1\\.5"
-              ]
-            },
-            {
-              "html": "<div class=\"text-xs text-muted/60 mb-4\">Ship Core</div>",
-              "target": [
-                ".border-red-500\\/30.p-6.bg-background:nth-child(1) > .text-muted\\/60.text-xs.mb-4"
-              ]
-            }
-          ]
-        }
-      ],
+      "lighthouse_score": 100,
+      "violations": [],
       "violation_counts": {
         "critical": 0,
-        "serious": 21,
+        "serious": 0,
         "moderate": 0,
         "minor": 0
       },
@@ -268,27 +116,11 @@
     {
       "name": "Team Allocation",
       "url": "/team/allocation",
-      "lighthouse_score": 96,
-      "violations": [
-        {
-          "id": "color-contrast",
-          "impact": "serious",
-          "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
-          "help": "Elements must meet minimum color contrast ratio thresholds",
-          "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/color-contrast?application=playwright",
-          "nodes": [
-            {
-              "html": "<span class=\"text-xs font-medium text-accent\">Week 13</span>",
-              "target": [
-                ".text-accent.font-medium.text-xs"
-              ]
-            }
-          ]
-        }
-      ],
+      "lighthouse_score": 100,
+      "violations": [],
       "violation_counts": {
         "critical": 0,
-        "serious": 1,
+        "serious": 0,
         "moderate": 0,
         "minor": 0
       },
@@ -298,27 +130,11 @@
     {
       "name": "Status Overview",
       "url": "/team/status",
-      "lighthouse_score": 96,
-      "violations": [
-        {
-          "id": "color-contrast",
-          "impact": "serious",
-          "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
-          "help": "Elements must meet minimum color contrast ratio thresholds",
-          "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/color-contrast?application=playwright",
-          "nodes": [
-            {
-              "html": "<span class=\"text-xs font-medium text-accent\">Week 13</span>",
-              "target": [
-                ".text-accent.font-medium.text-xs"
-              ]
-            }
-          ]
-        }
-      ],
+      "lighthouse_score": 100,
+      "violations": [],
       "violation_counts": {
         "critical": 0,
-        "serious": 1,
+        "serious": 0,
         "moderate": 0,
         "minor": 0
       },
@@ -343,26 +159,10 @@
       "name": "Reviews",
       "url": "/team/reviews",
       "lighthouse_score": 100,
-      "violations": [
-        {
-          "id": "color-contrast",
-          "impact": "serious",
-          "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
-          "help": "Elements must meet minimum color contrast ratio thresholds",
-          "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/color-contrast?application=playwright",
-          "nodes": [
-            {
-              "html": "<span class=\"text-xs font-medium text-accent\">Week 13</span>",
-              "target": [
-                ".text-accent.font-medium.text-xs"
-              ]
-            }
-          ]
-        }
-      ],
+      "violations": [],
       "violation_counts": {
         "critical": 0,
-        "serious": 1,
+        "serious": 0,
         "moderate": 0,
         "minor": 0
       },
@@ -373,25 +173,9 @@
       "name": "Settings",
       "url": "/settings",
       "lighthouse_score": 100,
-      "violations": [
-        {
-          "id": "select-name",
-          "impact": "critical",
-          "description": "Ensure select element has an accessible name",
-          "help": "Select element must have an accessible name",
-          "helpUrl": "https://dequeuniversity.com/rules/axe/4.11/select-name?application=playwright",
-          "nodes": [
-            {
-              "html": "<select class=\"px-2 py-1 rounded text-sm bg-background border border-border\"><option value=\"admin\">Admin</option><option value=\"member\">Member</option></select>",
-              "target": [
-                "tr:nth-child(1) > td:nth-child(3) > select"
-              ]
-            }
-          ]
-        }
-      ],
+      "violations": [],
       "violation_counts": {
-        "critical": 1,
+        "critical": 0,
         "serious": 0,
         "moderate": 0,
         "minor": 0
