@@ -65,6 +65,8 @@ interface IssueSidebarProps {
   onReject?: (reason: string) => Promise<void>;
   isConverting?: boolean;
   isUndoing?: boolean;
+  canConvert?: boolean;
+  conversionDisabledReason?: string;
   /** Fields to highlight as missing (e.g., after type conversion) */
   highlightedFields?: string[];
 }
@@ -111,6 +113,8 @@ export function IssueSidebar({
   onReject,
   isConverting = false,
   isUndoing = false,
+  canConvert = true,
+  conversionDisabledReason,
   highlightedFields = [],
 }: IssueSidebarProps) {
   // Helper to check if a field should be highlighted
@@ -485,7 +489,7 @@ export function IssueSidebar({
         <div className="pt-4 mt-4 border-t border-border">
           <button
             onClick={onConvert}
-            disabled={isConverting}
+            disabled={isConverting || !canConvert}
             className="w-full rounded bg-accent/20 px-3 py-2 text-sm font-medium text-accent hover:bg-accent/30 disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
           >
             {isConverting ? (
@@ -505,7 +509,9 @@ export function IssueSidebar({
               </>
             )}
           </button>
-          <p className="mt-1 text-xs text-muted text-center">Convert this issue into a project</p>
+          <p className="mt-1 text-xs text-muted text-center">
+            {canConvert ? 'Convert this issue into a project' : conversionDisabledReason}
+          </p>
         </div>
       )}
 
@@ -537,4 +543,3 @@ export function IssueSidebar({
     </div>
   );
 }
-

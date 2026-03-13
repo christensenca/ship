@@ -16,6 +16,10 @@ import { TabBar } from '@/components/ui/TabBar';
 import { useCurrentDocument } from '@/contexts/CurrentDocumentContext';
 import { useRealtimeEvent } from '@/hooks/useRealtimeEvents';
 import {
+  getDocumentConversionErrorMessage,
+  getDocumentConversionPermission,
+} from '@/lib/documentConversion';
+import {
   getTabsForDocument,
   documentTypeHasTabs,
   resolveTabLabels,
@@ -175,13 +179,22 @@ export function UnifiedDocumentPage(): JSX.Element | null {
   const { convert, isConverting } = useDocumentConversion({
     navigateAfterConvert: true,
   });
+  const conversionPermission = useMemo(() => getDocumentConversionPermission({
+    documentType: document?.document_type ?? '',
+    createdBy: document?.created_by as string | null | undefined,
+    currentUserId: user?.id,
+  }), [document?.created_by, document?.document_type, user?.id]);
 
   // Conversion callbacks that use the current document
   const handleConvert = useCallback((): void => {
     if (!document || !id) return;
+    if (!conversionPermission.canConvert) {
+      showToast(conversionPermission.reason || 'Failed to convert document', 'error');
+      return;
+    }
     const sourceType = document.document_type as 'issue' | 'project';
     convert(id, sourceType, document.title);
-  }, [convert, document, id]);
+  }, [conversionPermission.canConvert, conversionPermission.reason, convert, document, id, showToast]);
 
   const handleUndoConversion = useCallback(async (): Promise<void> => {
     if (!document || !id) return;
@@ -221,6 +234,10 @@ export function UnifiedDocumentPage(): JSX.Element | null {
       showToast(`Converting ${currentType} to ${newType} is not supported`, 'error');
       return;
     }
+    if (!conversionPermission.canConvert) {
+      showToast(conversionPermission.reason || 'Failed to convert document', 'error');
+      return;
+    }
 
     try {
       const res = await apiPost(`/api/documents/${id}/convert`, { target_type: newType });
@@ -239,12 +256,12 @@ export function UnifiedDocumentPage(): JSX.Element | null {
         navigate(`/documents/${data.id}`, { replace: true });
       } else {
         const error = await res.json();
-        showToast(error.error || 'Failed to convert document', 'error');
+        showToast(getDocumentConversionErrorMessage(error.error, res.status), 'error');
       }
     } catch (_err) {
       showToast('Failed to convert document', 'error');
     }
-  }, [document, id, navigate, queryClient, showToast]);
+  }, [conversionPermission.canConvert, conversionPermission.reason, document, id, navigate, queryClient, showToast]);
 
   // Handle WebSocket notification that document was converted
   const handleDocumentConverted = useCallback((newDocId: string): void => {
@@ -397,6 +414,8 @@ export function UnifiedDocumentPage(): JSX.Element | null {
           onUndoConversion: handleUndoConversion,
           isConverting,
           isUndoing: isConverting,
+          canConvert: conversionPermission.canConvert,
+          conversionDisabledReason: conversionPermission.reason,
         };
       case 'project':
         return {
@@ -406,13 +425,15 @@ export function UnifiedDocumentPage(): JSX.Element | null {
           onUndoConversion: handleUndoConversion,
           isConverting,
           isUndoing: isConverting,
+          canConvert: conversionPermission.canConvert,
+          conversionDisabledReason: conversionPermission.reason,
         };
       case 'sprint':
         return {};
       default:
         return {};
     }
-  }, [document, teamMembers, programs, projects, handleAssociationChange, handleConvert, handleUndoConversion, isConverting]);
+  }, [document, teamMembers, programs, projects, handleAssociationChange, handleConvert, handleUndoConversion, isConverting, conversionPermission.canConvert, conversionPermission.reason]);
 
   // Transform API response to UnifiedDocument format
   const unifiedDocument: UnifiedDocument | null = useMemo(() => {

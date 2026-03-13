@@ -160,6 +160,8 @@ interface IssuePanelProps {
   isConverting?: boolean;
   isUndoing?: boolean;
   onAssociationChange?: () => void;
+  canConvert?: boolean;
+  conversionDisabledReason?: string;
 }
 
 // Props for project panel
@@ -170,6 +172,8 @@ interface ProjectPanelProps {
   onUndoConversion?: () => void;
   isConverting?: boolean;
   isUndoing?: boolean;
+  canConvert?: boolean;
+  conversionDisabledReason?: string;
   /** Whether current user can approve (is accountable or workspace admin) */
   canApprove?: boolean;
   /** Map of user ID to name for displaying approver */
@@ -523,6 +527,8 @@ export function PropertiesPanel({
             onReject={issueProps.onReject}
             isConverting={issueProps.isConverting}
             isUndoing={issueProps.isUndoing}
+            canConvert={issueProps.canConvert}
+            conversionDisabledReason={issueProps.conversionDisabledReason}
             highlightedFields={highlightedFields}
             onAssociationChange={issueProps.onAssociationChange}
           />
@@ -541,6 +547,8 @@ export function PropertiesPanel({
             onUndoConversion={projectProps.onUndoConversion}
             isConverting={projectProps.isConverting}
             isUndoing={projectProps.isUndoing}
+            canConvert={projectProps.canConvert}
+            conversionDisabledReason={projectProps.conversionDisabledReason}
             highlightedFields={highlightedFields}
             canApprove={canApprove}
             userNames={userNames}

@@ -76,6 +76,7 @@ interface RetroAnalysisResult {
 }
 
 type AnalysisError = { error: string };
+type AiAvailabilityState = 'checking' | 'ready' | 'unavailable';
 
 function isError(result: unknown): result is AnalysisError {
   return !!result && typeof result === 'object' && 'error' in result;
@@ -294,21 +295,21 @@ export function RetroQualityAssistant({
 }) {
   const [analysis, setAnalysis] = useState<RetroAnalysisResult | null>(null);
   const [loading, setLoading] = useState(false);
-  const [aiAvailable, setAiAvailable] = useState<boolean | null>(null);
+  const [aiState, setAiState] = useState<AiAvailabilityState>('checking');
   const lastContentRef = useRef<string>('');
   const pollRef = useRef<ReturnType<typeof setInterval>>();
 
   // Check AI availability on mount
   useEffect(() => {
     quietGet('/api/ai/status')
-      .then(r => r.json())
-      .then(data => setAiAvailable(data.available))
-      .catch(() => setAiAvailable(false));
+      .then(r => r.ok ? r.json() : null)
+      .then(data => setAiState(data?.available ? 'ready' : 'unavailable'))
+      .catch(() => setAiState('unavailable'));
   }, []);
 
   // Analyze content by fetching latest from API
   const checkAndAnalyze = useCallback(async () => {
-    if (!aiAvailable || !planContent) return;
+    if (aiState !== 'ready' || !planContent) return;
 
     try {
       // Fetch the latest saved content from the API
@@ -328,14 +329,18 @@ export function RetroQualityAssistant({
       const data = await res.json();
       if (!isError(data)) {
         setAnalysis(data);
+      } else if (data.error === 'ai_unavailable') {
+        setAiState('unavailable');
       }
-    } catch { /* keep previous analysis */ }
+    } catch {
+      setAiState('unavailable');
+    }
     finally { setLoading(false); }
-  }, [documentId, aiAvailable, planContent]);
+  }, [documentId, aiState, planContent]);
 
   // Poll for content changes every 10 seconds
   useEffect(() => {
-    if (!aiAvailable || !planContent) return;
+    if (aiState !== 'ready' || !planContent) return;
 
     const initialTimeout = setTimeout(checkAndAnalyze, 5000);
     pollRef.current = setInterval(checkAndAnalyze, 10000);
@@ -344,11 +349,9 @@ export function RetroQualityAssistant({
       clearTimeout(initialTimeout);
       if (pollRef.current) clearInterval(pollRef.current);
     };
-  }, [aiAvailable, planContent, checkAndAnalyze]);
+  }, [aiState, planContent, checkAndAnalyze]);
 
-  // Don't render if AI is unavailable
-  if (aiAvailable === false) return null;
-  if (aiAvailable === null) return null;
+  if (aiState === 'checking') return null;
 
   return (
     <div className="space-y-3">
@@ -406,6 +409,10 @@ export function RetroQualityAssistant({
             </div>
           )}
         </div>
+      ) : aiState === 'unavailable' ? (
+        <p className="text-xs text-muted italic">
+          AI feedback is temporarily unavailable. You can still write and submit your retro normally.
+        </p>
       ) : !loading ? (
         <p className="text-xs text-muted italic">
           {planContent ? 'Write your retro to get AI feedback.' : 'No plan found for comparison.'}

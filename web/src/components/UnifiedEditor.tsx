@@ -19,6 +19,7 @@ import { PlanQualityBanner, RetroQualityBanner } from '@/components/PlanQualityB
 import { useAutoSave } from '@/hooks/useAutoSave';
 import type { Person } from '@/components/PersonCombobox';
 import type { BelongsTo } from '@ship/shared';
+import { getDocumentConversionPermission } from '@/lib/documentConversion';
 
 export type DocumentType = 'wiki' | 'issue' | 'project' | 'sprint' | 'program' | 'person' | 'weekly_plan' | 'weekly_retro';
 
@@ -111,6 +112,8 @@ interface IssueSidebarData {
   isConverting?: boolean;
   isUndoing?: boolean;
   onAssociationChange?: () => void;
+  canConvert?: boolean;
+  conversionDisabledReason?: string;
 }
 
 interface ProjectSidebarData {
@@ -120,6 +123,8 @@ interface ProjectSidebarData {
   onUndoConversion?: () => void;
   isConverting?: boolean;
   isUndoing?: boolean;
+  canConvert?: boolean;
+  conversionDisabledReason?: string;
 }
 
 interface SprintSidebarData {
@@ -286,6 +291,24 @@ export function UnifiedEditor({
 
   // Check if this document type can have its type changed
   const canChangeType = ['wiki', 'issue', 'project', 'sprint'].includes(document.document_type);
+  const conversionPermission = useMemo(() => getDocumentConversionPermission({
+    documentType: document.document_type,
+    createdBy: document.created_by,
+    currentUserId: user?.id,
+  }), [document.created_by, document.document_type, user?.id]);
+  const disabledTypeHelperText = useMemo(() => {
+    if (document.document_type !== 'issue' && document.document_type !== 'project') return undefined;
+    return conversionPermission.reason;
+  }, [conversionPermission.reason, document.document_type]);
+  const disabledTypes = useMemo(() => {
+    if (document.document_type === 'issue' && !conversionPermission.canConvert) {
+      return ['project'] as SelectableDocumentType[];
+    }
+    if (document.document_type === 'project' && !conversionPermission.canConvert) {
+      return ['issue'] as SelectableDocumentType[];
+    }
+    return [] as SelectableDocumentType[];
+  }, [conversionPermission.canConvert, document.document_type]);
 
   // Build panel-specific props from sidebarData
   const panelProps = useMemo(() => {
@@ -310,6 +333,8 @@ export function UnifiedEditor({
           isConverting: issueData.isConverting,
           isUndoing: issueData.isUndoing,
           onAssociationChange: issueData.onAssociationChange,
+          canConvert: issueData.canConvert,
+          conversionDisabledReason: issueData.conversionDisabledReason,
         } as IssuePanelProps;
       }
       case 'project': {
@@ -321,6 +346,8 @@ export function UnifiedEditor({
           onUndoConversion: projectData.onUndoConversion,
           isConverting: projectData.isConverting,
           isUndoing: projectData.isUndoing,
+          canConvert: projectData.canConvert,
+          conversionDisabledReason: projectData.conversionDisabledReason,
         } as ProjectPanelProps;
       }
       case 'sprint': {
@@ -381,6 +408,8 @@ export function UnifiedEditor({
             value={document.document_type as SelectableDocumentType}
             onChange={handleTypeChange}
             disabled={isChangingType}
+            disabledTypes={disabledTypes}
+            helperText={disabledTypeHelperText}
           />
           {missingFields.length > 0 && (
             <p className="mt-2 text-xs text-amber-500">
@@ -394,7 +423,7 @@ export function UnifiedEditor({
         </div>
       </div>
     );
-  }, [showTypeSelector, canChangeType, typeSpecificSidebar, document.document_type, handleTypeChange, isChangingType, missingFields]);
+  }, [showTypeSelector, canChangeType, typeSpecificSidebar, document.document_type, handleTypeChange, isChangingType, disabledTypes, disabledTypeHelperText, missingFields]);
 
   if (!user) {
     return null;
