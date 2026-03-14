@@ -20,6 +20,10 @@ const TYPE_OPTIONS: { value: DocumentType; label: string; icon: React.ReactNode 
   { value: 'sprint', label: 'Week', icon: <SprintIcon /> },
 ];
 
+function isDocumentType(value: string): value is DocumentType {
+  return TYPE_OPTIONS.some((option) => option.value === value);
+}
+
 export function DocumentTypeSelector({
   value,
   onChange,
@@ -32,7 +36,11 @@ export function DocumentTypeSelector({
       <label className="block text-xs font-medium text-muted">Type</label>
       <select
         value={value}
-        onChange={(e) => onChange(e.target.value as DocumentType)}
+        onChange={(e) => {
+          if (isDocumentType(e.target.value)) {
+            onChange(e.target.value);
+          }
+        }}
         disabled={disabled}
         aria-label="Document type"
         className={cn(

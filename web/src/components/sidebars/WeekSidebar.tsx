@@ -47,6 +47,10 @@ interface Sprint {
   has_review?: boolean;
 }
 
+function isSprintStatus(value: string): value is Sprint['status'] {
+  return value === 'planning' || value === 'active' || value === 'completed';
+}
+
 // OPM 5-level performance rating labels
 const OPM_RATING_LABELS: Record<number, { label: string; color: string }> = {
   5: { label: 'Outstanding', color: 'text-green-500' },
@@ -171,7 +175,11 @@ export function WeekSidebar({
       <PropertyRow label="Status" highlighted={isHighlighted('status')}>
         <select
           value={sprint.status}
-          onChange={(e) => onUpdate({ status: e.target.value as Sprint['status'] })}
+          onChange={(e) => {
+            if (isSprintStatus(e.target.value)) {
+              onUpdate({ status: e.target.value });
+            }
+          }}
           className={`w-full rounded border bg-background px-2 py-1.5 text-sm text-foreground focus:border-accent focus:outline-none ${
             isHighlighted('status') ? 'border-amber-500 bg-amber-500/10' : 'border-border'
           }`}

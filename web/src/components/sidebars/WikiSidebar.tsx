@@ -18,9 +18,13 @@ interface WikiSidebarProps {
   onUpdate: (updates: Partial<WikiDocument>) => Promise<void>;
 }
 
+function getMaintainerId(document: WikiDocument): string | null {
+  const maintainerId = document.properties?.maintainer_id;
+  return typeof maintainerId === 'string' ? maintainerId : document.created_by ?? null;
+}
+
 export function WikiSidebar({ document, teamMembers, currentUserId, onUpdate }: WikiSidebarProps) {
-  // Get effective maintainer (explicit or fallback to creator)
-  const maintainerId = (document.properties as { maintainer_id?: string | null })?.maintainer_id || document.created_by;
+  const maintainerId = getMaintainerId(document);
 
   // Handle maintainer change
   const handleMaintainerChange = (userId: string | null) => {

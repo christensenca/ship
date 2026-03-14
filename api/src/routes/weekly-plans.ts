@@ -8,6 +8,50 @@ import { extractText } from '../utils/document-content.js';
 type RouterType = ReturnType<typeof Router>;
 const router: RouterType = Router();
 
+type TipTapDoc = {
+  type: 'doc';
+  content: unknown[];
+};
+
+function getObjectField(value: object, key: string): unknown {
+  return Reflect.get(value, key);
+}
+
+function getObjectArray(value: unknown, key: string): unknown[] | null {
+  if (!value || typeof value !== 'object') return null;
+  const field = getObjectField(value, key);
+  return Array.isArray(field) ? field : null;
+}
+
+function getObjectString(value: unknown, key: string): string | null {
+  if (!value || typeof value !== 'object') return null;
+  const field = getObjectField(value, key);
+  return typeof field === 'string' ? field : null;
+}
+
+function toTipTapDoc(content: unknown): TipTapDoc | null {
+  const nodes = getObjectArray(content, 'content');
+  return nodes ? { type: 'doc', content: nodes } : null;
+}
+
+function buildWeeklyDocumentResponse(
+  documentType: 'weekly_plan' | 'weekly_retro',
+  row: Record<string, unknown>,
+  computedTitle: string
+) {
+  return {
+    id: row.id,
+    title: computedTitle,
+    document_type: documentType,
+    content: row.content,
+    properties: row.properties,
+    person_name: row.person_name,
+    project_name: row.project_name,
+    created_at: row.created_at,
+    updated_at: row.updated_at,
+  };
+}
+
 type RequestContext = {
   userId: string;
   workspaceId: string;
@@ -23,7 +67,7 @@ function getRequestContext(req: Request): RequestContext {
 
 // Templates for weekly plan and retro documents
 // These provide structure for users to fill in, and "done" status is based on adding content beyond the template
-const WEEKLY_PLAN_TEMPLATE = {
+const WEEKLY_PLAN_TEMPLATE: TipTapDoc = {
   type: 'doc',
   content: [
     {
@@ -44,7 +88,7 @@ const WEEKLY_PLAN_TEMPLATE = {
   ]
 };
 
-const WEEKLY_RETRO_TEMPLATE = {
+const WEEKLY_RETRO_TEMPLATE: TipTapDoc = {
   type: 'doc',
   content: [
     {
@@ -74,31 +118,31 @@ const TEMPLATE_HEADINGS = [
 
 /** Extract plan items from TipTap JSON content (mirrors ai-analysis.ts logic) */
 function extractPlanItems(content: unknown): string[] {
-  if (!content || typeof content !== 'object') return [];
-  const doc = content as { content?: unknown[] };
-  if (!Array.isArray(doc.content)) return [];
+  const doc = toTipTapDoc(content);
+  if (!doc) return [];
 
   const items: string[] = [];
 
   function walkNodes(nodes: unknown[]) {
     for (const node of nodes) {
       if (!node || typeof node !== 'object') continue;
-      const n = node as { type?: string; content?: unknown[] };
+      const type = getObjectString(node, 'type');
+      const contentNodes = getObjectArray(node, 'content');
 
-      if (n.type === 'listItem' || n.type === 'taskItem') {
-        const text = extractText(n).trim();
+      if (type === 'listItem' || type === 'taskItem') {
+        const text = extractText(node).trim();
         if (text) items.push(text);
-      } else if (n.type === 'paragraph') {
+      } else if (type === 'paragraph') {
         // Skip headings and short fragments
         const parentIsHeading = false; // top-level paragraphs only
         if (!parentIsHeading) {
-          const text = extractText(n).trim();
+          const text = extractText(node).trim();
           if (text && text.length > 10) items.push(text);
         }
       }
 
-      if (n.content && n.type !== 'listItem' && n.type !== 'taskItem') {
-        walkNodes(n.content);
+      if (contentNodes && type !== 'listItem' && type !== 'taskItem') {
+        walkNodes(contentNodes);
       }
     }
   }
@@ -108,7 +152,7 @@ function extractPlanItems(content: unknown): string[] {
 }
 
 /** Build a retro template auto-populated with plan reference blocks */
-function buildRetroTemplateWithPlanItems(planItems: string[], planDocumentId: string): object {
+function buildRetroTemplateWithPlanItems(planItems: string[], planDocumentId: string): TipTapDoc {
   const content: unknown[] = [
     {
       type: 'heading',
@@ -378,17 +422,7 @@ router.get('/', authMiddleware, async (req: Request, res: Response) => {
     const plans = result.rows.map(row => {
       // Compute full title with person name for entity reference
       const computedTitle = row.person_name ? `${row.title} - ${row.person_name}` : row.title;
-      return {
-        id: row.id,
-        title: computedTitle,
-        document_type: 'weekly_plan' as const,
-        content: row.content,
-        properties: row.properties,
-        person_name: row.person_name,
-        project_name: row.project_name,
-        created_at: row.created_at,
-        updated_at: row.updated_at,
-      };
+      return buildWeeklyDocumentResponse('weekly_plan', row, computedTitle);
     });
 
     res.json(plans);
@@ -507,17 +541,7 @@ router.get('/:id', authMiddleware, async (req: Request, res: Response) => {
     const row = result.rows[0];
     // Compute full title with person name for entity reference
     const computedTitle = row.person_name ? `${row.title} - ${row.person_name}` : row.title;
-    res.json({
-      id: row.id,
-      title: computedTitle,
-      document_type: 'weekly_plan' as const,
-      content: row.content,
-      properties: row.properties,
-      person_name: row.person_name,
-      project_name: row.project_name,
-      created_at: row.created_at,
-      updated_at: row.updated_at,
-    });
+    res.json(buildWeeklyDocumentResponse('weekly_plan', row, computedTitle));
   } catch (err) {
     console.error('Get weekly plan error:', err);
     res.status(500).json({ error: 'Internal server error' });
@@ -649,7 +673,7 @@ weeklyRetrosRouter.post('/', authMiddleware, async (req: Request, res: Response)
     }
 
     // Fetch corresponding plan to auto-populate retro with plan items (by person+week only)
-    let retroTemplate = WEEKLY_RETRO_TEMPLATE;
+    let retroTemplate: TipTapDoc = WEEKLY_RETRO_TEMPLATE;
     const planResult = await client.query(
       `SELECT id, content FROM documents
        WHERE workspace_id = $1
@@ -663,7 +687,7 @@ weeklyRetrosRouter.post('/', authMiddleware, async (req: Request, res: Response)
     if (planResult.rows.length > 0 && planResult.rows[0].content) {
       const planItems = extractPlanItems(planResult.rows[0].content);
       if (planItems.length > 0) {
-        retroTemplate = buildRetroTemplateWithPlanItems(planItems, planResult.rows[0].id) as typeof WEEKLY_RETRO_TEMPLATE;
+        retroTemplate = buildRetroTemplateWithPlanItems(planItems, planResult.rows[0].id);
       }
     }
 
@@ -772,17 +796,7 @@ weeklyRetrosRouter.get('/', authMiddleware, async (req: Request, res: Response) 
     const retros = result.rows.map(row => {
       // Compute full title with person name for entity reference
       const computedTitle = row.person_name ? `${row.title} - ${row.person_name}` : row.title;
-      return {
-        id: row.id,
-        title: computedTitle,
-        document_type: 'weekly_retro' as const,
-        content: row.content,
-        properties: row.properties,
-        person_name: row.person_name,
-        project_name: row.project_name,
-        created_at: row.created_at,
-        updated_at: row.updated_at,
-      };
+      return buildWeeklyDocumentResponse('weekly_retro', row, computedTitle);
     });
 
     res.json(retros);
@@ -901,17 +915,7 @@ weeklyRetrosRouter.get('/:id', authMiddleware, async (req: Request, res: Respons
     const row = result.rows[0];
     // Compute full title with person name for entity reference
     const computedTitle = row.person_name ? `${row.title} - ${row.person_name}` : row.title;
-    res.json({
-      id: row.id,
-      title: computedTitle,
-      document_type: 'weekly_retro' as const,
-      content: row.content,
-      properties: row.properties,
-      person_name: row.person_name,
-      project_name: row.project_name,
-      created_at: row.created_at,
-      updated_at: row.updated_at,
-    });
+    res.json(buildWeeklyDocumentResponse('weekly_retro', row, computedTitle));
   } catch (err) {
     console.error('Get weekly retro error:', err);
     res.status(500).json({ error: 'Internal server error' });
@@ -1026,10 +1030,12 @@ router.get('/project-allocation-grid/:projectId', authMiddleware, async (req: Re
     // Helper to extract all text from a TipTap document
     const extractText = (node: unknown): string => {
       if (!node || typeof node !== 'object') return '';
-      const n = node as { type?: string; text?: string; content?: unknown[] };
-      if (n.type === 'text' && n.text) return n.text;
-      if (Array.isArray(n.content)) {
-        return n.content.map(extractText).join('');
+      const type = getObjectString(node, 'type');
+      const text = getObjectString(node, 'text');
+      const content = getObjectArray(node, 'content');
+      if (type === 'text' && text) return text;
+      if (content) {
+        return content.map(extractText).join('');
       }
       return '';
     };
@@ -1037,9 +1043,8 @@ router.get('/project-allocation-grid/:projectId', authMiddleware, async (req: Re
     // Helper to check if document has content beyond the template
     // "Done" means user has added their own text (not just the template heading)
     const hasContent = (content: unknown): boolean => {
-      if (!content || typeof content !== 'object') return false;
-      const doc = content as { content?: unknown[] };
-      if (!Array.isArray(doc.content) || doc.content.length === 0) return false;
+      const doc = toTipTapDoc(content);
+      if (!doc || doc.content.length === 0) return false;
 
       // Extract all text from the document
       const allText = extractText(content).trim();

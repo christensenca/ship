@@ -8,6 +8,10 @@ type Tab = 'workspaces' | 'users' | 'audit';
 
 const VALID_TABS: Tab[] = ['workspaces', 'users', 'audit'];
 
+function parseAdminTab(value: string | null): Tab {
+  return value === 'workspaces' || value === 'users' || value === 'audit' ? value : 'workspaces';
+}
+
 interface WorkspaceWithCount extends Workspace {
   memberCount: number;
 }
@@ -22,8 +26,7 @@ export function AdminDashboardPage() {
   const [searchParams, setSearchParams] = useSearchParams();
 
   // Derive active tab from URL query params
-  const tabParam = searchParams.get('tab') as Tab | null;
-  const activeTab: Tab = tabParam && VALID_TABS.includes(tabParam) ? tabParam : 'workspaces';
+  const activeTab = parseAdminTab(searchParams.get('tab'));
 
   const handleTabChange = useCallback((tab: Tab) => {
     setSearchParams({ tab }, { replace: true });

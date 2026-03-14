@@ -28,6 +28,11 @@ function getRequestContext(req: Request): RequestContext {
   return { userId, workspaceId };
 }
 
+function getParamString(req: Request, key: string): string | null {
+  const value = req.params[key];
+  return typeof value === 'string' ? value : null;
+}
+
 /**
  * Look up the reports_to user_id for a sprint's owner.
  * The sprint's owner_id is a person document ID; this resolves their supervisor's user_id.
@@ -60,7 +65,7 @@ function parseApprovalComment(body: unknown): { provided: boolean; value: string
     return { provided: false, value: null };
   }
 
-  const raw = (body as { comment?: unknown }).comment;
+  const raw = Reflect.get(body, 'comment');
   if (raw === null || raw === undefined) {
     return { provided: true, value: null };
   }
@@ -370,7 +375,7 @@ router.get('/', authMiddleware, async (req: Request, res: Response): Promise<voi
     const sprints = result.rows.map((row) => ({
       ...extractSprintFromRow(row),
       days_remaining: daysRemaining,
-      status: 'active' as const,
+      status: 'active',
     }));
 
     res.json({
@@ -2727,8 +2732,8 @@ router.post('/:id/carryover', authMiddleware, async (req: Request, res: Response
 // POST /api/weeks/:id/approve-plan - Approve sprint plan
 router.post('/:id/approve-plan', authMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
-    const id = req.params.id;
-    if (typeof id !== 'string') {
+    const id = getParamString(req, 'id');
+    if (!id) {
       res.status(400).json({ error: 'Invalid week id' });
       return;
     }
@@ -2763,14 +2768,14 @@ router.post('/:id/approve-plan', authMiddleware, async (req: Request, res: Respo
     const programAccountableId = sprint.program_accountable_id;
 
     // Check authorization: must be program's accountable_id, supervisor (reports_to), OR workspace admin
-    const ownerReportsTo = await getSprintOwnerReportsTo(id as string, workspaceId);
+    const ownerReportsTo = await getSprintOwnerReportsTo(id, workspaceId);
     if (programAccountableId !== userId && ownerReportsTo !== userId && !isAdmin) {
       res.status(403).json({ error: 'Only the supervisor, program accountable person, or admin can approve plans' });
       return;
     }
 
     // Get the latest plan history entry for version tracking
-    const historyEntry = await getLatestDocumentFieldHistory(id as string, 'plan');
+    const historyEntry = await getLatestDocumentFieldHistory(id, 'plan');
     const versionId = historyEntry?.id || null;
 
     // Update sprint properties with approval
@@ -2803,7 +2808,7 @@ router.post('/:id/approve-plan', authMiddleware, async (req: Request, res: Respo
     // If approval comment changed, log to history for auditability.
     if (previousComment !== resolvedComment) {
       await logDocumentChange(
-        id as string,
+        id,
         'plan_approval',
         previousApproval ? JSON.stringify(previousApproval) : null,
         JSON.stringify(newApproval),
@@ -2813,7 +2818,7 @@ router.post('/:id/approve-plan', authMiddleware, async (req: Request, res: Respo
 
     await broadcastAccountabilityUpdateToSprintOwner(
       sprint.sprint_owner_id,
-      id as string,
+      id,
       'plan_approved'
     );
 
@@ -2830,8 +2835,8 @@ router.post('/:id/approve-plan', authMiddleware, async (req: Request, res: Respo
 // POST /api/weeks/:id/unapprove-plan - Revoke plan approval (logged to history)
 router.post('/:id/unapprove-plan', authMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
-    const id = req.params.id;
-    if (typeof id !== 'string') {
+    const id = getParamString(req, 'id');
+    if (!id) {
       res.status(400).json({ error: 'Invalid week id' });
       return;
     }
@@ -2855,7 +2860,7 @@ router.post('/:id/unapprove-plan', authMiddleware, async (req: Request, res: Res
     }
 
     const sprint = sprintResult.rows[0];
-    const ownerReportsTo = await getSprintOwnerReportsTo(id as string, workspaceId);
+    const ownerReportsTo = await getSprintOwnerReportsTo(id, workspaceId);
     if (sprint.program_accountable_id !== userId && ownerReportsTo !== userId && !isAdmin) {
       res.status(403).json({ error: 'Only the supervisor, program accountable person, or admin can unapprove plans' });
       return;
@@ -2866,7 +2871,7 @@ router.post('/:id/unapprove-plan', authMiddleware, async (req: Request, res: Res
 
     // Log the unapproval to document_history (preserves audit trail)
     await logDocumentChange(
-      id as string,
+      id,
       'plan_approval',
       previousApproval ? JSON.stringify(previousApproval) : null,
       null,
@@ -2892,8 +2897,8 @@ router.post('/:id/unapprove-plan', authMiddleware, async (req: Request, res: Res
 // POST /api/weeks/:id/approve-review - Approve sprint review (rating required)
 router.post('/:id/approve-review', authMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
-    const id = req.params.id;
-    if (typeof id !== 'string') {
+    const id = getParamString(req, 'id');
+    if (!id) {
       res.status(400).json({ error: 'Invalid week id' });
       return;
     }
@@ -2940,7 +2945,7 @@ router.post('/:id/approve-review', authMiddleware, async (req: Request, res: Res
     const programAccountableId = sprint.program_accountable_id;
 
     // Check authorization: must be program's accountable_id, supervisor (reports_to), OR workspace admin
-    const ownerReportsTo = await getSprintOwnerReportsTo(id as string, workspaceId);
+    const ownerReportsTo = await getSprintOwnerReportsTo(id, workspaceId);
     if (programAccountableId !== userId && ownerReportsTo !== userId && !isAdmin) {
       res.status(403).json({ error: 'Only the supervisor, program accountable person, or admin can approve reviews' });
       return;
@@ -2996,7 +3001,7 @@ router.post('/:id/approve-review', authMiddleware, async (req: Request, res: Res
     // If approval comment changed, log to history for auditability.
     if (previousComment !== resolvedComment) {
       await logDocumentChange(
-        id as string,
+        id,
         'review_approval',
         previousApproval ? JSON.stringify(previousApproval) : null,
         JSON.stringify(newApproval),
@@ -3006,7 +3011,7 @@ router.post('/:id/approve-review', authMiddleware, async (req: Request, res: Res
 
     await broadcastAccountabilityUpdateToSprintOwner(
       sprint.sprint_owner_id,
-      id as string,
+      id,
       'review_approved'
     );
 
@@ -3024,8 +3029,8 @@ router.post('/:id/approve-review', authMiddleware, async (req: Request, res: Res
 // POST /api/weeks/:id/request-plan-changes - Request changes on sprint plan
 router.post('/:id/request-plan-changes', authMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
-    const id = req.params.id;
-    if (typeof id !== 'string') {
+    const id = getParamString(req, 'id');
+    if (!id) {
       res.status(400).json({ error: 'Invalid week id' });
       return;
     }
@@ -3065,7 +3070,7 @@ router.post('/:id/request-plan-changes', authMiddleware, async (req: Request, re
     const programAccountableId = sprint.program_accountable_id;
 
     // Check authorization: must be program's accountable_id, supervisor (reports_to), OR workspace admin
-    const ownerReportsTo = await getSprintOwnerReportsTo(id as string, workspaceId);
+    const ownerReportsTo = await getSprintOwnerReportsTo(id, workspaceId);
     if (programAccountableId !== userId && ownerReportsTo !== userId && !isAdmin) {
       res.status(403).json({ error: 'Only the supervisor, program accountable person, or admin can request changes' });
       return;
@@ -3102,7 +3107,7 @@ router.post('/:id/request-plan-changes', authMiddleware, async (req: Request, re
       if (ownerUserId) {
         broadcastToUser(ownerUserId, 'accountability:updated', {
           type: 'changes_requested_plan',
-          targetId: id as string,
+          targetId: id,
         });
       }
     }
@@ -3120,7 +3125,11 @@ router.post('/:id/request-plan-changes', authMiddleware, async (req: Request, re
 // POST /api/weeks/:id/request-retro-changes - Request changes on sprint retro
 router.post('/:id/request-retro-changes', authMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
-    const { id } = req.params;
+    const id = getParamString(req, 'id');
+    if (!id) {
+      res.status(400).json({ error: 'Invalid week id' });
+      return;
+    }
     const { feedback } = req.body || {};
     const { userId, workspaceId } = getRequestContext(req);
 
@@ -3157,7 +3166,7 @@ router.post('/:id/request-retro-changes', authMiddleware, async (req: Request, r
     const programAccountableId = sprint.program_accountable_id;
 
     // Check authorization: must be program's accountable_id, supervisor (reports_to), OR workspace admin
-    const ownerReportsTo = await getSprintOwnerReportsTo(id as string, workspaceId);
+    const ownerReportsTo = await getSprintOwnerReportsTo(id, workspaceId);
     if (programAccountableId !== userId && ownerReportsTo !== userId && !isAdmin) {
       res.status(403).json({ error: 'Only the supervisor, program accountable person, or admin can request changes' });
       return;
@@ -3193,7 +3202,7 @@ router.post('/:id/request-retro-changes', authMiddleware, async (req: Request, r
       if (ownerUserId) {
         broadcastToUser(ownerUserId, 'accountability:updated', {
           type: 'changes_requested_retro',
-          targetId: id as string,
+          targetId: id,
         });
       }
     }

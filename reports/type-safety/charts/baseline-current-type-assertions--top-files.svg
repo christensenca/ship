@@ -51,9 +51,9 @@
       <g font-family="ui-sans-serif, system-ui, sans-serif">
         <text x="408" y="211" text-anchor="end" font-size="12" fill="#111827">Api/Src/Routes/Weeks.Ts</text>
         <rect x="420" y="198" width="763.8730158730159" height="12" rx="3" fill="#9ca3af" />
-        <rect x="420" y="212" width="398.75132275132273" height="12" rx="3" fill="#2563eb" />
+        <rect x="420" y="212" width="273.8412698412698" height="12" rx="3" fill="#2563eb" />
         <text x="1191.873015873016" y="208" font-size="11" fill="#6b7280">159</text>
-        <text x="826.7513227513227" y="222" font-size="11" fill="#6b7280">83</text>
+        <text x="701.8412698412699" y="222" font-size="11" fill="#6b7280">57</text>
       </g>
     
       <g font-family="ui-sans-serif, system-ui, sans-serif">
@@ -67,9 +67,9 @@
       <g font-family="ui-sans-serif, system-ui, sans-serif">
         <text x="408" y="287" text-anchor="end" font-size="12" fill="#111827">Api/Src/Routes/Issues.Ts</text>
         <rect x="420" y="274" width="586.1164021164021" height="12" rx="3" fill="#9ca3af" />
-        <rect x="420" y="288" width="326.6878306878307" height="12" rx="3" fill="#2563eb" />
+        <rect x="420" y="288" width="336.2962962962963" height="12" rx="3" fill="#2563eb" />
         <text x="1014.1164021164021" y="284" font-size="11" fill="#6b7280">122</text>
-        <text x="754.6878306878307" y="298" font-size="11" fill="#6b7280">68</text>
+        <text x="764.2962962962963" y="298" font-size="11" fill="#6b7280">70</text>
       </g>
     
       <g font-family="ui-sans-serif, system-ui, sans-serif">
@@ -99,17 +99,17 @@
       <g font-family="ui-sans-serif, system-ui, sans-serif">
         <text x="408" y="439" text-anchor="end" font-size="12" fill="#111827">Api/Src/Routes/Projects.Ts</text>
         <rect x="420" y="426" width="441.989417989418" height="12" rx="3" fill="#9ca3af" />
-        <rect x="420" y="440" width="355.5132275132275" height="12" rx="3" fill="#2563eb" />
+        <rect x="420" y="440" width="220.994708994709" height="12" rx="3" fill="#2563eb" />
         <text x="869.9894179894179" y="436" font-size="11" fill="#6b7280">92</text>
-        <text x="783.5132275132275" y="450" font-size="11" fill="#6b7280">74</text>
+        <text x="648.994708994709" y="450" font-size="11" fill="#6b7280">46</text>
       </g>
     
       <g font-family="ui-sans-serif, system-ui, sans-serif">
         <text x="408" y="477" text-anchor="end" font-size="12" fill="#111827">Web/Src/Pages/UnifiedDocumentPage.Tsx</text>
         <rect x="420" y="464" width="441.989417989418" height="12" rx="3" fill="#9ca3af" />
-        <rect x="420" y="478" width="273.8412698412698" height="12" rx="3" fill="#2563eb" />
+        <rect x="420" y="478" width="163.34391534391534" height="12" rx="3" fill="#2563eb" />
         <text x="869.9894179894179" y="474" font-size="11" fill="#6b7280">92</text>
-        <text x="701.8412698412699" y="488" font-size="11" fill="#6b7280">57</text>
+        <text x="591.3439153439153" y="488" font-size="11" fill="#6b7280">34</text>
       </g>
     
 </svg>

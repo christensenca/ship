@@ -1,55 +1,55 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-03-11T20:46:18.487Z",
+  "generated_at": "2026-03-14T15:39:48.370Z",
   "baseline": {
     "snapshot_id": "2026-03-11T18-49-04-617Z-baseline",
     "label": "baseline",
     "generated_at": "2026-03-11T18:49:04.617Z"
   },
   "current": {
-    "snapshot_id": "2026-03-11T20-45-53-691Z-current-type-assertions",
+    "snapshot_id": "2026-03-14T15-39-12-032Z-current-type-assertions",
     "label": "current-type-assertions",
-    "generated_at": "2026-03-11T20:45:53.691Z"
+    "generated_at": "2026-03-14T15:39:12.032Z"
   },
   "charts": {
     "totals": [
       {
         "label": "overall",
         "baseline": 7201,
-        "current": 5742,
-        "delta": -1459
+        "current": 5603,
+        "delta": -1598
       },
       {
         "label": "production_only",
         "baseline": 5540,
-        "current": 4081,
-        "delta": -1459
+        "current": 3900,
+        "delta": -1640
       },
       {
         "label": "tests_only",
         "baseline": 1661,
-        "current": 1661,
-        "delta": 0
+        "current": 1703,
+        "delta": 42
       }
     ],
     "by_violation_type": [
       {
         "label": "explicit_any",
         "baseline": 260,
-        "current": 251,
-        "delta": -9
+        "current": 250,
+        "delta": -10
       },
       {
         "label": "type_assertion_as",
         "baseline": 696,
-        "current": 620,
-        "delta": -76
+        "current": 418,
+        "delta": -278
       },
       {
         "label": "non_null_assertion",
         "baseline": 343,
-        "current": 247,
-        "delta": -96
+        "current": 170,
+        "delta": -173
       },
       {
         "label": "ts_comment_directive",
@@ -60,14 +60,14 @@
       {
         "label": "untyped_parameter",
         "baseline": 1452,
-        "current": 1137,
-        "delta": -315
+        "current": 1168,
+        "delta": -284
       },
       {
         "label": "missing_return_type",
         "baseline": 4449,
-        "current": 3486,
-        "delta": -963
+        "current": 3596,
+        "delta": -853
       }
     ],
     "by_file": {
@@ -125,8 +125,8 @@
           "package": "api",
           "is_test_like": false,
           "baseline_total": 159,
-          "current_total": 83,
-          "delta": -76,
+          "current_total": 57,
+          "delta": -102,
           "baseline_counts": {
             "explicit_any": 11,
             "type_assertion_as": 26,
@@ -137,7 +137,7 @@
           },
           "current_counts": {
             "explicit_any": 11,
-            "type_assertion_as": 26,
+            "type_assertion_as": 0,
             "non_null_assertion": 0,
             "ts_comment_directive": 0,
             "untyped_parameter": 24,
@@ -173,8 +173,8 @@
           "package": "api",
           "is_test_like": false,
           "baseline_total": 122,
-          "current_total": 68,
-          "delta": -54,
+          "current_total": 70,
+          "delta": -52,
           "baseline_counts": {
             "explicit_any": 4,
             "type_assertion_as": 8,
@@ -184,12 +184,12 @@
             "missing_return_type": 44
           },
           "current_counts": {
-            "explicit_any": 4,
+            "explicit_any": 3,
             "type_assertion_as": 8,
             "non_null_assertion": 0,
             "ts_comment_directive": 0,
             "untyped_parameter": 29,
-            "missing_return_type": 27
+            "missing_return_type": 30
           }
         },
         {
@@ -262,8 +262,8 @@
           "package": "api",
           "is_test_like": false,
           "baseline_total": 92,
-          "current_total": 74,
-          "delta": -18,
+          "current_total": 46,
+          "delta": -46,
           "baseline_counts": {
             "explicit_any": 15,
             "type_assertion_as": 10,
@@ -274,11 +274,11 @@
           },
           "current_counts": {
             "explicit_any": 14,
-            "type_assertion_as": 10,
-            "non_null_assertion": 20,
+            "type_assertion_as": 0,
+            "non_null_assertion": 0,
             "ts_comment_directive": 0,
             "untyped_parameter": 8,
-            "missing_return_type": 22
+            "missing_return_type": 24
           }
         },
         {
@@ -286,8 +286,8 @@
           "package": "web",
           "is_test_like": false,
           "baseline_total": 92,
-          "current_total": 57,
-          "delta": -35,
+          "current_total": 34,
+          "delta": -58,
           "baseline_counts": {
             "explicit_any": 0,
             "type_assertion_as": 36,
@@ -298,11 +298,11 @@
           },
           "current_counts": {
             "explicit_any": 0,
-            "type_assertion_as": 36,
+            "type_assertion_as": 4,
             "non_null_assertion": 0,
             "ts_comment_directive": 0,
-            "untyped_parameter": 9,
-            "missing_return_type": 12
+            "untyped_parameter": 12,
+            "missing_return_type": 18
           }
         },
         {
@@ -498,8 +498,8 @@
           "package": "api",
           "is_test_like": false,
           "baseline_total": 69,
-          "current_total": 69,
-          "delta": 0,
+          "current_total": 52,
+          "delta": -17,
           "baseline_counts": {
             "explicit_any": 0,
             "type_assertion_as": 3,
@@ -510,8 +510,8 @@
           },
           "current_counts": {
             "explicit_any": 0,
-            "type_assertion_as": 3,
-            "non_null_assertion": 28,
+            "type_assertion_as": 1,
+            "non_null_assertion": 13,
             "ts_comment_directive": 0,
             "untyped_parameter": 10,
             "missing_return_type": 28
@@ -522,8 +522,8 @@
           "package": "api",
           "is_test_like": false,
           "baseline_total": 68,
-          "current_total": 68,
-          "delta": 0,
+          "current_total": 72,
+          "delta": 4,
           "baseline_counts": {
             "explicit_any": 1,
             "type_assertion_as": 2,
@@ -537,8 +537,8 @@
             "type_assertion_as": 2,
             "non_null_assertion": 4,
             "ts_comment_directive": 0,
-            "untyped_parameter": 28,
-            "missing_return_type": 33
+            "untyped_parameter": 30,
+            "missing_return_type": 35
           }
         },
         {
@@ -642,8 +642,8 @@
           "package": "api",
           "is_test_like": false,
           "baseline_total": 54,
-          "current_total": 54,
-          "delta": 0,
+          "current_total": 30,
+          "delta": -24,
           "baseline_counts": {
             "explicit_any": 0,
             "type_assertion_as": 12,
@@ -654,8 +654,8 @@
           },
           "current_counts": {
             "explicit_any": 0,
-            "type_assertion_as": 12,
-            "non_null_assertion": 14,
+            "type_assertion_as": 0,
+            "non_null_assertion": 2,
             "ts_comment_directive": 0,
             "untyped_parameter": 14,
             "missing_return_type": 14
@@ -690,8 +690,8 @@
           "package": "api",
           "is_test_like": false,
           "baseline_total": 52,
-          "current_total": 52,
-          "delta": 0,
+          "current_total": 26,
+          "delta": -26,
           "baseline_counts": {
             "explicit_any": 0,
             "type_assertion_as": 15,
@@ -702,11 +702,11 @@
           },
           "current_counts": {
             "explicit_any": 0,
-            "type_assertion_as": 15,
-            "non_null_assertion": 12,
+            "type_assertion_as": 0,
+            "non_null_assertion": 0,
             "ts_comment_directive": 0,
             "untyped_parameter": 8,
-            "missing_return_type": 17
+            "missing_return_type": 18
           }
         },
         {
@@ -738,8 +738,8 @@
           "package": "web",
           "is_test_like": false,
           "baseline_total": 49,
-          "current_total": 49,
-          "delta": 0,
+          "current_total": 48,
+          "delta": -1,
           "baseline_counts": {
             "explicit_any": 0,
             "type_assertion_as": 1,
@@ -750,7 +750,7 @@
           },
           "current_counts": {
             "explicit_any": 0,
-            "type_assertion_as": 1,
+            "type_assertion_as": 0,
             "non_null_assertion": 1,
             "ts_comment_directive": 0,
             "untyped_parameter": 11,
@@ -762,8 +762,8 @@
           "package": "web",
           "is_test_like": false,
           "baseline_total": 47,
-          "current_total": 47,
-          "delta": 0,
+          "current_total": 32,
+          "delta": -15,
           "baseline_counts": {
             "explicit_any": 0,
             "type_assertion_as": 19,
@@ -774,11 +774,11 @@
           },
           "current_counts": {
             "explicit_any": 0,
-            "type_assertion_as": 19,
+            "type_assertion_as": 1,
             "non_null_assertion": 0,
             "ts_comment_directive": 0,
-            "untyped_parameter": 7,
-            "missing_return_type": 21
+            "untyped_parameter": 8,
+            "missing_return_type": 23
           }
         },
         {
@@ -786,8 +786,8 @@
           "package": "api",
           "is_test_like": false,
           "baseline_total": 46,
-          "current_total": 46,
-          "delta": 0,
+          "current_total": 29,
+          "delta": -17,
           "baseline_counts": {
             "explicit_any": 2,
             "type_assertion_as": 1,
@@ -798,11 +798,11 @@
           },
           "current_counts": {
             "explicit_any": 2,
-            "type_assertion_as": 1,
-            "non_null_assertion": 18,
+            "type_assertion_as": 0,
+            "non_null_assertion": 0,
             "ts_comment_directive": 0,
             "untyped_parameter": 7,
-            "missing_return_type": 18
+            "missing_return_type": 20
           }
         },
         {
@@ -810,8 +810,8 @@
           "package": "web",
           "is_test_like": false,
           "baseline_total": 46,
-          "current_total": 46,
-          "delta": 0,
+          "current_total": 47,
+          "delta": 1,
           "baseline_counts": {
             "explicit_any": 0,
             "type_assertion_as": 5,
@@ -822,7 +822,7 @@
           },
           "current_counts": {
             "explicit_any": 0,
-            "type_assertion_as": 5,
+            "type_assertion_as": 6,
             "non_null_assertion": 1,
             "ts_comment_directive": 0,
             "untyped_parameter": 1,
@@ -906,8 +906,8 @@
           "package": "web",
           "is_test_like": false,
           "baseline_total": 42,
-          "current_total": 42,
-          "delta": 0,
+          "current_total": 17,
+          "delta": -25,
           "baseline_counts": {
             "explicit_any": 0,
             "type_assertion_as": 28,
@@ -918,11 +918,11 @@
           },
           "current_counts": {
             "explicit_any": 0,
-            "type_assertion_as": 28,
+            "type_assertion_as": 0,
             "non_null_assertion": 0,
             "ts_comment_directive": 0,
             "untyped_parameter": 0,
-            "missing_return_type": 14
+            "missing_return_type": 17
           }
         },
         {
@@ -978,8 +978,8 @@
           "package": "web",
           "is_test_like": false,
           "baseline_total": 39,
-          "current_total": 39,
-          "delta": 0,
+          "current_total": 15,
+          "delta": -24,
           "baseline_counts": {
             "explicit_any": 0,
             "type_assertion_as": 25,
@@ -990,7 +990,7 @@
           },
           "current_counts": {
             "explicit_any": 0,
-            "type_assertion_as": 25,
+            "type_assertion_as": 1,
             "non_null_assertion": 0,
             "ts_comment_directive": 0,
             "untyped_parameter": 3,
@@ -1002,8 +1002,8 @@
           "package": "web",
           "is_test_like": false,
           "baseline_total": 38,
-          "current_total": 38,
-          "delta": 0,
+          "current_total": 32,
+          "delta": -6,
           "baseline_counts": {
             "explicit_any": 0,
             "type_assertion_as": 7,
@@ -1014,7 +1014,7 @@
           },
           "current_counts": {
             "explicit_any": 0,
-            "type_assertion_as": 7,
+            "type_assertion_as": 1,
             "non_null_assertion": 0,
             "ts_comment_directive": 0,
             "untyped_parameter": 13,
@@ -1050,8 +1050,8 @@
           "package": "web",
           "is_test_like": false,
           "baseline_total": 37,
-          "current_total": 37,
-          "delta": 0,
+          "current_total": 36,
+          "delta": -1,
           "baseline_counts": {
             "explicit_any": 0,
             "type_assertion_as": 2,
@@ -1062,7 +1062,7 @@
           },
           "current_counts": {
             "explicit_any": 0,
-            "type_assertion_as": 2,
+            "type_assertion_as": 1,
             "non_null_assertion": 0,
             "ts_comment_directive": 0,
             "untyped_parameter": 15,
@@ -1266,8 +1266,8 @@
           "package": "web",
           "is_test_like": false,
           "baseline_total": 34,
-          "current_total": 34,
-          "delta": 0,
+          "current_total": 24,
+          "delta": -10,
           "baseline_counts": {
             "explicit_any": 0,
             "type_assertion_as": 10,
@@ -1278,7 +1278,7 @@
           },
           "current_counts": {
             "explicit_any": 0,
-            "type_assertion_as": 10,
+            "type_assertion_as": 0,
             "non_null_assertion": 0,
             "ts_comment_directive": 0,
             "untyped_parameter": 7,
@@ -1314,8 +1314,8 @@
           "package": "api",
           "is_test_like": false,
           "baseline_total": 33,
-          "current_total": 33,
-          "delta": 0,
+          "current_total": 35,
+          "delta": 2,
           "baseline_counts": {
             "explicit_any": 2,
             "type_assertion_as": 5,
@@ -1330,7 +1330,7 @@
             "non_null_assertion": 3,
             "ts_comment_directive": 0,
             "untyped_parameter": 6,
-            "missing_return_type": 17
+            "missing_return_type": 19
           }
         },
         {
@@ -1482,8 +1482,8 @@
           "package": "api",
           "is_test_like": false,
           "baseline_total": 29,
-          "current_total": 29,
-          "delta": 0,
+          "current_total": 34,
+          "delta": 5,
           "baseline_counts": {
             "explicit_any": 0,
             "type_assertion_as": 5,
@@ -1498,7 +1498,7 @@
             "non_null_assertion": 6,
             "ts_comment_directive": 0,
             "untyped_parameter": 7,
-            "missing_return_type": 11
+            "missing_return_type": 16
           }
         },
         {
@@ -1602,8 +1602,8 @@
           "package": "web",
           "is_test_like": false,
           "baseline_total": 28,
-          "current_total": 28,
-          "delta": 0,
+          "current_total": 21,
+          "delta": -7,
           "baseline_counts": {
             "explicit_any": 0,
             "type_assertion_as": 9,
@@ -1614,11 +1614,11 @@
           },
           "current_counts": {
             "explicit_any": 0,
-            "type_assertion_as": 9,
+            "type_assertion_as": 0,
             "non_null_assertion": 0,
             "ts_comment_directive": 0,
-            "untyped_parameter": 5,
-            "missing_return_type": 14
+            "untyped_parameter": 6,
+            "missing_return_type": 15
           }
         },
         {
@@ -1698,8 +1698,8 @@
           "package": "web",
           "is_test_like": false,
           "baseline_total": 28,
-          "current_total": 28,
-          "delta": 0,
+          "current_total": 31,
+          "delta": 3,
           "baseline_counts": {
             "explicit_any": 0,
             "type_assertion_as": 1,
@@ -1710,11 +1710,11 @@
           },
           "current_counts": {
             "explicit_any": 0,
-            "type_assertion_as": 1,
+            "type_assertion_as": 0,
             "non_null_assertion": 0,
             "ts_comment_directive": 0,
-            "untyped_parameter": 9,
-            "missing_return_type": 18
+            "untyped_parameter": 11,
+            "missing_return_type": 20
           }
         },
         {
@@ -1866,8 +1866,8 @@
           "package": "web",
           "is_test_like": false,
           "baseline_total": 25,
-          "current_total": 25,
-          "delta": 0,
+          "current_total": 24,
+          "delta": -1,
           "baseline_counts": {
             "explicit_any": 0,
             "type_assertion_as": 2,
@@ -1878,7 +1878,7 @@
           },
           "current_counts": {
             "explicit_any": 0,
-            "type_assertion_as": 2,
+            "type_assertion_as": 1,
             "non_null_assertion": 0,
             "ts_comment_directive": 0,
             "untyped_parameter": 7,
@@ -2226,8 +2226,8 @@
           "package": "web",
           "is_test_like": false,
           "baseline_total": 19,
-          "current_total": 19,
-          "delta": 0,
+          "current_total": 15,
+          "delta": -4,
           "baseline_counts": {
             "explicit_any": 0,
             "type_assertion_as": 4,
@@ -2238,7 +2238,7 @@
           },
           "current_counts": {
             "explicit_any": 0,
-            "type_assertion_as": 4,
+            "type_assertion_as": 0,
             "non_null_assertion": 0,
             "ts_comment_directive": 0,
             "untyped_parameter": 5,
@@ -2370,8 +2370,8 @@
           "package": "api",
           "is_test_like": false,
           "baseline_total": 17,
-          "current_total": 17,
-          "delta": 0,
+          "current_total": 21,
+          "delta": 4,
           "baseline_counts": {
             "explicit_any": 0,
             "type_assertion_as": 2,
@@ -2385,8 +2385,8 @@
             "type_assertion_as": 2,
             "non_null_assertion": 0,
             "ts_comment_directive": 0,
-            "untyped_parameter": 9,
-            "missing_return_type": 6
+            "untyped_parameter": 12,
+            "missing_return_type": 7
           }
         },
         {
@@ -2850,8 +2850,8 @@
           "package": "web",
           "is_test_like": false,
           "baseline_total": 12,
-          "current_total": 12,
-          "delta": 0,
+          "current_total": 7,
+          "delta": -5,
           "baseline_counts": {
             "explicit_any": 0,
             "type_assertion_as": 3,
@@ -2862,11 +2862,11 @@
           },
           "current_counts": {
             "explicit_any": 0,
-            "type_assertion_as": 3,
+            "type_assertion_as": 0,
             "non_null_assertion": 0,
             "ts_comment_directive": 0,
-            "untyped_parameter": 2,
-            "missing_return_type": 7
+            "untyped_parameter": 1,
+            "missing_return_type": 6
           }
         },
         {
@@ -2874,8 +2874,8 @@
           "package": "web",
           "is_test_like": false,
           "baseline_total": 12,
-          "current_total": 12,
-          "delta": 0,
+          "current_total": 13,
+          "delta": 1,
           "baseline_counts": {
             "explicit_any": 0,
             "type_assertion_as": 1,
@@ -2886,11 +2886,11 @@
           },
           "current_counts": {
             "explicit_any": 0,
-            "type_assertion_as": 1,
+            "type_assertion_as": 0,
             "non_null_assertion": 0,
             "ts_comment_directive": 0,
-            "untyped_parameter": 3,
-            "missing_return_type": 8
+            "untyped_parameter": 4,
+            "missing_return_type": 9
           }
         },
         {
@@ -3114,8 +3114,8 @@
           "package": "web",
           "is_test_like": false,
           "baseline_total": 11,
-          "current_total": 11,
-          "delta": 0,
+          "current_total": 14,
+          "delta": 3,
           "baseline_counts": {
             "explicit_any": 0,
             "type_assertion_as": 1,
@@ -3126,11 +3126,11 @@
           },
           "current_counts": {
             "explicit_any": 0,
-            "type_assertion_as": 1,
+            "type_assertion_as": 2,
             "non_null_assertion": 0,
             "ts_comment_directive": 0,
-            "untyped_parameter": 0,
-            "missing_return_type": 10
+            "untyped_parameter": 1,
+            "missing_return_type": 11
           }
         },
         {
@@ -3330,8 +3330,8 @@
           "package": "web",
           "is_test_like": false,
           "baseline_total": 9,
-          "current_total": 9,
-          "delta": 0,
+          "current_total": 62,
+          "delta": 53,
           "baseline_counts": {
             "explicit_any": 0,
             "type_assertion_as": 0,
@@ -3345,8 +3345,8 @@
             "type_assertion_as": 0,
             "non_null_assertion": 1,
             "ts_comment_directive": 0,
-            "untyped_parameter": 0,
-            "missing_return_type": 8
+            "untyped_parameter": 17,
+            "missing_return_type": 44
           }
         },
         {
@@ -3570,8 +3570,8 @@
           "package": "web",
           "is_test_like": false,
           "baseline_total": 7,
-          "current_total": 7,
-          "delta": 0,
+          "current_total": 5,
+          "delta": -2,
           "baseline_counts": {
             "explicit_any": 0,
             "type_assertion_as": 2,
@@ -3582,7 +3582,7 @@
           },
           "current_counts": {
             "explicit_any": 0,
-            "type_assertion_as": 2,
+            "type_assertion_as": 0,
             "non_null_assertion": 0,
             "ts_comment_directive": 0,
             "untyped_parameter": 0,
@@ -3642,8 +3642,8 @@
           "package": "web",
           "is_test_like": false,
           "baseline_total": 7,
-          "current_total": 7,
-          "delta": 0,
+          "current_total": 6,
+          "delta": -1,
           "baseline_counts": {
             "explicit_any": 0,
             "type_assertion_as": 1,
@@ -3654,7 +3654,7 @@
           },
           "current_counts": {
             "explicit_any": 0,
-            "type_assertion_as": 1,
+            "type_assertion_as": 0,
             "non_null_assertion": 0,
             "ts_comment_directive": 0,
             "untyped_parameter": 0,
@@ -3858,8 +3858,8 @@
           "package": "web",
           "is_test_like": false,
           "baseline_total": 6,
-          "current_total": 6,
-          "delta": 0,
+          "current_total": 2,
+          "delta": -4,
           "baseline_counts": {
             "explicit_any": 0,
             "type_assertion_as": 2,
@@ -3870,11 +3870,11 @@
           },
           "current_counts": {
             "explicit_any": 0,
-            "type_assertion_as": 2,
+            "type_assertion_as": 0,
             "non_null_assertion": 0,
             "ts_comment_directive": 0,
-            "untyped_parameter": 1,
-            "missing_return_type": 3
+            "untyped_parameter": 0,
+            "missing_return_type": 2
           }
         },
         {
@@ -4242,8 +4242,8 @@
           "package": "web",
           "is_test_like": false,
           "baseline_total": 4,
-          "current_total": 4,
-          "delta": 0,
+          "current_total": 1,
+          "delta": -3,
           "baseline_counts": {
             "explicit_any": 0,
             "type_assertion_as": 1,
@@ -4254,11 +4254,11 @@
           },
           "current_counts": {
             "explicit_any": 0,
-            "type_assertion_as": 1,
+            "type_assertion_as": 0,
             "non_null_assertion": 0,
             "ts_comment_directive": 0,
-            "untyped_parameter": 1,
-            "missing_return_type": 2
+            "untyped_parameter": 0,
+            "missing_return_type": 1
           }
         },
         {
@@ -4266,8 +4266,8 @@
           "package": "web",
           "is_test_like": false,
           "baseline_total": 4,
-          "current_total": 4,
-          "delta": 0,
+          "current_total": 1,
+          "delta": -3,
           "baseline_counts": {
             "explicit_any": 0,
             "type_assertion_as": 1,
@@ -4278,11 +4278,11 @@
           },
           "current_counts": {
             "explicit_any": 0,
-            "type_assertion_as": 1,
+            "type_assertion_as": 0,
             "non_null_assertion": 0,
             "ts_comment_directive": 0,
-            "untyped_parameter": 1,
-            "missing_return_type": 2
+            "untyped_parameter": 0,
+            "missing_return_type": 1
           }
         },
         {
@@ -5388,6 +5388,57 @@
             "untyped_parameter": 0,
             "missing_return_type": 1
           }
+        },
+        {
+          "file": "api/src/middleware/request-performance.ts",
+          "package": "api",
+          "is_test_like": false,
+          "baseline_total": 0,
+          "current_total": 9,
+          "delta": 9,
+          "baseline_counts": null,
+          "current_counts": {
+            "explicit_any": 0,
+            "type_assertion_as": 2,
+            "non_null_assertion": 0,
+            "ts_comment_directive": 0,
+            "untyped_parameter": 2,
+            "missing_return_type": 5
+          }
+        },
+        {
+          "file": "api/src/middleware/auth.ts",
+          "package": "api",
+          "is_test_like": false,
+          "baseline_total": 0,
+          "current_total": 4,
+          "delta": 4,
+          "baseline_counts": null,
+          "current_counts": {
+            "explicit_any": 0,
+            "type_assertion_as": 0,
+            "non_null_assertion": 0,
+            "ts_comment_directive": 0,
+            "untyped_parameter": 0,
+            "missing_return_type": 4
+          }
+        },
+        {
+          "file": "api/src/middleware/visibility.ts",
+          "package": "api",
+          "is_test_like": false,
+          "baseline_total": 0,
+          "current_total": 1,
+          "delta": 1,
+          "baseline_counts": null,
+          "current_counts": {
+            "explicit_any": 0,
+            "type_assertion_as": 0,
+            "non_null_assertion": 0,
+            "ts_comment_directive": 0,
+            "untyped_parameter": 0,
+            "missing_return_type": 1
+          }
         }
       ],
       "top_by_baseline_total": [
@@ -5444,8 +5495,8 @@
           "package": "api",
           "is_test_like": false,
           "baseline_total": 159,
-          "current_total": 83,
-          "delta": -76,
+          "current_total": 57,
+          "delta": -102,
           "baseline_counts": {
             "explicit_any": 11,
             "type_assertion_as": 26,
@@ -5456,7 +5507,7 @@
           },
           "current_counts": {
             "explicit_any": 11,
-            "type_assertion_as": 26,
+            "type_assertion_as": 0,
             "non_null_assertion": 0,
             "ts_comment_directive": 0,
             "untyped_parameter": 24,
@@ -5492,8 +5543,8 @@
           "package": "api",
           "is_test_like": false,
           "baseline_total": 122,
-          "current_total": 68,
-          "delta": -54,
+          "current_total": 70,
+          "delta": -52,
           "baseline_counts": {
             "explicit_any": 4,
             "type_assertion_as": 8,
@@ -5503,12 +5554,12 @@
             "missing_return_type": 44
           },
           "current_counts": {
-            "explicit_any": 4,
+            "explicit_any": 3,
             "type_assertion_as": 8,
             "non_null_assertion": 0,
             "ts_comment_directive": 0,
             "untyped_parameter": 29,
-            "missing_return_type": 27
+            "missing_return_type": 30
           }
         },
         {
@@ -5581,8 +5632,8 @@
           "package": "api",
           "is_test_like": false,
           "baseline_total": 92,
-          "current_total": 74,
-          "delta": -18,
+          "current_total": 46,
+          "delta": -46,
           "baseline_counts": {
             "explicit_any": 15,
             "type_assertion_as": 10,
@@ -5593,11 +5644,11 @@
           },
           "current_counts": {
             "explicit_any": 14,
-            "type_assertion_as": 10,
-            "non_null_assertion": 20,
+            "type_assertion_as": 0,
+            "non_null_assertion": 0,
             "ts_comment_directive": 0,
             "untyped_parameter": 8,
-            "missing_return_type": 22
+            "missing_return_type": 24
           }
         },
         {
@@ -5605,8 +5656,8 @@
           "package": "web",
           "is_test_like": false,
           "baseline_total": 92,
-          "current_total": 57,
-          "delta": -35,
+          "current_total": 34,
+          "delta": -58,
           "baseline_counts": {
             "explicit_any": 0,
             "type_assertion_as": 36,
@@ -5617,11 +5668,11 @@
           },
           "current_counts": {
             "explicit_any": 0,
-            "type_assertion_as": 36,
+            "type_assertion_as": 4,
             "non_null_assertion": 0,
             "ts_comment_directive": 0,
-            "untyped_parameter": 9,
-            "missing_return_type": 12
+            "untyped_parameter": 12,
+            "missing_return_type": 18
           }
         },
         {
@@ -5817,8 +5868,8 @@
           "package": "api",
           "is_test_like": false,
           "baseline_total": 69,
-          "current_total": 69,
-          "delta": 0,
+          "current_total": 52,
+          "delta": -17,
           "baseline_counts": {
             "explicit_any": 0,
             "type_assertion_as": 3,
@@ -5829,8 +5880,8 @@
           },
           "current_counts": {
             "explicit_any": 0,
-            "type_assertion_as": 3,
-            "non_null_assertion": 28,
+            "type_assertion_as": 1,
+            "non_null_assertion": 13,
             "ts_comment_directive": 0,
             "untyped_parameter": 10,
             "missing_return_type": 28
@@ -5935,6 +5986,30 @@
           }
         },
         {
+          "file": "api/src/routes/weeks.ts",
+          "package": "api",
+          "is_test_like": false,
+          "baseline_total": 159,
+          "current_total": 57,
+          "delta": -102,
+          "baseline_counts": {
+            "explicit_any": 11,
+            "type_assertion_as": 26,
+            "non_null_assertion": 48,
+            "ts_comment_directive": 0,
+            "untyped_parameter": 24,
+            "missing_return_type": 50
+          },
+          "current_counts": {
+            "explicit_any": 11,
+            "type_assertion_as": 0,
+            "non_null_assertion": 0,
+            "ts_comment_directive": 0,
+            "untyped_parameter": 24,
+            "missing_return_type": 22
+          }
+        },
+        {
           "file": "web/src/hooks/useWeeksQuery.ts",
           "package": "web",
           "is_test_like": false,
@@ -6027,30 +6102,6 @@
           "current_counts": null
         },
         {
-          "file": "api/src/routes/weeks.ts",
-          "package": "api",
-          "is_test_like": false,
-          "baseline_total": 159,
-          "current_total": 83,
-          "delta": -76,
-          "baseline_counts": {
-            "explicit_any": 11,
-            "type_assertion_as": 26,
-            "non_null_assertion": 48,
-            "ts_comment_directive": 0,
-            "untyped_parameter": 24,
-            "missing_return_type": 50
-          },
-          "current_counts": {
-            "explicit_any": 11,
-            "type_assertion_as": 26,
-            "non_null_assertion": 0,
-            "ts_comment_directive": 0,
-            "untyped_parameter": 24,
-            "missing_return_type": 22
-          }
-        },
-        {
           "file": "web/src/components/editor/SlashCommands.tsx",
           "package": "web",
           "is_test_like": false,
@@ -6116,27 +6167,27 @@
           }
         },
         {
-          "file": "api/src/routes/issues.ts",
-          "package": "api",
+          "file": "web/src/pages/UnifiedDocumentPage.tsx",
+          "package": "web",
           "is_test_like": false,
-          "baseline_total": 122,
-          "current_total": 68,
-          "delta": -54,
+          "baseline_total": 92,
+          "current_total": 34,
+          "delta": -58,
           "baseline_counts": {
-            "explicit_any": 4,
-            "type_assertion_as": 8,
-            "non_null_assertion": 37,
+            "explicit_any": 0,
+            "type_assertion_as": 36,
+            "non_null_assertion": 1,
             "ts_comment_directive": 0,
-            "untyped_parameter": 29,
-            "missing_return_type": 44
+            "untyped_parameter": 16,
+            "missing_return_type": 39
           },
           "current_counts": {
-            "explicit_any": 4,
-            "type_assertion_as": 8,
+            "explicit_any": 0,
+            "type_assertion_as": 4,
             "non_null_assertion": 0,
             "ts_comment_directive": 0,
-            "untyped_parameter": 29,
-            "missing_return_type": 27
+            "untyped_parameter": 12,
+            "missing_return_type": 18
           }
         },
         {
@@ -6164,6 +6215,78 @@
           }
         },
         {
+          "file": "web/src/main.tsx",
+          "package": "web",
+          "is_test_like": false,
+          "baseline_total": 9,
+          "current_total": 62,
+          "delta": 53,
+          "baseline_counts": {
+            "explicit_any": 0,
+            "type_assertion_as": 0,
+            "non_null_assertion": 1,
+            "ts_comment_directive": 0,
+            "untyped_parameter": 0,
+            "missing_return_type": 8
+          },
+          "current_counts": {
+            "explicit_any": 0,
+            "type_assertion_as": 0,
+            "non_null_assertion": 1,
+            "ts_comment_directive": 0,
+            "untyped_parameter": 17,
+            "missing_return_type": 44
+          }
+        },
+        {
+          "file": "api/src/routes/issues.ts",
+          "package": "api",
+          "is_test_like": false,
+          "baseline_total": 122,
+          "current_total": 70,
+          "delta": -52,
+          "baseline_counts": {
+            "explicit_any": 4,
+            "type_assertion_as": 8,
+            "non_null_assertion": 37,
+            "ts_comment_directive": 0,
+            "untyped_parameter": 29,
+            "missing_return_type": 44
+          },
+          "current_counts": {
+            "explicit_any": 3,
+            "type_assertion_as": 8,
+            "non_null_assertion": 0,
+            "ts_comment_directive": 0,
+            "untyped_parameter": 29,
+            "missing_return_type": 30
+          }
+        },
+        {
+          "file": "api/src/routes/projects.ts",
+          "package": "api",
+          "is_test_like": false,
+          "baseline_total": 92,
+          "current_total": 46,
+          "delta": -46,
+          "baseline_counts": {
+            "explicit_any": 15,
+            "type_assertion_as": 10,
+            "non_null_assertion": 26,
+            "ts_comment_directive": 0,
+            "untyped_parameter": 8,
+            "missing_return_type": 33
+          },
+          "current_counts": {
+            "explicit_any": 14,
+            "type_assertion_as": 0,
+            "non_null_assertion": 0,
+            "ts_comment_directive": 0,
+            "untyped_parameter": 8,
+            "missing_return_type": 24
+          }
+        },
+        {
           "file": "web/src/pages/Documents.tsx",
           "package": "web",
           "is_test_like": false,
@@ -6188,99 +6311,27 @@
           }
         },
         {
-          "file": "web/src/pages/UnifiedDocumentPage.tsx",
-          "package": "web",
-          "is_test_like": false,
-          "baseline_total": 92,
-          "current_total": 57,
-          "delta": -35,
-          "baseline_counts": {
-            "explicit_any": 0,
-            "type_assertion_as": 36,
-            "non_null_assertion": 1,
-            "ts_comment_directive": 0,
-            "untyped_parameter": 16,
-            "missing_return_type": 39
-          },
-          "current_counts": {
-            "explicit_any": 0,
-            "type_assertion_as": 36,
-            "non_null_assertion": 0,
-            "ts_comment_directive": 0,
-            "untyped_parameter": 9,
-            "missing_return_type": 12
-          }
-        },
-        {
-          "file": "api/src/routes/projects.ts",
+          "file": "api/src/routes/weekly-plans.ts",
           "package": "api",
           "is_test_like": false,
-          "baseline_total": 92,
-          "current_total": 74,
-          "delta": -18,
-          "baseline_counts": {
-            "explicit_any": 15,
-            "type_assertion_as": 10,
-            "non_null_assertion": 26,
-            "ts_comment_directive": 0,
-            "untyped_parameter": 8,
-            "missing_return_type": 33
-          },
-          "current_counts": {
-            "explicit_any": 14,
-            "type_assertion_as": 10,
-            "non_null_assertion": 20,
-            "ts_comment_directive": 0,
-            "untyped_parameter": 8,
-            "missing_return_type": 22
-          }
-        },
-        {
-          "file": "web/src/hooks/useWeeklyReviewActions.ts",
-          "package": "web",
-          "is_test_like": false,
-          "baseline_total": 25,
-          "current_total": 11,
-          "delta": -14,
+          "baseline_total": 52,
+          "current_total": 26,
+          "delta": -26,
           "baseline_counts": {
             "explicit_any": 0,
-            "type_assertion_as": 11,
-            "non_null_assertion": 0,
+            "type_assertion_as": 15,
+            "non_null_assertion": 12,
             "ts_comment_directive": 0,
-            "untyped_parameter": 0,
-            "missing_return_type": 14
+            "untyped_parameter": 8,
+            "missing_return_type": 17
           },
           "current_counts": {
             "explicit_any": 0,
             "type_assertion_as": 0,
             "non_null_assertion": 0,
             "ts_comment_directive": 0,
-            "untyped_parameter": 0,
-            "missing_return_type": 11
-          }
-        },
-        {
-          "file": "web/src/hooks/useProgramsQuery.ts",
-          "package": "web",
-          "is_test_like": false,
-          "baseline_total": 67,
-          "current_total": 54,
-          "delta": -13,
-          "baseline_counts": {
-            "explicit_any": 0,
-            "type_assertion_as": 9,
-            "non_null_assertion": 0,
-            "ts_comment_directive": 0,
-            "untyped_parameter": 26,
-            "missing_return_type": 32
-          },
-          "current_counts": {
-            "explicit_any": 0,
-            "type_assertion_as": 0,
-            "non_null_assertion": 0,
-            "ts_comment_directive": 0,
-            "untyped_parameter": 26,
-            "missing_return_type": 28
+            "untyped_parameter": 8,
+            "missing_return_type": 18
           }
         }
       ]
@@ -6294,14 +6345,14 @@
         "total": {
           "label": "total",
           "baseline": 151,
-          "current": 151,
-          "delta": 0
+          "current": 157,
+          "delta": 6
         },
         "passed": {
           "label": "passed",
           "baseline": 138,
-          "current": 138,
-          "delta": 0
+          "current": 144,
+          "delta": 6
         },
         "failed": {
           "label": "failed",
@@ -6413,14 +6464,14 @@
         "total": {
           "label": "total",
           "baseline": 451,
-          "current": 451,
-          "delta": 0
+          "current": 454,
+          "delta": 3
         },
         "passed": {
           "label": "passed",
           "baseline": 0,
-          "current": 451,
-          "delta": 451
+          "current": 454,
+          "delta": 454
         },
         "failed": {
           "label": "failed",

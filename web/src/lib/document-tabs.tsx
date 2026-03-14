@@ -29,6 +29,11 @@ export interface DocumentResponse extends Record<string, unknown> {
   emoji?: string | null;
 }
 
+export interface BelongsToReference {
+  id: string;
+  type: string;
+}
+
 export interface DocumentTabProps {
   documentId: string;
   document: DocumentResponse;
@@ -48,9 +53,52 @@ export interface TabCounts {
   projects?: number;
 }
 
-function getSprintStatus(document: DocumentResponse): string {
-  const status = document.properties?.status;
-  return typeof status === 'string' ? status : 'planning';
+export type SprintTabStatus = 'planning' | 'active' | 'completed';
+
+function getPropertiesRecord(document: DocumentResponse): Record<string, unknown> {
+  const { properties } = document;
+  return properties && typeof properties === 'object' ? properties : {};
+}
+
+function getObjectString(value: object, key: string): string | undefined {
+  const property = Reflect.get(value, key);
+  return typeof property === 'string' ? property : undefined;
+}
+
+export function getBelongsToEntries(document: DocumentResponse): BelongsToReference[] {
+  const belongsTo = document.belongs_to;
+  if (!Array.isArray(belongsTo)) {
+    return [];
+  }
+
+  return belongsTo.flatMap((entry) => {
+    if (!entry || typeof entry !== 'object') {
+      return [];
+    }
+
+    const id = getObjectString(entry, 'id');
+    const type = getObjectString(entry, 'type');
+    return id && type ? [{ id, type }] : [];
+  });
+}
+
+export function getBelongsToId(document: DocumentResponse, relationshipType: string): string | undefined {
+  return getBelongsToEntries(document).find((entry) => entry.type === relationshipType)?.id;
+}
+
+export function getSprintStatus(document: DocumentResponse): SprintTabStatus {
+  const status = getPropertiesRecord(document).status;
+  return status === 'active' || status === 'completed' ? status : 'planning';
+}
+
+export function getSprintNumber(document: DocumentResponse): number {
+  const sprintNumber = getPropertiesRecord(document).sprint_number;
+  return typeof sprintNumber === 'number' && Number.isFinite(sprintNumber) ? sprintNumber : 1;
+}
+
+export function getSprintIssueCount(document: DocumentResponse): number {
+  const issueCount = getPropertiesRecord(document).issue_count;
+  return typeof issueCount === 'number' && Number.isFinite(issueCount) ? issueCount : 0;
 }
 
 // Lazy load tab components to avoid circular dependencies

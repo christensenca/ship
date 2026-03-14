@@ -10,6 +10,24 @@ const router: RouterType = Router();
 // All admin routes require super-admin
 router.use(authMiddleware, superAdminMiddleware);
 
+function getRequestUserId(req: Request): string {
+  const { userId } = req;
+  if (!userId) {
+    throw new Error('Missing authenticated request context');
+  }
+  return userId;
+}
+
+function getOptionalStringQuery(value: unknown): string | null {
+  return typeof value === 'string' && value.length > 0 ? value : null;
+}
+
+function parseIntegerQuery(value: unknown, fallback: number): number {
+  if (typeof value !== 'string') return fallback;
+  const parsed = parseInt(value, 10);
+  return Number.isNaN(parsed) ? fallback : parsed;
+}
+
 // GET /api/admin/workspaces - List all workspaces (including archived)
 router.get('/workspaces', async (req: Request, res: Response): Promise<void> => {
   const { includeArchived } = req.query;
@@ -129,7 +147,7 @@ router.post('/workspaces', async (req: Request, res: Response): Promise<void> =>
 
     await logAuditEvent({
       workspaceId: workspace.id,
-      actorUserId: req.userId!,
+      actorUserId: getRequestUserId(req),
       action: 'workspace.create',
       resourceType: 'workspace',
       resourceId: workspace.id,
@@ -246,7 +264,7 @@ router.patch('/workspaces/:id', async (req: Request, res: Response): Promise<voi
 
     await logAuditEvent({
       workspaceId,
-      actorUserId: req.userId!,
+      actorUserId: getRequestUserId(req),
       action: 'workspace.update',
       resourceType: 'workspace',
       resourceId: workspaceId,
@@ -308,7 +326,7 @@ router.post('/workspaces/:id/archive', async (req: Request, res: Response): Prom
 
     await logAuditEvent({
       workspaceId: id,
-      actorUserId: req.userId!,
+      actorUserId: getRequestUserId(req),
       action: 'workspace.archive',
       resourceType: 'workspace',
       resourceId: id,
@@ -534,27 +552,30 @@ router.get('/audit-logs', async (req: Request, res: Response): Promise<void> => 
     `;
     const params: (string | number)[] = [];
     let paramIndex = 1;
+    const workspaceIdFilter = getOptionalStringQuery(workspaceId);
+    const userIdFilter = getOptionalStringQuery(userId);
+    const actionFilter = getOptionalStringQuery(action);
 
-    if (workspaceId) {
+    if (workspaceIdFilter) {
       query += ` AND al.workspace_id = $${paramIndex}`;
-      params.push(workspaceId as string);
+      params.push(workspaceIdFilter);
       paramIndex++;
     }
 
-    if (userId) {
+    if (userIdFilter) {
       query += ` AND al.actor_user_id = $${paramIndex}`;
-      params.push(userId as string);
+      params.push(userIdFilter);
       paramIndex++;
     }
 
-    if (action) {
+    if (actionFilter) {
       query += ` AND al.action = $${paramIndex}`;
-      params.push(action as string);
+      params.push(actionFilter);
       paramIndex++;
     }
 
     query += ` ORDER BY al.created_at DESC LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`;
-    params.push(parseInt(limit as string), parseInt(offset as string));
+    params.push(parseIntegerQuery(limit, 100), parseIntegerQuery(offset, 0));
 
     const result = await pool.query(query, params);
 
@@ -607,22 +628,25 @@ router.get('/audit-logs/export', async (req: Request, res: Response): Promise<vo
     `;
     const params: (string | Date)[] = [];
     let paramIndex = 1;
+    const workspaceIdFilter = getOptionalStringQuery(workspaceId);
+    const startDateFilter = getOptionalStringQuery(startDate);
+    const endDateFilter = getOptionalStringQuery(endDate);
 
-    if (workspaceId) {
+    if (workspaceIdFilter) {
       query += ` AND al.workspace_id = $${paramIndex}`;
-      params.push(workspaceId as string);
+      params.push(workspaceIdFilter);
       paramIndex++;
     }
 
-    if (startDate) {
+    if (startDateFilter) {
       query += ` AND al.created_at >= $${paramIndex}`;
-      params.push(new Date(startDate as string));
+      params.push(new Date(startDateFilter));
       paramIndex++;
     }
 
-    if (endDate) {
+    if (endDateFilter) {
       query += ` AND al.created_at <= $${paramIndex}`;
-      params.push(new Date(endDate as string));
+      params.push(new Date(endDateFilter));
       paramIndex++;
     }
 
@@ -689,7 +713,7 @@ router.post('/impersonate/:userId', async (req: Request, res: Response): Promise
     // Store impersonation in session (we'll update session table to track this)
     // For now, return impersonation data that frontend can track
     await logAuditEvent({
-      actorUserId: req.userId!,
+      actorUserId: getRequestUserId(req),
       action: 'impersonation.start',
       resourceType: 'user',
       resourceId: userId,
@@ -723,7 +747,7 @@ router.post('/impersonate/:userId', async (req: Request, res: Response): Promise
 router.delete('/impersonate', async (req: Request, res: Response): Promise<void> => {
   try {
     await logAuditEvent({
-      actorUserId: req.userId!,
+      actorUserId: getRequestUserId(req),
       action: 'impersonation.end',
       req,
     });
@@ -1019,7 +1043,7 @@ router.post('/workspaces/:id/invites', async (req: Request, res: Response): Prom
 
     await logAuditEvent({
       workspaceId: id,
-      actorUserId: req.userId!,
+      actorUserId: getRequestUserId(req),
       action: 'workspace.invite_create',
       resourceType: 'workspace_invite',
       resourceId: invite.id,
@@ -1101,7 +1125,7 @@ router.delete('/workspaces/:workspaceId/invites/:inviteId', async (req: Request,
 
     await logAuditEvent({
       workspaceId,
-      actorUserId: req.userId!,
+      actorUserId: getRequestUserId(req),
       action: 'workspace.invite_revoke',
       resourceType: 'workspace_invite',
       resourceId: inviteId,
@@ -1212,7 +1236,7 @@ router.post('/workspaces/:id/members', async (req: Request, res: Response): Prom
     // Audit log
     await logAuditEvent({
       workspaceId: id,
-      actorUserId: req.userId!,
+      actorUserId: getRequestUserId(req),
       action: 'workspace.member_add',
       resourceType: 'workspace_membership',
       resourceId: membershipResult.rows[0].id,
@@ -1327,7 +1351,7 @@ router.patch('/workspaces/:workspaceId/members/:userId', async (req: Request, re
 
     await logAuditEvent({
       workspaceId,
-      actorUserId: req.userId!,
+      actorUserId: getRequestUserId(req),
       action: 'workspace.member_role_update',
       resourceType: 'workspace_membership',
       resourceId: userId,
@@ -1429,7 +1453,7 @@ router.delete('/workspaces/:workspaceId/members/:userId', async (req: Request, r
 
     await logAuditEvent({
       workspaceId,
-      actorUserId: req.userId!,
+      actorUserId: getRequestUserId(req),
       action: 'workspace.member_remove',
       resourceType: 'workspace_membership',
       resourceId: userId,
@@ -1494,7 +1518,7 @@ router.get('/debug/users', async (req: Request, res: Response): Promise<void> =>
     }>> = {};
 
     for (const m of membershipsResult.rows) {
-      const userId = m.user_id as string;
+      const userId = String(m.user_id);
       if (!membershipsByUser[userId]) {
         membershipsByUser[userId] = [];
       }
@@ -1509,7 +1533,7 @@ router.get('/debug/users', async (req: Request, res: Response): Promise<void> =>
     // Identify potential duplicates (same email_lower)
     const emailCounts: Record<string, number> = {};
     for (const u of usersResult.rows) {
-      const emailLower = u.email_lower as string;
+      const emailLower = String(u.email_lower);
       emailCounts[emailLower] = (emailCounts[emailLower] ?? 0) + 1;
     }
 
@@ -1527,7 +1551,7 @@ router.get('/debug/users', async (req: Request, res: Response): Promise<void> =>
       membershipCount: parseInt(row.membership_count),
       sessionCount: parseInt(row.session_count),
       memberships: membershipsByUser[row.id] || [],
-      isDuplicate: (emailCounts[row.email_lower as string] ?? 0) > 1,
+      isDuplicate: (emailCounts[String(row.email_lower)] ?? 0) > 1,
     }));
 
     // Summary stats
@@ -1697,7 +1721,7 @@ router.post('/debug/orphans/fix', async (req: Request, res: Response): Promise<v
 
       // Log the fix action
       await logAuditEvent({
-        actorUserId: req.userId!,
+        actorUserId: getRequestUserId(req),
         action: 'admin.fix_orphans',
         details: {
           danglingDeleted: deleteDanglingResult.rowCount,
@@ -1735,7 +1759,7 @@ router.post('/debug/orphans/fix', async (req: Request, res: Response): Promise<v
 
 // DELETE /api/admin/debug/users/:id - Delete a specific user (for cleanup)
 router.delete('/debug/users/:id', async (req: Request, res: Response): Promise<void> => {
-  const id = req.params.id as string;
+  const id = String(req.params.id);
 
   try {
     // Get user info for audit log
@@ -1775,7 +1799,7 @@ router.delete('/debug/users/:id', async (req: Request, res: Response): Promise<v
     await pool.query('DELETE FROM users WHERE id = $1', [id]);
 
     await logAuditEvent({
-      actorUserId: req.userId!,
+      actorUserId: getRequestUserId(req),
       action: 'user.delete',
       resourceType: 'user',
       resourceId: id,

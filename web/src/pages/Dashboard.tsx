@@ -6,8 +6,7 @@ import { useDashboardActionItems } from '@/hooks/useDashboardActionItems';
 import { cn } from '@/lib/cn';
 import { formatRelativeTime } from '@/lib/date-utils';
 import { DashboardVariantC } from '@/components/dashboard/DashboardVariantC';
-
-type DashboardView = 'my-work' | 'overview';
+import { parseDashboardView } from '@/lib/dashboard-view';
 
 const API_URL = import.meta.env.VITE_API_URL ?? '';
 
@@ -44,7 +43,7 @@ function extractTextFromContent(content: unknown): string {
 
 export function DashboardPage() {
   const [searchParams] = useSearchParams();
-  const currentView: DashboardView = (searchParams.get('view') as DashboardView) || 'my-work';
+  const currentView = parseDashboardView(searchParams.get('view'));
 
   const { data: weeksData, isLoading: weeksLoading } = useActiveWeeksQuery();
   const { projects, loading: projectsLoading } = useProjects();

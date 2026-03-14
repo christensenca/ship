@@ -1,19 +1,19 @@
 import { useSearchParams } from 'react-router-dom';
 import { useEffect } from 'react';
 import { cn } from '@/lib/cn';
+import { isDashboardView, parseDashboardView, type DashboardView } from '@/lib/dashboard-view';
 
 const STORAGE_KEY = 'dashboard-view';
-export type DashboardView = 'my-work' | 'overview';
 
 export function DashboardSidebar() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const currentView = (searchParams.get('view') as DashboardView) || 'my-work';
+  const currentView = parseDashboardView(searchParams.get('view'));
 
   // On mount, restore saved view preference if no view param is set
   useEffect(() => {
     if (!searchParams.get('view')) {
-      const savedView = localStorage.getItem(STORAGE_KEY) as DashboardView | null;
-      if (savedView && savedView !== 'my-work') {
+      const savedView = localStorage.getItem(STORAGE_KEY);
+      if (isDashboardView(savedView) && savedView !== 'my-work') {
         setSearchParams({ view: savedView }, { replace: true });
       }
     }

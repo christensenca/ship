@@ -4,7 +4,13 @@ import { IssuesList, DEFAULT_FILTER_TABS } from '@/components/IssuesList';
 import { apiPost } from '@/lib/api';
 import { useToast } from '@/components/ui/Toast';
 import { cn } from '@/lib/cn';
-import type { DocumentTabProps } from '@/lib/document-tabs';
+import {
+  getBelongsToId,
+  getSprintIssueCount,
+  getSprintStatus,
+  type DocumentTabProps,
+  type SprintTabStatus,
+} from '@/lib/document-tabs';
 
 /**
  * SprintPlanningTab - Sprint planning view
@@ -24,13 +30,9 @@ export default function SprintPlanningTab({ documentId, document }: DocumentTabP
   const queryClient = useQueryClient();
   const [isStarting, setIsStarting] = useState(false);
 
-  // Get program_id from belongs_to array (sprint's parent program via document_associations)
-  const belongsTo = (document as { belongs_to?: Array<{ id: string; type: string }> }).belongs_to;
-  const programId = belongsTo?.find(b => b.type === 'program')?.id;
-  // Sprint status is stored in properties.status
-  const properties = document.properties as { status?: string; issue_count?: number } | undefined;
-  const status = properties?.status || 'planning';
-  const issueCount = properties?.issue_count ?? 0;
+  const programId = getBelongsToId(document, 'program');
+  const status = getSprintStatus(document);
+  const issueCount = getSprintIssueCount(document);
 
   // Start sprint mutation
   const startSprintMutation = useMutation({
@@ -69,7 +71,7 @@ export default function SprintPlanningTab({ documentId, document }: DocumentTabP
       {/* Header with status and action */}
       <div className="flex items-center justify-between border-b border-border px-4 py-2">
         <div className="flex items-center gap-2">
-          <StatusBadge status={status as 'planning' | 'active' | 'completed'} />
+          <StatusBadge status={status} />
           {issueCount > 0 && (
             <span className="text-xs text-muted">
               {issueCount} issue{issueCount === 1 ? '' : 's'} scoped
@@ -131,7 +133,7 @@ export default function SprintPlanningTab({ documentId, document }: DocumentTabP
 }
 
 // Status badge component
-function StatusBadge({ status }: { status: 'planning' | 'active' | 'completed' }) {
+function StatusBadge({ status }: { status: SprintTabStatus }) {
   const statusConfig = {
     planning: { label: 'Planning', className: 'bg-blue-500/20 text-blue-400' },
     active: { label: 'Active', className: 'bg-green-500/20 text-green-400' },
