@@ -7,12 +7,14 @@ export interface WikiDocument {
   document_type: string;
   parent_id: string | null;
   position: number;
-  created_at: string;
-  updated_at: string;
+  created_at?: string;
+  updated_at?: string;
   created_by?: string | null;
   properties?: Record<string, unknown>;
   visibility: 'private' | 'workspace';
 }
+
+export type WikiListVariant = 'full' | 'tree';
 
 interface HttpError extends Error {
   status: number;
@@ -26,7 +28,8 @@ interface CreateDocumentInput {
 }
 
 interface CreateDocumentContext {
-  previousDocs?: WikiDocument[];
+  previousTreeDocs?: WikiDocument[];
+  previousFullDocs?: WikiDocument[];
   optimisticId: string;
 }
 
@@ -36,7 +39,8 @@ interface UpdateDocumentInput {
 }
 
 interface MutationContext {
-  previousDocs?: WikiDocument[];
+  previousTreeDocs?: WikiDocument[];
+  previousFullDocs?: WikiDocument[];
 }
 
 const allDocumentKey: readonly ['documents'] = ['documents'];
@@ -45,19 +49,32 @@ function createHttpError(message: string, status: number): HttpError {
   return Object.assign(new Error(message), { status });
 }
 
+function setWikiListData(
+  queryClient: ReturnType<typeof useQueryClient>,
+  updater: (old: WikiDocument[] | undefined) => WikiDocument[]
+): void {
+  queryClient.setQueryData<WikiDocument[]>(documentKeys.wikiList('tree'), updater);
+  queryClient.setQueryData<WikiDocument[]>(documentKeys.wikiList('full'), updater);
+}
+
 // Query keys
 export const documentKeys = {
   all: allDocumentKey,
   lists: (): readonly ['documents', 'list'] => ['documents', 'list'],
   list: (type: string): readonly ['documents', 'list', string] => ['documents', 'list', type],
-  wikiList: (): readonly ['documents', 'wiki'] => ['documents', 'wiki'],
+  wikiList: (variant: WikiListVariant = 'full'): readonly ['documents', 'wiki', WikiListVariant] => ['documents', 'wiki', variant],
   details: (): readonly ['documents', 'detail'] => ['documents', 'detail'],
   detail: (id: string): readonly ['documents', 'detail', string] => ['documents', 'detail', id],
 };
 
 // Fetch documents
-async function fetchDocuments(type: string = 'wiki'): Promise<WikiDocument[]> {
-  const res = await apiGet(`/api/documents?type=${type}`);
+async function fetchDocuments(type: string = 'wiki', variant: WikiListVariant = 'full'): Promise<WikiDocument[]> {
+  const params = new URLSearchParams({ type });
+  if (type === 'wiki' && variant === 'tree') {
+    params.set('view', 'tree');
+  }
+
+  const res = await apiGet(`/api/documents?${params.toString()}`);
   if (!res.ok) {
     throw createHttpError('Failed to fetch documents', res.status);
   }
@@ -91,11 +108,11 @@ async function deleteDocumentApi(id: string): Promise<void> {
 }
 
 // Hook to get documents
-export function useDocumentsQuery(type: string = 'wiki'): UseQueryResult<WikiDocument[], HttpError> {
-  const queryKey = type === 'wiki' ? documentKeys.wikiList() : documentKeys.list(type);
+export function useDocumentsQuery(type: string = 'wiki', variant: WikiListVariant = 'full'): UseQueryResult<WikiDocument[], HttpError> {
+  const queryKey = type === 'wiki' ? documentKeys.wikiList(variant) : documentKeys.list(type);
   return useQuery({
     queryKey,
-    queryFn: (): Promise<WikiDocument[]> => fetchDocuments(type),
+    queryFn: (): Promise<WikiDocument[]> => fetchDocuments(type, variant),
     staleTime: 1000 * 60 * 5, // 5 minutes
     refetchOnMount: 'always',
   });
@@ -114,7 +131,8 @@ export function useCreateDocument(): UseMutationResult<WikiDocument, HttpError, 
       }),
     onMutate: async (newDoc: CreateDocumentInput): Promise<CreateDocumentContext> => {
       await queryClient.cancelQueries({ queryKey: documentKeys.lists() });
-      const previousDocs = queryClient.getQueryData<WikiDocument[]>(documentKeys.wikiList());
+      const previousTreeDocs = queryClient.getQueryData<WikiDocument[]>(documentKeys.wikiList('tree'));
+      const previousFullDocs = queryClient.getQueryData<WikiDocument[]>(documentKeys.wikiList('full'));
 
       const optimisticDoc: WikiDocument = {
         id: `temp-${crypto.randomUUID()}`,
@@ -127,22 +145,21 @@ export function useCreateDocument(): UseMutationResult<WikiDocument, HttpError, 
         visibility: newDoc.visibility ?? 'workspace',
       };
 
-      queryClient.setQueryData<WikiDocument[]>(
-        documentKeys.wikiList(),
+      setWikiListData(
+        queryClient,
         (old: WikiDocument[] | undefined): WikiDocument[] => [optimisticDoc, ...(old ?? [])]
       );
 
-      return { previousDocs, optimisticId: optimisticDoc.id };
+      return { previousTreeDocs, previousFullDocs, optimisticId: optimisticDoc.id };
     },
     onError: (_err: HttpError, _newDoc: CreateDocumentInput, context: CreateDocumentContext | undefined): void => {
-      if (context?.previousDocs) {
-        queryClient.setQueryData(documentKeys.wikiList(), context.previousDocs);
-      }
+      if (context?.previousTreeDocs) queryClient.setQueryData(documentKeys.wikiList('tree'), context.previousTreeDocs);
+      if (context?.previousFullDocs) queryClient.setQueryData(documentKeys.wikiList('full'), context.previousFullDocs);
     },
     onSuccess: (data: WikiDocument, _variables: CreateDocumentInput, context: CreateDocumentContext | undefined): void => {
       if (context?.optimisticId) {
-        queryClient.setQueryData<WikiDocument[]>(
-          documentKeys.wikiList(),
+        setWikiListData(
+          queryClient,
           (old: WikiDocument[] | undefined): WikiDocument[] =>
             old?.map((document: WikiDocument): WikiDocument => (
               document.id === context.optimisticId ? data : document
@@ -165,26 +182,26 @@ export function useUpdateDocument(): UseMutationResult<WikiDocument, HttpError, 
       updateDocumentApi(id, updates),
     onMutate: async ({ id, updates }: UpdateDocumentInput): Promise<MutationContext> => {
       await queryClient.cancelQueries({ queryKey: documentKeys.lists() });
-      const previousDocs = queryClient.getQueryData<WikiDocument[]>(documentKeys.wikiList());
+      const previousTreeDocs = queryClient.getQueryData<WikiDocument[]>(documentKeys.wikiList('tree'));
+      const previousFullDocs = queryClient.getQueryData<WikiDocument[]>(documentKeys.wikiList('full'));
 
-      queryClient.setQueryData<WikiDocument[]>(
-        documentKeys.wikiList(),
+      setWikiListData(
+        queryClient,
         (old: WikiDocument[] | undefined): WikiDocument[] =>
           old?.map((document: WikiDocument): WikiDocument => (
             document.id === id ? { ...document, ...updates } : document
           )) ?? []
       );
 
-      return { previousDocs };
+      return { previousTreeDocs, previousFullDocs };
     },
     onError: (_err: HttpError, _variables: UpdateDocumentInput, context: MutationContext | undefined): void => {
-      if (context?.previousDocs) {
-        queryClient.setQueryData(documentKeys.wikiList(), context.previousDocs);
-      }
+      if (context?.previousTreeDocs) queryClient.setQueryData(documentKeys.wikiList('tree'), context.previousTreeDocs);
+      if (context?.previousFullDocs) queryClient.setQueryData(documentKeys.wikiList('full'), context.previousFullDocs);
     },
     onSuccess: (data: WikiDocument, { id }: UpdateDocumentInput): void => {
-      queryClient.setQueryData<WikiDocument[]>(
-        documentKeys.wikiList(),
+      setWikiListData(
+        queryClient,
         (old: WikiDocument[] | undefined): WikiDocument[] =>
           old?.map((document: WikiDocument): WikiDocument => (
             document.id === id ? data : document
@@ -205,20 +222,20 @@ export function useDeleteDocument(): UseMutationResult<void, HttpError, string, 
     mutationFn: (id: string): Promise<void> => deleteDocumentApi(id),
     onMutate: async (id: string): Promise<MutationContext> => {
       await queryClient.cancelQueries({ queryKey: documentKeys.lists() });
-      const previousDocs = queryClient.getQueryData<WikiDocument[]>(documentKeys.wikiList());
+      const previousTreeDocs = queryClient.getQueryData<WikiDocument[]>(documentKeys.wikiList('tree'));
+      const previousFullDocs = queryClient.getQueryData<WikiDocument[]>(documentKeys.wikiList('full'));
 
-      queryClient.setQueryData<WikiDocument[]>(
-        documentKeys.wikiList(),
+      setWikiListData(
+        queryClient,
         (old: WikiDocument[] | undefined): WikiDocument[] =>
           old?.filter((document: WikiDocument): boolean => document.id !== id) ?? []
       );
 
-      return { previousDocs };
+      return { previousTreeDocs, previousFullDocs };
     },
     onError: (_err: HttpError, _id: string, context: MutationContext | undefined): void => {
-      if (context?.previousDocs) {
-        queryClient.setQueryData(documentKeys.wikiList(), context.previousDocs);
-      }
+      if (context?.previousTreeDocs) queryClient.setQueryData(documentKeys.wikiList('tree'), context.previousTreeDocs);
+      if (context?.previousFullDocs) queryClient.setQueryData(documentKeys.wikiList('full'), context.previousFullDocs);
     },
     onSettled: (): void => {
       queryClient.invalidateQueries({ queryKey: documentKeys.lists() });
@@ -235,7 +252,7 @@ export function useDocuments(): {
   deleteDocument: (id: string) => Promise<boolean>;
   refreshDocuments: () => Promise<void>;
 } {
-  const { data: documents = [], isLoading: loading, refetch } = useDocumentsQuery('wiki');
+  const { data: documents = [], isLoading: loading, refetch } = useDocumentsQuery('wiki', 'tree');
   const createMutation = useCreateDocument();
   const updateMutation = useUpdateDocument();
   const deleteMutation = useDeleteDocument();

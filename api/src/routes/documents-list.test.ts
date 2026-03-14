@@ -71,18 +71,45 @@ describe('Documents list payloads', () => {
     await pool.query('DELETE FROM workspaces WHERE id = $1', [testWorkspaceId]);
   });
 
-  it('returns a trimmed wiki list payload for type=wiki', async () => {
+  it('returns a compact wiki tree payload for type=wiki&view=tree', async () => {
     const res = await request(app)
-      .get('/api/documents?type=wiki')
+      .get('/api/documents?type=wiki&view=tree')
       .set('Cookie', sessionCookie);
 
     expect(res.status).toBe(200);
     const wiki = res.body.find((doc: { id: string }) => doc.id === wikiId);
     expect(wiki).toBeDefined();
+    expect(wiki.workspace_id).toBeUndefined();
     expect(wiki.properties).toBeUndefined();
     expect(wiki.state).toBeUndefined();
     expect(wiki.priority).toBeUndefined();
+    expect(wiki.created_by).toBeUndefined();
+    expect(wiki.updated_at).toBeUndefined();
+    expect(wiki.created_at).toBeTruthy();
     expect(wiki.visibility).toBe('workspace');
+  });
+
+  it('emits benchmark timing headers for the wiki list fast path', async () => {
+    const previousBenchmark = process.env.API_BENCHMARK;
+    process.env.API_BENCHMARK = '1';
+
+    try {
+      const res = await request(app)
+        .get('/api/documents?type=wiki&view=tree')
+        .set('Cookie', sessionCookie);
+
+      expect(res.status).toBe(200);
+      expect(res.headers['server-timing']).toContain('auth_session');
+      expect(res.headers['server-timing']).toContain('db_main');
+      expect(res.headers['server-timing']).toContain('serialize');
+      expect(res.headers['server-timing']).toContain('total');
+    } finally {
+      if (previousBenchmark === undefined) {
+        delete process.env.API_BENCHMARK;
+      } else {
+        process.env.API_BENCHMARK = previousBenchmark;
+      }
+    }
   });
 
   it('keeps non-wiki document list payload backward-compatible', async () => {
@@ -96,5 +123,19 @@ describe('Documents list payloads', () => {
     expect(issue.properties).toBeTruthy();
     expect(issue.state).toBe('backlog');
     expect(issue.priority).toBe('high');
+  });
+
+  it('returns the fuller wiki list payload without the tree view flag', async () => {
+    const res = await request(app)
+      .get('/api/documents?type=wiki')
+      .set('Cookie', sessionCookie);
+
+    expect(res.status).toBe(200);
+    const wiki = res.body.find((doc: { id: string }) => doc.id === wikiId);
+    expect(wiki).toBeDefined();
+    expect(wiki.created_at).toBeTruthy();
+    expect(wiki.updated_at).toBeTruthy();
+    expect(wiki.created_by).toBe(testUserId);
+    expect(wiki.properties).toBeUndefined();
   });
 });

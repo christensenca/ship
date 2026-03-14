@@ -215,7 +215,7 @@ function mapIssueListRow(row: IssueListRow, belongsTo: BelongsToEntry[]): IssueL
 // List issues with filters
 router.get('/', authMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
-    const { state, priority, assignee_id, program_id, sprint_id, source, parent_filter } = req.query;
+    const { state, priority, assignee_id, program_id, project_id, sprint_id, source, parent_filter } = req.query;
     const { userId, workspaceId } = getRequestContext(req);
 
     const { isAdmin } = await resolveVisibilityContextFromRequest(req, userId, workspaceId);
@@ -311,6 +311,15 @@ router.get('/', authMiddleware, async (req: Request, res: Response): Promise<voi
         WHERE da.document_id = fi.id AND da.related_id = $${params.length + 1} AND da.relationship_type = 'program'
       )`;
       params.push(program_id as string);
+    }
+
+    // Filter by project via junction table
+    if (project_id) {
+      query += ` AND EXISTS (
+        SELECT 1 FROM document_associations da
+        WHERE da.document_id = fi.id AND da.related_id = $${params.length + 1} AND da.relationship_type = 'project'
+      )`;
+      params.push(project_id as string);
     }
 
     // Filter by sprint via junction table

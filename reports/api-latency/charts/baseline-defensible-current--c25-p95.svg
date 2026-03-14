@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="500" viewBox="0 0 1400 500">
+  <rect width="100%" height="100%" fill="white" />
+  <text x="72" y="34" font-family="ui-sans-serif, system-ui, sans-serif" font-size="28" font-weight="700" fill="#111827">API Latency P95 at c=25</text>
+  <g transform="translate(72, 76)">
+    
+    <g font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#111827">
+      <rect x="0" y="0" width="12" height="12" rx="2" fill="#9ca3af" />
+      <text x="18" y="10">Baseline</text>
+      <rect x="96" y="0" width="12" height="12" rx="2" fill="#2563eb" />
+      <text x="114" y="10">Current</text>
+    </g>
+  
+  </g>
+  <line x1="72" y1="360" x2="1352" y2="360" stroke="#6b7280" />
+  
+      <line x1="72" y1="360" x2="1352" y2="360" stroke="#e5e7eb" />
+      <text x="62" y="364" text-anchor="end" font-size="12" fill="#6b7280">0</text>
+    
+      <line x1="72" y1="312.4" x2="1352" y2="312.4" stroke="#e5e7eb" />
+      <text x="62" y="316.4" text-anchor="end" font-size="12" fill="#6b7280">11</text>
+    
+      <line x1="72" y1="264.8" x2="1352" y2="264.8" stroke="#e5e7eb" />
+      <text x="62" y="268.8" text-anchor="end" font-size="12" fill="#6b7280">23</text>
+    
+      <line x1="72" y1="217.2" x2="1352" y2="217.2" stroke="#e5e7eb" />
+      <text x="62" y="221.2" text-anchor="end" font-size="12" fill="#6b7280">34</text>
+    
+      <line x1="72" y1="169.6" x2="1352" y2="169.6" stroke="#e5e7eb" />
+      <text x="62" y="173.6" text-anchor="end" font-size="12" fill="#6b7280">46</text>
+    
+      <line x1="72" y1="122" x2="1352" y2="122" stroke="#e5e7eb" />
+      <text x="62" y="126" text-anchor="end" font-size="12" fill="#6b7280">57</text>
+    
+  
+      <g font-family="ui-sans-serif, system-ui, sans-serif">
+        <rect x="140.5" y="122" width="58" height="238" rx="4" fill="#9ca3af" />
+        <rect x="201.5" y="201.33333333333334" width="58" height="158.66666666666666" rx="4" fill="#2563eb" />
+        <text x="169.5" y="114" text-anchor="middle" font-size="11" fill="#6b7280">57</text>
+        <text x="230.5" y="193.33333333333334" text-anchor="middle" font-size="11" fill="#6b7280">38</text>
+        <text x="200" y="384" text-anchor="middle" font-size="12" fill="#111827">documents?type=wiki</text>
+        <text x="200" y="404" text-anchor="middle" font-size="11" fill="#047857">-33.3%</text>
+      </g>
+    
+      <g font-family="ui-sans-serif, system-ui, sans-serif">
+        <rect x="396.5" y="134.5263157894737" width="58" height="225.4736842105263" rx="4" fill="#9ca3af" />
+        <rect x="457.5" y="192.98245614035088" width="58" height="167.01754385964912" rx="4" fill="#2563eb" />
+        <text x="425.5" y="126.5263157894737" text-anchor="middle" font-size="11" fill="#6b7280">54</text>
+        <text x="486.5" y="184.98245614035088" text-anchor="middle" font-size="11" fill="#6b7280">40</text>
+        <text x="456" y="384" text-anchor="middle" font-size="12" fill="#111827">issues</text>
+        <text x="456" y="404" text-anchor="middle" font-size="11" fill="#047857">-25.9%</text>
+      </g>
+    
+      <g font-family="ui-sans-serif, system-ui, sans-serif">
+        <rect x="652.5" y="226.3859649122807" width="58" height="133.6140350877193" rx="4" fill="#9ca3af" />
+        <rect x="713.5" y="293.1929824561404" width="58" height="66.80701754385964" rx="4" fill="#2563eb" />
+        <text x="681.5" y="218.3859649122807" text-anchor="middle" font-size="11" fill="#6b7280">32</text>
+        <text x="742.5" y="285.1929824561404" text-anchor="middle" font-size="11" fill="#6b7280">16</text>
+        <text x="712" y="384" text-anchor="middle" font-size="12" fill="#111827">projects</text>
+        <text x="712" y="404" text-anchor="middle" font-size="11" fill="#047857">-50%</text>
+      </g>
+    
+      <g font-family="ui-sans-serif, system-ui, sans-serif">
+        <rect x="908.5" y="259.7894736842105" width="58" height="100.21052631578947" rx="4" fill="#9ca3af" />
+        <rect x="969.5" y="322.42105263157896" width="58" height="37.57894736842105" rx="4" fill="#2563eb" />
+        <text x="937.5" y="251.78947368421052" text-anchor="middle" font-size="11" fill="#6b7280">24</text>
+        <text x="998.5" y="314.42105263157896" text-anchor="middle" font-size="11" fill="#6b7280">9</text>
+        <text x="968" y="384" text-anchor="middle" font-size="12" fill="#111827">programs</text>
+        <text x="968" y="404" text-anchor="middle" font-size="11" fill="#047857">-62.5%</text>
+      </g>
+    
+      <g font-family="ui-sans-serif, system-ui, sans-serif">
+        <rect x="1164.5" y="197.1578947368421" width="58" height="162.8421052631579" rx="4" fill="#9ca3af" />
+        <rect x="1225.5" y="263.96491228070175" width="58" height="96.03508771929825" rx="4" fill="#2563eb" />
+        <text x="1193.5" y="189.1578947368421" text-anchor="middle" font-size="11" fill="#6b7280">39</text>
+        <text x="1254.5" y="255.96491228070175" text-anchor="middle" font-size="11" fill="#6b7280">23</text>
+        <text x="1224" y="384" text-anchor="middle" font-size="12" fill="#111827">dashboard/my-week</text>
+        <text x="1224" y="404" text-anchor="middle" font-size="11" fill="#047857">-41%</text>
+      </g>
+    
+</svg>

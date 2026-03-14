@@ -10,7 +10,7 @@
  *   After:  const { byType: { wiki: documents } } = useUnifiedDocuments({ type: 'wiki' })
  */
 import { createContext, useContext, ReactNode } from 'react';
-import { useDocuments as useDocumentsQuery, WikiDocument } from '@/hooks/useDocumentsQuery';
+import { useDocuments as useDocumentsData, WikiDocument } from '@/hooks/useDocumentsQuery';
 
 export type { WikiDocument };
 
@@ -26,7 +26,7 @@ interface DocumentsContextValue {
 const DocumentsContext = createContext<DocumentsContextValue | null>(null);
 
 export function DocumentsProvider({ children }: { children: ReactNode }) {
-  const documentsData = useDocumentsQuery();
+  const documentsData = useDocumentsData();
 
   return (
     <DocumentsContext.Provider value={documentsData}>
