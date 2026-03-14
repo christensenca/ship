@@ -7,14 +7,32 @@ import { TEMPLATE_HEADINGS, extractText, hasContent } from '../utils/document-co
 type RouterType = ReturnType<typeof Router>;
 const router: RouterType = Router();
 
+type RequestContext = {
+  userId: string;
+  workspaceId: string;
+};
+
+function getRequestContext(req: Request): RequestContext {
+  const { userId, workspaceId } = req;
+  if (!userId || !workspaceId) {
+    throw new Error('Missing authenticated request context');
+  }
+  return { userId, workspaceId };
+}
+
+function parseIntegerQuery(value: unknown): number | null {
+  if (typeof value !== 'string') return null;
+  const parsed = parseInt(value, 10);
+  return Number.isNaN(parsed) ? null : parsed;
+}
+
 // GET /api/team/grid - Get team grid data
 // Query params:
 //   fromSprint: number - start of range (default: current - 7)
 //   toSprint: number - end of range (default: current + 7)
 router.get('/grid', authMiddleware, async (req: Request, res: Response) => {
   try {
-    const userId = req.userId!;
-    const workspaceId = req.workspaceId!;
+    const { userId, workspaceId } = getRequestContext(req);
 
     // Get visibility context for filtering
     const { isAdmin } = await getVisibilityContext(userId, workspaceId);
@@ -76,11 +94,13 @@ router.get('/grid', authMiddleware, async (req: Request, res: Response) => {
     // Parse query params for sprint range (default: ~quarter each way)
     const defaultBack = 7;
     const defaultForward = 7;
-    const fromSprint = req.query.fromSprint
-      ? Math.max(1, parseInt(req.query.fromSprint as string, 10))
+    const parsedFromSprint = parseIntegerQuery(req.query.fromSprint);
+    const parsedToSprint = parseIntegerQuery(req.query.toSprint);
+    const fromSprint = parsedFromSprint !== null
+      ? Math.max(1, parsedFromSprint)
       : Math.max(1, currentSprintNumber - defaultBack);
-    const toSprint = req.query.toSprint
-      ? parseInt(req.query.toSprint as string, 10)
+    const toSprint = parsedToSprint !== null
+      ? parsedToSprint
       : currentSprintNumber + defaultForward;
 
     // Generate sprint periods for requested range
@@ -199,8 +219,7 @@ router.get('/grid', authMiddleware, async (req: Request, res: Response) => {
 // Returns projects that can be assigned to team members in the assignments grid
 router.get('/projects', authMiddleware, async (req: Request, res: Response) => {
   try {
-    const userId = req.userId!;
-    const workspaceId = req.workspaceId!;
+    const { userId, workspaceId } = getRequestContext(req);
 
     // Get visibility context for filtering
     const { isAdmin } = await getVisibilityContext(userId, workspaceId);
@@ -237,8 +256,7 @@ router.get('/projects', authMiddleware, async (req: Request, res: Response) => {
 // GET /api/team/programs - Get all programs
 router.get('/programs', authMiddleware, async (req: Request, res: Response) => {
   try {
-    const userId = req.userId!;
-    const workspaceId = req.workspaceId!;
+    const { userId, workspaceId } = getRequestContext(req);
 
     // Get visibility context for filtering
     const { isAdmin } = await getVisibilityContext(userId, workspaceId);
@@ -264,8 +282,7 @@ router.get('/programs', authMiddleware, async (req: Request, res: Response) => {
 //           2) Inferred assignments from issue assignees (fallback)
 router.get('/assignments', authMiddleware, async (req: Request, res: Response) => {
   try {
-    const userId = req.userId!;
-    const workspaceId = req.workspaceId!;
+    const { userId, workspaceId } = getRequestContext(req);
 
     // Get visibility context for filtering
     const { isAdmin } = await getVisibilityContext(userId, workspaceId);
@@ -461,7 +478,7 @@ router.get('/assignments', authMiddleware, async (req: Request, res: Response) =
 // Falls back to userId for backward compatibility
 router.post('/assign', authMiddleware, async (req: Request, res: Response) => {
   try {
-    const workspaceId = req.workspaceId!;
+    const { workspaceId } = getRequestContext(req);
     // Support both projectId (new) and programId (legacy)
     const { personId, userId, projectId, programId, sprintNumber } = req.body;
 
@@ -646,8 +663,7 @@ router.post('/assign', authMiddleware, async (req: Request, res: Response) => {
 // Falls back to userId for backward compatibility
 router.delete('/assign', authMiddleware, async (req: Request, res: Response) => {
   try {
-    const currentUserId = req.userId!;
-    const workspaceId = req.workspaceId!;
+    const { userId: currentUserId, workspaceId } = getRequestContext(req);
     const { personId, userId, sprintNumber } = req.body;
 
     // Get visibility context for filtering
@@ -729,8 +745,7 @@ router.delete('/assign', authMiddleware, async (req: Request, res: Response) => 
 // GET /api/team/people - Get all people (person documents)
 router.get('/people', authMiddleware, async (req: Request, res: Response) => {
   try {
-    const userId = req.userId!;
-    const workspaceId = req.workspaceId!;
+    const { userId, workspaceId } = getRequestContext(req);
 
     // Get visibility context for filtering
     const { isAdmin } = await getVisibilityContext(userId, workspaceId);
@@ -770,8 +785,7 @@ router.get('/people', authMiddleware, async (req: Request, res: Response) => {
 // Returns: { people, sprints, metrics } where metrics[userId][sprintNumber] = { committed, completed }
 router.get('/accountability', authMiddleware, async (req: Request, res: Response) => {
   try {
-    const userId = req.userId!;
-    const workspaceId = req.workspaceId!;
+    const { userId, workspaceId } = getRequestContext(req);
 
     // Check if user is admin
     const { isAdmin } = await getVisibilityContext(userId, workspaceId);

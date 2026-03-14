@@ -9,6 +9,10 @@ import { useActiveWeeksQuery } from '@/hooks/useWeeksQuery';
 import { apiPatch, apiDelete } from '@/lib/api';
 import type { DocumentTabProps } from '@/lib/document-tabs';
 
+function getString(value: unknown): string | undefined {
+  return typeof value === 'string' ? value : undefined;
+}
+
 /**
  * SprintOverviewTab - Renders the sprint document in the UnifiedEditor
  *
@@ -54,8 +58,7 @@ export default function SprintOverviewTab({ documentId, document }: DocumentTabP
 
       // Optimistically update the document cache
       if (previousDocument) {
-        const sprintUpdates = updates as Record<string, unknown>;
-        queryClient.setQueryData(['document', documentId], { ...previousDocument, ...sprintUpdates });
+        queryClient.setQueryData(['document', documentId], { ...previousDocument, ...updates });
       }
 
       // Return context with the previous value for rollback
@@ -104,12 +107,13 @@ export default function SprintOverviewTab({ documentId, document }: DocumentTabP
 
   // Build sidebar data with people and existing sprints for owner selection
   const sidebarData: SidebarData = useMemo(() => ({
+    kind: 'sprint',
     people,
     existingSprints,
   }), [people, existingSprints]);
 
   // Get program_id from belongs_to array (sprint's parent program via document_associations)
-  const belongsTo = (document as { belongs_to?: Array<{ id: string; type: string }> }).belongs_to;
+  const belongsTo = Array.isArray(document.belongs_to) ? document.belongs_to : undefined;
   const programId = belongsTo?.find(b => b.type === 'program')?.id;
 
   // Transform to UnifiedDocument format
@@ -119,14 +123,14 @@ export default function SprintOverviewTab({ documentId, document }: DocumentTabP
     document_type: 'sprint',
     created_at: document.created_at,
     updated_at: document.updated_at,
-    created_by: document.created_by as string | undefined,
-    properties: document.properties as Record<string, unknown> | undefined,
-    start_date: (document.start_date as string) || '',
-    end_date: (document.end_date as string) || '',
-    status: ((document.status as string) || 'planning') as 'planning' | 'active' | 'completed',
-    program_id: programId,
-    plan: (document.plan as string) || '',
-    owner_id: document.owner_id as string | null | undefined,
+    created_by: document.created_by ?? undefined,
+    properties: document.properties,
+    start_date: getString(document.start_date) ?? '',
+    end_date: getString(document.end_date) ?? '',
+    status: document.status === 'active' || document.status === 'completed' ? document.status : 'planning',
+    program_id: programId ?? null,
+    plan: getString(document.plan) ?? '',
+    owner_id: getString(document.owner_id) ?? null,
   }), [document, programId]);
 
   if (!user) return null;

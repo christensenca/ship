@@ -27,6 +27,100 @@ import {
   type TabCounts,
 } from '@/lib/document-tabs';
 
+type UnifiedPageDocumentType =
+  | 'wiki'
+  | 'issue'
+  | 'project'
+  | 'program'
+  | 'sprint'
+  | 'person'
+  | 'weekly_plan'
+  | 'weekly_retro'
+  | 'standup';
+
+type BelongsToAssociation = {
+  id: string;
+  type: 'program' | 'project' | 'sprint' | 'parent';
+  title?: string;
+  color?: string;
+};
+
+function isUnifiedPageDocumentType(value: string): value is UnifiedPageDocumentType {
+  return [
+    'wiki',
+    'issue',
+    'project',
+    'program',
+    'sprint',
+    'person',
+    'weekly_plan',
+    'weekly_retro',
+    'standup',
+  ].includes(value);
+}
+
+function getString(value: unknown): string | undefined {
+  return typeof value === 'string' ? value : undefined;
+}
+
+function getNullableString(value: unknown): string | null | undefined {
+  return typeof value === 'string' ? value : value === null ? null : undefined;
+}
+
+function getNumber(value: unknown): number | undefined {
+  return typeof value === 'number' ? value : undefined;
+}
+
+function getNullableNumber(value: unknown): number | null | undefined {
+  return typeof value === 'number' ? value : value === null ? null : undefined;
+}
+
+function getStringArray(value: unknown): string[] | undefined {
+  return Array.isArray(value) && value.every((item) => typeof item === 'string') ? value : undefined;
+}
+
+function getOwner(
+  value: unknown
+): { id: string; name: string; email: string } | null | undefined {
+  if (value === null) return null;
+  if (!value || typeof value !== 'object') return undefined;
+
+  const id = getString((value as Record<string, unknown>).id);
+  const name = getString((value as Record<string, unknown>).name);
+  const email = getString((value as Record<string, unknown>).email);
+
+  return id && name && email ? { id, name, email } : undefined;
+}
+
+function getBelongsToAssociations(value: unknown): BelongsToAssociation[] | undefined {
+  if (!Array.isArray(value)) return undefined;
+
+  return value.flatMap((association) => {
+    if (!association || typeof association !== 'object') return [];
+    const record = association as Record<string, unknown>;
+    const id = getString(record.id);
+    const type = getString(record.type);
+    if (!id || (type !== 'program' && type !== 'project' && type !== 'sprint' && type !== 'parent')) return [];
+
+    return [{
+      id,
+      type,
+      title: getString(record.title),
+      color: getString(record.color),
+    }];
+  });
+}
+
+function getProgramAndSprintIds(belongsTo: BelongsToAssociation[] | undefined): {
+  programId?: string;
+  sprintId?: string;
+} {
+  return {
+    programId: belongsTo?.find((association) => association.type === 'program')?.id,
+    sprintId: belongsTo?.find((association) => association.type === 'sprint')?.id,
+  };
+}
+
 /**
  * UnifiedDocumentPage - Renders any document type via /documents/:id route
  *
@@ -85,12 +179,13 @@ export function UnifiedDocumentPage(): JSX.Element | null {
   // Sync current document context for rail highlighting
   useEffect(() => {
     if (document && id) {
-      const docType = document.document_type as 'wiki' | 'issue' | 'project' | 'program' | 'sprint' | 'person' | 'weekly_plan' | 'weekly_retro' | 'standup';
+      if (!isUnifiedPageDocumentType(document.document_type)) return;
+
       // Extract projectId for weekly documents
       const projectId = (document.document_type === 'weekly_plan' || document.document_type === 'weekly_retro')
-        ? (document.properties?.project_id as string | undefined) ?? null
+        ? getString(document.properties?.project_id) ?? null
         : null;
-      setCurrentDocument(id, docType, projectId);
+      setCurrentDocument(id, document.document_type, projectId);
     }
     return () => {
       clearCurrentDocument();
@@ -134,10 +229,10 @@ export function UnifiedDocumentPage(): JSX.Element | null {
 
   // Fetch programs for sidebar data
   const { data: programsData = [] } = useProgramsQuery();
-  const programs = useMemo(() => programsData.map((program): { id: string; name: string; color?: string; emoji?: string | null } => ({
+  const programs = useMemo(() => programsData.map((program): { id: string; name: string; color: string; emoji?: string | null } => ({
     id: program.id,
     name: program.name,
-    color: program.color,
+    color: program.color || '#6366f1',
     emoji: program.emoji,
   })), [programsData]);
 
@@ -157,7 +252,7 @@ export function UnifiedDocumentPage(): JSX.Element | null {
   // Compute tab counts based on document type
   const tabCounts: TabCounts = useMemo(() => {
     if (isProject) {
-      const issueCount = (document as { issue_count?: number })?.issue_count ?? 0;
+      const issueCount = getNumber(document?.issue_count) ?? 0;
       return {
         issues: issueCount,
         weeks: projectWeeks.length,
@@ -181,7 +276,7 @@ export function UnifiedDocumentPage(): JSX.Element | null {
   });
   const conversionPermission = useMemo(() => getDocumentConversionPermission({
     documentType: document?.document_type ?? '',
-    createdBy: document?.created_by as string | null | undefined,
+    createdBy: document?.created_by,
     currentUserId: user?.id,
   }), [document?.created_by, document?.document_type, user?.id]);
 
@@ -192,8 +287,9 @@ export function UnifiedDocumentPage(): JSX.Element | null {
       showToast(conversionPermission.reason || 'Failed to convert document', 'error');
       return;
     }
-    const sourceType = document.document_type as 'issue' | 'project';
-    convert(id, sourceType, document.title);
+    if (document.document_type === 'issue' || document.document_type === 'project') {
+      convert(id, document.document_type, document.title);
+    }
   }, [conversionPermission.canConvert, conversionPermission.reason, convert, document, id, showToast]);
 
   const handleUndoConversion = useCallback(async (): Promise<void> => {
@@ -270,7 +366,7 @@ export function UnifiedDocumentPage(): JSX.Element | null {
 
   interface UpdateMutationVariables {
     documentId: string;
-    updates: Partial<DocumentResponse>;
+    updates: Partial<UnifiedDocument>;
   }
 
   interface UpdateMutationContext {
@@ -278,7 +374,7 @@ export function UnifiedDocumentPage(): JSX.Element | null {
     documentId: string;
   }
 
-  const isTitleOnlyUpdate = useCallback((updates: Partial<DocumentResponse>): boolean => {
+  const isTitleOnlyUpdate = useCallback((updates: Partial<UnifiedDocument>): boolean => {
     const keys = Object.keys(updates);
     return keys.length === 1 && keys[0] === 'title';
   }, []);
@@ -345,7 +441,7 @@ export function UnifiedDocumentPage(): JSX.Element | null {
   // Handle update
   const handleUpdate = useCallback(async (updates: Partial<UnifiedDocument>): Promise<void> => {
     if (!id) return;
-    await updateMutation.mutateAsync({ documentId: id, updates: updates as Partial<DocumentResponse> });
+    await updateMutation.mutateAsync({ documentId: id, updates });
   }, [updateMutation, id]);
 
   // Handle delete
@@ -362,7 +458,7 @@ export function UnifiedDocumentPage(): JSX.Element | null {
   // Resolve standup author name for title suffix
   const standupAuthorName = useMemo((): string | undefined => {
     if (!isStandup) return undefined;
-    const authorId = document?.properties?.author_id as string | undefined;
+    const authorId = getString(document?.properties?.author_id);
     if (!authorId) return undefined;
     return teamMembersData.find((member): boolean => member.user_id === authorId)?.name;
   }, [isStandup, document?.properties?.author_id, teamMembersData]);
@@ -397,15 +493,17 @@ export function UnifiedDocumentPage(): JSX.Element | null {
 
   // Build sidebar data based on document type
   const sidebarData: SidebarData = useMemo(() => {
-    if (!document) return {};
+    if (!document) return { kind: 'empty' };
 
     switch (document.document_type) {
       case 'wiki':
         return {
+          kind: 'wiki',
           teamMembers,
         };
       case 'issue':
         return {
+          kind: 'issue',
           teamMembers,
           programs,
           projects,
@@ -419,6 +517,7 @@ export function UnifiedDocumentPage(): JSX.Element | null {
         };
       case 'project':
         return {
+          kind: 'project',
           programs,
           people: teamMembers,
           onConvert: handleConvert,
@@ -429,9 +528,14 @@ export function UnifiedDocumentPage(): JSX.Element | null {
           conversionDisabledReason: conversionPermission.reason,
         };
       case 'sprint':
-        return {};
+        return { kind: 'sprint' };
+      case 'program':
+        return {
+          kind: 'program',
+          people: teamMembers,
+        };
       default:
-        return {};
+        return { kind: 'empty' };
     }
   }, [document, teamMembers, programs, projects, handleAssociationChange, handleConvert, handleUndoConversion, isConverting, conversionPermission.canConvert, conversionPermission.reason]);
 
@@ -439,65 +543,105 @@ export function UnifiedDocumentPage(): JSX.Element | null {
   const unifiedDocument: UnifiedDocument | null = useMemo(() => {
     if (!document) return null;
 
-    // Extract program_id from belongs_to array (via document_associations)
-    const belongsTo = document.belongs_to as Array<{ id: string; type: string }> | undefined;
-    const programIdFromBelongsTo = belongsTo?.find((association): boolean => association.type === 'program')?.id;
-    const sprintIdFromBelongsTo = belongsTo?.find((association): boolean => association.type === 'sprint')?.id;
+    if (!isUnifiedPageDocumentType(document.document_type)) {
+      return null;
+    }
 
-    return {
+    const baseDocument = {
       id: document.id,
       title: document.title,
-      document_type: document.document_type as UnifiedDocument['document_type'],
+      document_type: document.document_type,
       created_at: document.created_at,
       updated_at: document.updated_at,
-      created_by: document.created_by as string | undefined,
+      created_by: document.created_by ?? undefined,
       properties: document.properties,
-      // Spread flattened properties based on type
-      ...(document.document_type === 'issue' && {
-        state: (document.state as string) || 'backlog',
-        priority: (document.priority as string) || 'medium',
-        estimate: document.estimate as number | undefined,
-        assignee_id: document.assignee_id as string | undefined,
-        assignee_name: document.assignee_name as string | undefined,
-        program_id: programIdFromBelongsTo,
-        sprint_id: sprintIdFromBelongsTo,
-        source: document.source as 'internal' | 'external' | undefined,
-        converted_from_id: document.converted_from_id as string | undefined,
-        display_id: (document.ticket_number as number) ? `#${document.ticket_number}` : undefined,
-        belongs_to: document.belongs_to as Array<{
-          id: string;
-          type: 'program' | 'project' | 'sprint' | 'parent';
-          title?: string;
-          color?: string;
-        }> | undefined,
-      }),
-      ...(document.document_type === 'project' && {
-        impact: (document.impact as number | null) ?? null,
-        confidence: (document.confidence as number | null) ?? null,
-        ease: (document.ease as number | null) ?? null,
-        color: (document.color as string) || '#3b82f6',
-        emoji: null,
-        program_id: programIdFromBelongsTo,
-        owner: document.owner as { id: string; name: string; email: string } | null,
-        owner_id: document.owner_id as string | undefined,
-        // RACI fields
-        accountable_id: document.accountable_id as string | undefined,
-        consulted_ids: document.consulted_ids as string[] | undefined,
-        informed_ids: document.informed_ids as string[] | undefined,
-        converted_from_id: document.converted_from_id as string | undefined,
-      }),
-      ...(document.document_type === 'sprint' && {
-        start_date: (document.start_date as string) || '',
-        end_date: (document.end_date as string) || '',
-        status: ((document.status as string) || 'planning') as 'planning' | 'active' | 'completed',
-        program_id: programIdFromBelongsTo,
-        plan: (document.plan as string) || '',
-      }),
-      ...(document.document_type === 'wiki' && {
-        parent_id: document.parent_id as string | undefined,
-        visibility: document.visibility as 'private' | 'workspace' | undefined,
-      }),
-    } as UnifiedDocument;
+    };
+
+    const belongsTo = getBelongsToAssociations(document.belongs_to);
+    const { programId, sprintId } = getProgramAndSprintIds(belongsTo);
+
+    switch (document.document_type) {
+      case 'issue':
+        return {
+          ...baseDocument,
+          document_type: 'issue',
+          state: getString(document.state) ?? 'backlog',
+          priority: getString(document.priority) ?? 'medium',
+          estimate: getNullableNumber(document.estimate) ?? null,
+          assignee_id: getNullableString(document.assignee_id) ?? null,
+          assignee_name: getNullableString(document.assignee_name) ?? null,
+          program_id: programId ?? null,
+          sprint_id: sprintId ?? null,
+          source: document.source === 'internal' || document.source === 'external' ? document.source : undefined,
+          converted_from_id: getNullableString(document.converted_from_id) ?? null,
+          display_id: getNumber(document.ticket_number) ? `#${document.ticket_number}` : undefined,
+          belongs_to: belongsTo,
+        };
+      case 'project':
+        return {
+          ...baseDocument,
+          document_type: 'project',
+          impact: getNullableNumber(document.impact) ?? null,
+          confidence: getNullableNumber(document.confidence) ?? null,
+          ease: getNullableNumber(document.ease) ?? null,
+          color: getString(document.color) ?? '#3b82f6',
+          emoji: getNullableString(document.emoji) ?? null,
+          program_id: programId ?? null,
+          owner: getOwner(document.owner) ?? null,
+          owner_id: getNullableString(document.owner_id) ?? null,
+          accountable_id: getNullableString(document.accountable_id) ?? null,
+          consulted_ids: getStringArray(document.consulted_ids),
+          informed_ids: getStringArray(document.informed_ids),
+          converted_from_id: getNullableString(document.converted_from_id) ?? null,
+        };
+      case 'sprint': {
+        const status = getString(document.status);
+        return {
+          ...baseDocument,
+          document_type: 'sprint',
+          start_date: getString(document.start_date) ?? '',
+          end_date: getString(document.end_date) ?? '',
+          status: status === 'active' || status === 'completed' ? status : 'planning',
+          program_id: programId ?? null,
+          plan: getString(document.plan) ?? '',
+        };
+      }
+      case 'wiki':
+        return {
+          ...baseDocument,
+          document_type: 'wiki',
+          parent_id: getNullableString(document.parent_id) ?? null,
+          visibility: document.visibility === 'private' || document.visibility === 'workspace' ? document.visibility : undefined,
+        };
+      case 'program':
+        return {
+          ...baseDocument,
+          document_type: 'program',
+          color: getString(document.color),
+          emoji: getNullableString(document.emoji),
+          owner_id: getNullableString(document.owner_id) ?? null,
+          accountable_id: getNullableString(document.accountable_id) ?? null,
+          consulted_ids: getStringArray(document.consulted_ids),
+          informed_ids: getStringArray(document.informed_ids),
+        };
+      case 'weekly_plan':
+      case 'weekly_retro':
+        return {
+          ...baseDocument,
+          document_type: document.document_type,
+          properties: document.properties,
+        };
+      case 'person':
+        return {
+          ...baseDocument,
+          document_type: 'person',
+        };
+      case 'standup':
+        return {
+          ...baseDocument,
+          document_type: 'standup',
+        };
+    }
   }, [document]);
 
   // Loading state

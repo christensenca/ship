@@ -6,6 +6,7 @@ import { WeeklyReviewSubNav } from '@/components/review/WeeklyReviewSubNav';
 import { useWeeklyReviewActions } from '@/hooks/useWeeklyReviewActions';
 import type {
   PanelDocument,
+  PanelSpecificProps,
   WikiPanelProps,
   IssuePanelProps,
   ProjectPanelProps,
@@ -21,7 +22,7 @@ import type { Person } from '@/components/PersonCombobox';
 import type { BelongsTo } from '@ship/shared';
 import { getDocumentConversionPermission } from '@/lib/documentConversion';
 
-export type DocumentType = 'wiki' | 'issue' | 'project' | 'sprint' | 'program' | 'person' | 'weekly_plan' | 'weekly_retro';
+export type DocumentType = 'wiki' | 'issue' | 'project' | 'sprint' | 'program' | 'person' | 'weekly_plan' | 'weekly_retro' | 'standup';
 
 // Base document interface - common properties across all document types
 interface BaseDocument {
@@ -32,6 +33,41 @@ interface BaseDocument {
   updated_at?: string;
   created_by?: string | null;
   properties?: Record<string, unknown>;
+}
+
+interface ProgramDocument extends BaseDocument {
+  document_type: 'program';
+  color?: string;
+  emoji?: string | null;
+  owner_id?: string | null;
+  accountable_id?: string | null;
+  consulted_ids?: string[];
+  informed_ids?: string[];
+}
+
+interface WeeklyDocumentProperties {
+  [key: string]: unknown;
+  person_id?: string;
+  project_id?: string;
+  week_number?: number;
+}
+
+interface WeeklyPlanDocument extends BaseDocument {
+  document_type: 'weekly_plan';
+  properties?: WeeklyDocumentProperties;
+}
+
+interface WeeklyRetroDocument extends BaseDocument {
+  document_type: 'weekly_retro';
+  properties?: WeeklyDocumentProperties;
+}
+
+interface PersonDocument extends BaseDocument {
+  document_type: 'person';
+}
+
+interface StandupDocument extends BaseDocument {
+  document_type: 'standup';
 }
 
 // Wiki document
@@ -78,6 +114,9 @@ interface ProjectDocument extends BaseDocument {
   sprint_count?: number;
   issue_count?: number;
   converted_from_id?: string | null;
+  plan?: string | null;
+  has_design_review?: boolean | null;
+  design_review_notes?: string | null;
 }
 
 // Sprint document
@@ -94,14 +133,25 @@ interface SprintDocument extends BaseDocument {
 }
 
 // Union type for all document types
-export type UnifiedDocument = WikiDocument | IssueDocument | ProjectDocument | SprintDocument | BaseDocument;
+export type UnifiedDocument =
+  | WikiDocument
+  | IssueDocument
+  | ProjectDocument
+  | SprintDocument
+  | ProgramDocument
+  | WeeklyPlanDocument
+  | WeeklyRetroDocument
+  | PersonDocument
+  | StandupDocument;
 
 // Sidebar data types
 interface WikiSidebarData {
+  kind: 'wiki';
   teamMembers: Person[];
 }
 
 interface IssueSidebarData {
+  kind: 'issue';
   teamMembers: Array<{ id: string; user_id: string; name: string }>;
   programs: Array<{ id: string; name: string; color?: string }>;
   projects?: Array<{ id: string; title: string; color?: string }>;
@@ -117,7 +167,8 @@ interface IssueSidebarData {
 }
 
 interface ProjectSidebarData {
-  programs: Array<{ id: string; name: string; emoji?: string | null }>;
+  kind: 'project';
+  programs: Array<{ id: string; name: string; color: string; emoji?: string | null }>;
   people: Person[];
   onConvert?: () => void;
   onUndoConversion?: () => void;
@@ -128,15 +179,27 @@ interface ProjectSidebarData {
 }
 
 interface SprintSidebarData {
+  kind: 'sprint';
   people?: Array<{ id: string; user_id: string; name: string }>;
   existingSprints?: Array<{ owner?: { id: string; name: string; email: string } | null }>;
 }
 
 interface ProgramSidebarData {
+  kind: 'program';
   people: Array<{ id: string; user_id: string; name: string; email: string }>;
 }
 
-export type SidebarData = WikiSidebarData | IssueSidebarData | ProjectSidebarData | SprintSidebarData | ProgramSidebarData;
+interface EmptySidebarData {
+  kind: 'empty';
+}
+
+export type SidebarData =
+  | WikiSidebarData
+  | IssueSidebarData
+  | ProjectSidebarData
+  | SprintSidebarData
+  | ProgramSidebarData
+  | EmptySidebarData;
 
 interface UnifiedEditorProps {
   /** The document to edit */
@@ -171,6 +234,37 @@ interface UnifiedEditorProps {
   titleSuffix?: string;
 }
 
+function isSelectableDocumentType(value: UnifiedDocument['document_type']): value is SelectableDocumentType {
+  return value === 'wiki' || value === 'issue' || value === 'project' || value === 'sprint';
+}
+
+function getRequiredFieldSource(document: UnifiedDocument): Record<string, unknown> {
+  switch (document.document_type) {
+    case 'issue':
+      return {
+        ...document.properties,
+        state: document.state,
+        priority: document.priority,
+      };
+    case 'project':
+      return {
+        ...document.properties,
+        impact: document.impact,
+        confidence: document.confidence,
+        ease: document.ease,
+      };
+    case 'sprint':
+      return {
+        ...document.properties,
+        start_date: document.start_date,
+        end_date: document.end_date,
+        status: document.status,
+      };
+    default:
+      return document.properties ?? {};
+  }
+}
+
 /**
  * UnifiedEditor - Adaptive editor component that renders type-specific properties
  *
@@ -190,7 +284,7 @@ interface UnifiedEditorProps {
  */
 export function UnifiedEditor({
   document,
-  sidebarData = {},
+  sidebarData = { kind: 'empty' },
   onUpdate,
   onBack,
   backLabel,
@@ -211,22 +305,8 @@ export function UnifiedEditor({
 
   // Track missing required fields after type changes
   const missingFields = useMemo(() => {
-    const selectableType = document.document_type as SelectableDocumentType;
-    if (['wiki', 'issue', 'project', 'sprint'].includes(selectableType)) {
-      // Build properties object from document
-      const props: Record<string, unknown> = {
-        ...document.properties,
-        // Include top-level fields that might be required
-        state: (document as IssueDocument).state,
-        priority: (document as IssueDocument).priority,
-        impact: (document as ProjectDocument).impact,
-        confidence: (document as ProjectDocument).confidence,
-        ease: (document as ProjectDocument).ease,
-        start_date: (document as SprintDocument).start_date,
-        end_date: (document as SprintDocument).end_date,
-        status: (document as SprintDocument).status,
-      };
-      return getMissingRequiredFields(selectableType, props);
+    if (isSelectableDocumentType(document.document_type)) {
+      return getMissingRequiredFields(document.document_type, getRequiredFieldSource(document));
     }
     return [];
   }, [document]);
@@ -245,9 +325,9 @@ export function UnifiedEditor({
     setIsChangingType(true);
     try {
       if (onTypeChange) {
-        await onTypeChange(newType as DocumentType);
+        await onTypeChange(newType);
       } else {
-        await onUpdate({ document_type: newType as DocumentType } as Partial<UnifiedDocument>);
+        await onUpdate({ document_type: newType });
       }
     } finally {
       setIsChangingType(false);
@@ -266,8 +346,7 @@ export function UnifiedEditor({
   // Handle plan change (for sprint and project documents)
   const handlePlanChange = useCallback(async (plan: string) => {
     if (document.document_type !== 'sprint' && document.document_type !== 'project') return;
-    // Update the plan property
-    await onUpdate({ plan } as Partial<UnifiedDocument>);
+    await onUpdate({ ...document, plan });
   }, [document.document_type, onUpdate]);
 
   // Determine room prefix based on document type if not provided
@@ -283,14 +362,14 @@ export function UnifiedEditor({
     isWeeklyDoc
       ? {
           id: document.id,
-          document_type: document.document_type as 'weekly_plan' | 'weekly_retro',
-          properties: document.properties as { person_id?: string; project_id?: string; week_number?: number } | undefined,
+          document_type: document.document_type,
+          properties: document.properties,
         }
       : null
   );
 
   // Check if this document type can have its type changed
-  const canChangeType = ['wiki', 'issue', 'project', 'sprint'].includes(document.document_type);
+  const canChangeType = isSelectableDocumentType(document.document_type);
   const conversionPermission = useMemo(() => getDocumentConversionPermission({
     documentType: document.document_type,
     createdBy: document.created_by,
@@ -300,72 +379,85 @@ export function UnifiedEditor({
     if (document.document_type !== 'issue' && document.document_type !== 'project') return undefined;
     return conversionPermission.reason;
   }, [conversionPermission.reason, document.document_type]);
-  const disabledTypes = useMemo(() => {
+  const disabledTypes = useMemo<SelectableDocumentType[]>(() => {
     if (document.document_type === 'issue' && !conversionPermission.canConvert) {
-      return ['project'] as SelectableDocumentType[];
+      return ['project'];
     }
     if (document.document_type === 'project' && !conversionPermission.canConvert) {
-      return ['issue'] as SelectableDocumentType[];
+      return ['issue'];
     }
-    return [] as SelectableDocumentType[];
+    return [];
   }, [conversionPermission.canConvert, document.document_type]);
 
   // Build panel-specific props from sidebarData
-  const panelProps = useMemo(() => {
-    switch (document.document_type) {
-      case 'wiki': {
-        const wikiData = sidebarData as WikiSidebarData;
-        return {
-          teamMembers: wikiData.teamMembers || [],
-          currentUserId: user?.id,
-        } as WikiPanelProps;
-      }
-      case 'issue': {
-        const issueData = sidebarData as IssueSidebarData;
-        return {
-          teamMembers: issueData.teamMembers || [],
-          programs: issueData.programs || [],
-          projects: issueData.projects || [],
-          onConvert: issueData.onConvert,
-          onUndoConversion: issueData.onUndoConversion,
-          onAccept: issueData.onAccept,
-          onReject: issueData.onReject,
-          isConverting: issueData.isConverting,
-          isUndoing: issueData.isUndoing,
-          onAssociationChange: issueData.onAssociationChange,
-          canConvert: issueData.canConvert,
-          conversionDisabledReason: issueData.conversionDisabledReason,
-        } as IssuePanelProps;
-      }
-      case 'project': {
-        const projectData = sidebarData as ProjectSidebarData;
-        return {
-          programs: projectData.programs || [],
-          people: projectData.people || [],
-          onConvert: projectData.onConvert,
-          onUndoConversion: projectData.onUndoConversion,
-          isConverting: projectData.isConverting,
-          isUndoing: projectData.isUndoing,
-          canConvert: projectData.canConvert,
-          conversionDisabledReason: projectData.conversionDisabledReason,
-        } as ProjectPanelProps;
-      }
-      case 'sprint': {
-        const sprintData = sidebarData as SprintSidebarData;
-        return {
-          people: sprintData.people || [],
-          existingSprints: sprintData.existingSprints || [],
-        } as SprintPanelProps;
-      }
-      case 'program': {
-        const programData = sidebarData as ProgramSidebarData;
-        return {
-          people: programData.people || [],
-        } as ProgramPanelProps;
-      }
-      default:
-        return {};
+  const panelProps: PanelSpecificProps = useMemo(() => {
+    if (document.document_type === 'wiki' && sidebarData.kind === 'wiki') {
+      return {
+        kind: 'wiki',
+        teamMembers: sidebarData.teamMembers,
+        currentUserId: user?.id,
+      } satisfies WikiPanelProps;
     }
+    if (document.document_type === 'issue' && sidebarData.kind === 'issue') {
+      return {
+        kind: 'issue',
+        teamMembers: sidebarData.teamMembers,
+        programs: sidebarData.programs,
+        projects: sidebarData.projects,
+        onConvert: sidebarData.onConvert,
+        onUndoConversion: sidebarData.onUndoConversion,
+        onAccept: sidebarData.onAccept,
+        onReject: sidebarData.onReject,
+        isConverting: sidebarData.isConverting,
+        isUndoing: sidebarData.isUndoing,
+        onAssociationChange: sidebarData.onAssociationChange,
+        canConvert: sidebarData.canConvert,
+        conversionDisabledReason: sidebarData.conversionDisabledReason,
+      } satisfies IssuePanelProps;
+    }
+    if (document.document_type === 'project' && sidebarData.kind === 'project') {
+      return {
+        kind: 'project',
+        programs: sidebarData.programs,
+        people: sidebarData.people,
+        onConvert: sidebarData.onConvert,
+        onUndoConversion: sidebarData.onUndoConversion,
+        isConverting: sidebarData.isConverting,
+        isUndoing: sidebarData.isUndoing,
+        canConvert: sidebarData.canConvert,
+        conversionDisabledReason: sidebarData.conversionDisabledReason,
+      } satisfies ProjectPanelProps;
+    }
+    if (document.document_type === 'sprint' && sidebarData.kind === 'sprint') {
+      return {
+        kind: 'sprint',
+        people: sidebarData.people ?? [],
+        existingSprints: sidebarData.existingSprints ?? [],
+      } satisfies SprintPanelProps;
+    }
+    if (document.document_type === 'program' && sidebarData.kind === 'program') {
+      return {
+        kind: 'program',
+        people: sidebarData.people,
+      } satisfies ProgramPanelProps;
+    }
+
+    if (document.document_type === 'wiki') {
+      return { kind: 'wiki', teamMembers: [], currentUserId: user?.id } satisfies WikiPanelProps;
+    }
+    if (document.document_type === 'issue') {
+      return { kind: 'issue', teamMembers: [], programs: [], projects: [] } satisfies IssuePanelProps;
+    }
+    if (document.document_type === 'project') {
+      return { kind: 'project', programs: [], people: [] } satisfies ProjectPanelProps;
+    }
+    if (document.document_type === 'sprint') {
+      return { kind: 'sprint', people: [], existingSprints: [] } satisfies SprintPanelProps;
+    }
+    if (document.document_type === 'program') {
+      return { kind: 'program', people: [] } satisfies ProgramPanelProps;
+    }
+    return null;
   }, [document.document_type, sidebarData, user?.id]);
 
   // Render the type-specific sidebar content via unified PropertiesPanel
@@ -381,11 +473,17 @@ export function UnifiedEditor({
       );
     }
 
+    if (document.document_type === 'person' || document.document_type === 'standup') {
+      return null;
+    }
+
+    const handlePanelUpdate = (updates: Partial<PanelDocument>): Promise<void> => onUpdate(updates);
+
     return (
       <PropertiesPanel
-        document={document as PanelDocument}
+        document={document}
         panelProps={panelProps}
-        onUpdate={onUpdate as (updates: Partial<PanelDocument>) => Promise<void>}
+        onUpdate={handlePanelUpdate}
         highlightedFields={missingFields}
         weeklyReviewState={weeklyReviewState}
       />
@@ -395,7 +493,7 @@ export function UnifiedEditor({
   // Compose full sidebar with type selector
   const sidebar = useMemo(() => {
     // If we're not showing the type selector, just return the type-specific sidebar
-    if (!showTypeSelector || !canChangeType) {
+    if (!showTypeSelector || !canChangeType || !isSelectableDocumentType(document.document_type)) {
       return typeSpecificSidebar;
     }
 
@@ -405,7 +503,7 @@ export function UnifiedEditor({
         {/* Type Selector */}
         <div className="p-4 border-b border-border">
           <DocumentTypeSelector
-            value={document.document_type as SelectableDocumentType}
+            value={document.document_type}
             onChange={handleTypeChange}
             disabled={isChangingType}
             disabledTypes={disabledTypes}
@@ -510,6 +608,8 @@ function getDefaultPlaceholder(documentType: DocumentType): string {
       return 'Describe this program...';
     case 'person':
       return 'Add notes about this person...';
+    case 'standup':
+      return 'Add standup notes...';
     default:
       return 'Start writing...';
   }

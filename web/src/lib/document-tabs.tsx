@@ -48,6 +48,11 @@ export interface TabCounts {
   projects?: number;
 }
 
+function getSprintStatus(document: DocumentResponse): string {
+  const status = document.properties?.status;
+  return typeof status === 'string' ? status : 'planning';
+}
+
 // Lazy load tab components to avoid circular dependencies
 const ProjectDetailsTab = React.lazy(() => import('@/components/document-tabs/ProjectDetailsTab'));
 const ProjectIssuesTab = React.lazy(() => import('@/components/document-tabs/ProjectIssuesTab'));
@@ -207,9 +212,7 @@ export function getTabsForDocument(document: DocumentResponse): DocumentTabConfi
 
   // Handle sprint-specific dynamic tabs based on status
   if (document_type === 'sprint') {
-    // Status is stored in properties.status
-    const properties = document.properties as { status?: string } | undefined;
-    const status = properties?.status || 'planning';
+    const status = getSprintStatus(document);
 
     if (status === 'planning') {
       return documentTabConfigs['sprint:planning'] || documentTabConfigs.sprint || [];

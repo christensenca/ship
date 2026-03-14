@@ -36,6 +36,8 @@ function extractProjectFromRow(row: any): Record<string, unknown> {
   const confidence = props.confidence !== undefined ? props.confidence : null;
   const ease = props.ease !== undefined ? props.ease : null;
 
+  const inferredStatus = row.inferred_status;
+
   return {
     id: row.id,
     title: row.title,
@@ -66,7 +68,14 @@ function extractProjectFromRow(row: any): Record<string, unknown> {
     is_complete: props.is_complete ?? null,
     missing_fields: props.missing_fields ?? [],
     // Inferred status (computed from sprint relationships)
-    inferred_status: row.inferred_status as InferredProjectStatus || 'backlog',
+    inferred_status:
+      inferredStatus === 'active' ||
+      inferredStatus === 'planned' ||
+      inferredStatus === 'completed' ||
+      inferredStatus === 'backlog' ||
+      inferredStatus === 'archived'
+        ? inferredStatus
+        : 'backlog',
     // Conversion tracking
     converted_from_id: row.converted_from_id || null,
     // RACI fields
@@ -327,8 +336,8 @@ const VALID_SORT_FIELDS = ['ice_score', 'impact', 'confidence', 'ease', 'title',
 router.get('/', authMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
     const includeArchived = req.query.archived === 'true';
-    const sortField = (req.query.sort as string) || 'ice_score';
-    const sortDir = (req.query.dir as string) === 'asc' ? 'ASC' : 'DESC';
+    const sortField = typeof req.query.sort === 'string' ? req.query.sort : 'ice_score';
+    const sortDir = req.query.dir === 'asc' ? 'ASC' : 'DESC';
     const { userId, workspaceId } = getRequestContext(req);
 
     // Validate sort field to prevent SQL injection
@@ -436,7 +445,11 @@ router.get('/', authMiddleware, async (req: Request, res: Response): Promise<voi
 // Get single project
 router.get('/:id', authMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
-    const { id } = req.params;
+    const id = req.params.id;
+    if (typeof id !== 'string') {
+      res.status(400).json({ error: 'Invalid project id' });
+      return;
+    }
     const { userId, workspaceId } = getRequestContext(req);
 
     // Get visibility context for filtering
@@ -617,7 +630,11 @@ router.post('/', authMiddleware, async (req: Request, res: Response): Promise<vo
 // Update project
 router.patch('/:id', authMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
-    const { id } = req.params;
+    const id = req.params.id;
+    if (typeof id !== 'string') {
+      res.status(400).json({ error: 'Invalid project id' });
+      return;
+    }
     const { userId, workspaceId } = getRequestContext(req);
 
     const parsed = updateProjectSchema.safeParse(req.body);
@@ -774,13 +791,13 @@ router.patch('/:id', authMiddleware, async (req: Request, res: Response): Promis
 
     // Broadcast celebration when plan is added
     if (data.plan && data.plan.trim() !== '') {
-      broadcastToUser(userId, 'accountability:updated', { type: 'project_plan', targetId: id as string });
+      broadcastToUser(userId, 'accountability:updated', { type: 'project_plan', targetId: id });
     }
 
     // Log plan changes to document_history for approval workflow tracking
     if (data.plan !== undefined && data.plan !== currentProps.plan) {
       await logDocumentChange(
-        id as string,
+        id,
         'plan',
         currentProps.plan || null,
         data.plan || null,
@@ -870,9 +887,12 @@ router.patch('/:id', authMiddleware, async (req: Request, res: Response): Promis
 // Delete project
 router.delete('/:id', authMiddleware, async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
-    const userId = req.userId!;
-    const workspaceId = req.workspaceId!;
+    const id = req.params.id;
+    if (typeof id !== 'string') {
+      res.status(400).json({ error: 'Invalid project id' });
+      return;
+    }
+    const { userId, workspaceId } = getRequestContext(req);
 
     // Get visibility context for filtering
     const { isAdmin } = await getVisibilityContext(userId, workspaceId);
@@ -912,9 +932,12 @@ router.delete('/:id', authMiddleware, async (req: Request, res: Response) => {
 // GET /api/projects/:id/retro - Returns pre-filled draft or existing retro
 router.get('/:id/retro', authMiddleware, async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
-    const userId = req.userId!;
-    const workspaceId = req.workspaceId!;
+    const id = req.params.id;
+    if (typeof id !== 'string') {
+      res.status(400).json({ error: 'Invalid project id' });
+      return;
+    }
+    const { userId, workspaceId } = getRequestContext(req);
 
     // Get visibility context for filtering
     const { isAdmin } = await getVisibilityContext(userId, workspaceId);
@@ -1011,9 +1034,12 @@ router.get('/:id/retro', authMiddleware, async (req: Request, res: Response) => 
 // POST /api/projects/:id/retro - Creates finalized project retro
 router.post('/:id/retro', authMiddleware, async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
-    const userId = req.userId!;
-    const workspaceId = req.workspaceId!;
+    const id = req.params.id;
+    if (typeof id !== 'string') {
+      res.status(400).json({ error: 'Invalid project id' });
+      return;
+    }
+    const { userId, workspaceId } = getRequestContext(req);
 
     const parsed = projectRetroSchema.safeParse(req.body);
     if (!parsed.success) {
@@ -1065,12 +1091,12 @@ router.post('/:id/retro', authMiddleware, async (req: Request, res: Response) =>
     );
 
     // Broadcast celebration when project retro is completed
-    broadcastToUser(userId, 'accountability:updated', { type: 'project_retro', targetId: id as string });
+    broadcastToUser(userId, 'accountability:updated', { type: 'project_retro', targetId: id });
 
     // Log initial retro content to document_history for approval workflow tracking
     if (content) {
       await logDocumentChange(
-        id as string,
+        id,
         'retro_content',
         null,
         JSON.stringify(content),
@@ -1145,9 +1171,12 @@ function extractSprintFromRow(row: any) {
 // GET /api/projects/:id/issues - List issues for a project
 router.get('/:id/issues', authMiddleware, async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
-    const userId = req.userId!;
-    const workspaceId = req.workspaceId!;
+    const id = req.params.id;
+    if (typeof id !== 'string') {
+      res.status(400).json({ error: 'Invalid project id' });
+      return;
+    }
+    const { userId, workspaceId } = getRequestContext(req);
 
     // Get visibility context for filtering
     const { isAdmin } = await getVisibilityContext(userId, workspaceId);
@@ -1220,9 +1249,12 @@ router.get('/:id/issues', authMiddleware, async (req: Request, res: Response) =>
 // Note: "weeks" is the user-facing terminology, "sprints" is internal
 router.get('/:id/weeks', authMiddleware, async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
-    const userId = req.userId!;
-    const workspaceId = req.workspaceId!;
+    const id = req.params.id;
+    if (typeof id !== 'string') {
+      res.status(400).json({ error: 'Invalid project id' });
+      return;
+    }
+    const { userId, workspaceId } = getRequestContext(req);
 
     // Get visibility context for filtering
     const { isAdmin } = await getVisibilityContext(userId, workspaceId);
@@ -1279,9 +1311,12 @@ router.get('/:id/weeks', authMiddleware, async (req: Request, res: Response) => 
 // GET /api/projects/:id/sprints - List sprints for a project (deprecated, use /weeks)
 router.get('/:id/sprints', authMiddleware, async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
-    const userId = req.userId!;
-    const workspaceId = req.workspaceId!;
+    const id = req.params.id;
+    if (typeof id !== 'string') {
+      res.status(400).json({ error: 'Invalid project id' });
+      return;
+    }
+    const { userId, workspaceId } = getRequestContext(req);
 
     // Get visibility context for filtering
     const { isAdmin } = await getVisibilityContext(userId, workspaceId);
@@ -1338,9 +1373,12 @@ router.get('/:id/sprints', authMiddleware, async (req: Request, res: Response) =
 // POST /api/projects/:id/sprints - Create a sprint associated with a project
 router.post('/:id/sprints', authMiddleware, async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
-    const userId = req.userId!;
-    const workspaceId = req.workspaceId!;
+    const id = req.params.id;
+    if (typeof id !== 'string') {
+      res.status(400).json({ error: 'Invalid project id' });
+      return;
+    }
+    const { userId, workspaceId } = getRequestContext(req);
 
     const parsed = createProjectSprintSchema.safeParse(req.body);
     if (!parsed.success) {
@@ -1509,9 +1547,12 @@ router.post('/:id/sprints', authMiddleware, async (req: Request, res: Response) 
 // PATCH /api/projects/:id/retro - Updates existing project retro
 router.patch('/:id/retro', authMiddleware, async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
-    const userId = req.userId!;
-    const workspaceId = req.workspaceId!;
+    const id = req.params.id;
+    if (typeof id !== 'string') {
+      res.status(400).json({ error: 'Invalid project id' });
+      return;
+    }
+    const { userId, workspaceId } = getRequestContext(req);
 
     const parsed = projectRetroSchema.safeParse(req.body);
     if (!parsed.success) {
@@ -1589,7 +1630,7 @@ router.patch('/:id/retro', authMiddleware, async (req: Request, res: Response) =
       const newContent = JSON.stringify(content);
       if (oldContent !== newContent) {
         await logDocumentChange(
-          id as string,
+          id,
           'retro_content',
           oldContent,
           newContent,
@@ -1623,9 +1664,12 @@ router.patch('/:id/retro', authMiddleware, async (req: Request, res: Response) =
 // POST /api/projects/:id/approve-plan - Approve project plan
 router.post('/:id/approve-plan', authMiddleware, async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
-    const userId = req.userId!;
-    const workspaceId = req.workspaceId!;
+    const id = req.params.id;
+    if (typeof id !== 'string') {
+      res.status(400).json({ error: 'Invalid project id' });
+      return;
+    }
+    const { userId, workspaceId } = getRequestContext(req);
 
     // Get visibility context for admin check
     const { isAdmin } = await getVisibilityContext(userId, workspaceId);
@@ -1654,7 +1698,7 @@ router.post('/:id/approve-plan', authMiddleware, async (req: Request, res: Respo
     }
 
     // Get the latest plan history entry for version tracking
-    const historyEntry = await getLatestDocumentFieldHistory(id as string, 'plan');
+    const historyEntry = await getLatestDocumentFieldHistory(id, 'plan');
     const versionId = historyEntry?.id || null;
 
     // Update project properties with approval
@@ -1687,9 +1731,12 @@ router.post('/:id/approve-plan', authMiddleware, async (req: Request, res: Respo
 // POST /api/projects/:id/approve-retro - Approve project retro
 router.post('/:id/approve-retro', authMiddleware, async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
-    const userId = req.userId!;
-    const workspaceId = req.workspaceId!;
+    const id = req.params.id;
+    if (typeof id !== 'string') {
+      res.status(400).json({ error: 'Invalid project id' });
+      return;
+    }
+    const { userId, workspaceId } = getRequestContext(req);
 
     // Get visibility context for admin check
     const { isAdmin } = await getVisibilityContext(userId, workspaceId);
@@ -1718,7 +1765,7 @@ router.post('/:id/approve-retro', authMiddleware, async (req: Request, res: Resp
     }
 
     // Get the latest retro content history entry for version tracking
-    const historyEntry = await getLatestDocumentFieldHistory(id as string, 'retro_content');
+    const historyEntry = await getLatestDocumentFieldHistory(id, 'retro_content');
     const versionId = historyEntry?.id || null;
 
     // Update project properties with retro approval

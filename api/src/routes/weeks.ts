@@ -60,7 +60,7 @@ function parseApprovalComment(body: unknown): { provided: boolean; value: string
     return { provided: false, value: null };
   }
 
-  const raw = (body as Record<string, unknown>).comment;
+  const raw = (body as { comment?: unknown }).comment;
   if (raw === null || raw === undefined) {
     return { provided: true, value: null };
   }
@@ -101,7 +101,7 @@ async function broadcastAccountabilityUpdateToSprintOwner(
 router.get('/lookup-person', authMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
     const { workspaceId } = getRequestContext(req);
-    const userId = req.query.user_id as string;
+    const userId = typeof req.query.user_id === 'string' ? req.query.user_id : '';
 
     if (!userId) {
       res.status(400).json({ error: 'user_id is required' });
@@ -133,8 +133,8 @@ router.get('/lookup-person', authMiddleware, async (req: Request, res: Response)
 router.get('/lookup', authMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
     const { workspaceId } = getRequestContext(req);
-    const projectId = req.query.project_id as string;
-    const sprintNumber = parseInt(req.query.sprint_number as string, 10);
+    const projectId = typeof req.query.project_id === 'string' ? req.query.project_id : '';
+    const sprintNumber = typeof req.query.sprint_number === 'string' ? parseInt(req.query.sprint_number, 10) : NaN;
 
     if (!projectId || isNaN(sprintNumber)) {
       res.status(400).json({ error: 'project_id and sprint_number are required' });
@@ -750,7 +750,11 @@ router.get('/my-week', authMiddleware, async (req: Request, res: Response): Prom
 // Automatically takes a plan snapshot when sprint becomes active (start_date reached)
 router.get('/:id', authMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
-    const { id } = req.params;
+    const id = req.params.id;
+    if (typeof id !== 'string') {
+      res.status(400).json({ error: 'Invalid week id' });
+      return;
+    }
     const { userId, workspaceId } = getRequestContext(req);
 
     // Get visibility context for filtering
@@ -806,7 +810,7 @@ router.get('/:id', authMiddleware, async (req: Request, res: Response): Promise<
     // Take snapshot when: sprint is active (start_date reached) AND no snapshot exists yet
     if (workspaceStartDate && isSprintActive(sprintNumber, workspaceStartDate) && !props.planned_issue_ids) {
       // Take the snapshot
-      const sprintId = id as string; // Safe: Express route param is always a string
+      const sprintId = id;
       const plannedIssueIds = await takeSprintSnapshot(sprintId);
       const snapshotTakenAt = new Date().toISOString();
 
@@ -1026,7 +1030,11 @@ router.post('/', authMiddleware, async (req: Request, res: Response): Promise<vo
 // When sprint_number changes, the plan snapshot is cleared and will be retaken when the new date arrives
 router.patch('/:id', authMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
-    const { id } = req.params;
+    const id = req.params.id;
+    if (typeof id !== 'string') {
+      res.status(400).json({ error: 'Invalid week id' });
+      return;
+    }
     const { userId, workspaceId } = getRequestContext(req);
 
     const parsed = updateSprintSchema.safeParse(req.body);
@@ -1207,7 +1215,11 @@ router.patch('/:id', authMiddleware, async (req: Request, res: Response): Promis
 // POST /api/weeks/:id/start
 router.post('/:id/start', authMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
-    const { id } = req.params;
+    const id = req.params.id;
+    if (typeof id !== 'string') {
+      res.status(400).json({ error: 'Invalid week id' });
+      return;
+    }
     const { userId, workspaceId } = getRequestContext(req);
 
     // Get visibility context for filtering
@@ -1241,7 +1253,7 @@ router.post('/:id/start', authMiddleware, async (req: Request, res: Response): P
     }
 
     // Take the scope snapshot
-    const sprintId = id as string;
+    const sprintId = id;
     const plannedIssueIds = await takeSprintSnapshot(sprintId);
     const snapshotTakenAt = new Date().toISOString();
 
@@ -1259,7 +1271,7 @@ router.post('/:id/start', authMiddleware, async (req: Request, res: Response): P
     );
 
     // Broadcast celebration when sprint is started
-    broadcastToUser(userId, 'accountability:updated', { type: 'week_start', targetId: id as string });
+    broadcastToUser(userId, 'accountability:updated', { type: 'week_start', targetId: id });
 
     // Re-query to get full sprint with owner info
     const result = await pool.query(
@@ -1312,7 +1324,11 @@ router.post('/:id/start', authMiddleware, async (req: Request, res: Response): P
 // Delete sprint
 router.delete('/:id', authMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
-    const { id } = req.params;
+    const id = req.params.id;
+    if (typeof id !== 'string') {
+      res.status(400).json({ error: 'Invalid week id' });
+      return;
+    }
     const { userId, workspaceId } = getRequestContext(req);
 
     // Get visibility context for filtering
@@ -1353,7 +1369,11 @@ router.delete('/:id', authMiddleware, async (req: Request, res: Response): Promi
 // PATCH /api/weeks/:id/plan
 router.patch('/:id/plan', authMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
-    const { id } = req.params;
+    const id = req.params.id;
+    if (typeof id !== 'string') {
+      res.status(400).json({ error: 'Invalid week id' });
+      return;
+    }
     const { userId, workspaceId } = getRequestContext(req);
 
     const parsed = updatePlanSchema.safeParse(req.body);
@@ -1441,7 +1461,7 @@ router.patch('/:id/plan', authMiddleware, async (req: Request, res: Response): P
     // Log changes to document_history for approval workflow tracking
     if (data.plan !== undefined && data.plan !== currentProps.plan) {
       await logDocumentChange(
-        id as string,
+        id,
         'plan',
         currentProps.plan || null,
         data.plan || null,
@@ -1453,7 +1473,7 @@ router.patch('/:id/plan', authMiddleware, async (req: Request, res: Response): P
       const newCriteria = data.success_criteria ? JSON.stringify(data.success_criteria) : null;
       if (oldCriteria !== newCriteria) {
         await logDocumentChange(
-          id as string,
+          id,
           'success_criteria',
           oldCriteria,
           newCriteria,
@@ -1464,7 +1484,7 @@ router.patch('/:id/plan', authMiddleware, async (req: Request, res: Response): P
 
     // Broadcast celebration when plan is added
     if (data.plan && data.plan.trim() !== '') {
-      broadcastToUser(userId, 'accountability:updated', { type: 'weekly_plan', targetId: id as string });
+      broadcastToUser(userId, 'accountability:updated', { type: 'weekly_plan', targetId: id });
     }
 
     // Re-query to get full sprint with owner info
@@ -1513,7 +1533,11 @@ router.patch('/:id/plan', authMiddleware, async (req: Request, res: Response): P
 // Get sprint issues
 router.get('/:id/issues', authMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
-    const { id } = req.params;
+    const id = req.params.id;
+    if (typeof id !== 'string') {
+      res.status(400).json({ error: 'Invalid week id' });
+      return;
+    }
     const { userId, workspaceId } = getRequestContext(req);
 
     // Get visibility context for filtering
@@ -1611,7 +1635,11 @@ router.get('/:id/issues', authMiddleware, async (req: Request, res: Response): P
 // Returns: { originalScope, currentScope, scopeChangePercent, scopeChanges }
 router.get('/:id/scope-changes', authMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
-    const { id } = req.params;
+    const id = req.params.id;
+    if (typeof id !== 'string') {
+      res.status(400).json({ error: 'Invalid week id' });
+      return;
+    }
     const { userId, workspaceId } = getRequestContext(req);
 
     // Get visibility context for filtering
@@ -1834,7 +1862,11 @@ function formatStandupResponse(row: any) {
  */
 router.get('/:id/standups', authMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
-    const { id } = req.params;
+    const id = req.params.id;
+    if (typeof id !== 'string') {
+      res.status(400).json({ error: 'Invalid week id' });
+      return;
+    }
     const { userId, workspaceId } = getRequestContext(req);
 
     // Get visibility context for filtering
@@ -1926,7 +1958,11 @@ router.get('/:id/standups', authMiddleware, async (req: Request, res: Response):
  */
 router.post('/:id/standups', authMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
-    const { id } = req.params;
+    const id = req.params.id;
+    if (typeof id !== 'string') {
+      res.status(400).json({ error: 'Invalid week id' });
+      return;
+    }
     const { userId, workspaceId } = getRequestContext(req);
 
     const parsed = createStandupSchema.safeParse(req.body);
@@ -1988,7 +2024,7 @@ router.post('/:id/standups', authMiddleware, async (req: Request, res: Response)
     const author = authorResult.rows[0];
 
     // Broadcast celebration when standup is created
-    broadcastToUser(userId, 'accountability:updated', { type: 'standup', targetId: id as string });
+    broadcastToUser(userId, 'accountability:updated', { type: 'standup', targetId: id });
 
     res.status(201).json({
       id: standup.id,
@@ -2156,7 +2192,11 @@ async function generatePrefilledReviewContent(sprintData: any, issues: any[]) {
 // GET /api/weeks/:id/review - Get or generate pre-filled sprint review
 router.get('/:id/review', authMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
-    const { id } = req.params;
+    const id = req.params.id;
+    if (typeof id !== 'string') {
+      res.status(400).json({ error: 'Invalid week id' });
+      return;
+    }
     const { userId, workspaceId } = getRequestContext(req);
 
     // Get visibility context for filtering
@@ -2269,7 +2309,11 @@ router.get('/:id/review', authMiddleware, async (req: Request, res: Response): P
 // POST /api/weeks/:id/review - Create finalized sprint review
 router.post('/:id/review', authMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
-    const { id } = req.params;
+    const id = req.params.id;
+    if (typeof id !== 'string') {
+      res.status(400).json({ error: 'Invalid week id' });
+      return;
+    }
     const { userId, workspaceId } = getRequestContext(req);
 
     const parsed = sprintReviewSchema.safeParse(req.body);
@@ -2343,7 +2387,7 @@ router.post('/:id/review', authMiddleware, async (req: Request, res: Response): 
     );
 
     // Broadcast celebration when sprint review is created
-    broadcastToUser(userId, 'accountability:updated', { type: 'weekly_review', targetId: id as string });
+    broadcastToUser(userId, 'accountability:updated', { type: 'weekly_review', targetId: id });
 
     // Log initial review content to document_history for approval workflow tracking
     const review = result.rows[0];
@@ -2381,7 +2425,11 @@ router.post('/:id/review', authMiddleware, async (req: Request, res: Response): 
 // PATCH /api/weeks/:id/review - Update existing sprint review
 router.patch('/:id/review', authMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
-    const { id } = req.params;
+    const id = req.params.id;
+    if (typeof id !== 'string') {
+      res.status(400).json({ error: 'Invalid week id' });
+      return;
+    }
     const { userId, workspaceId } = getRequestContext(req);
 
     const parsed = sprintReviewSchema.safeParse(req.body);
@@ -2679,7 +2727,11 @@ router.post('/:id/carryover', authMiddleware, async (req: Request, res: Response
 // POST /api/weeks/:id/approve-plan - Approve sprint plan
 router.post('/:id/approve-plan', authMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
-    const { id } = req.params;
+    const id = req.params.id;
+    if (typeof id !== 'string') {
+      res.status(400).json({ error: 'Invalid week id' });
+      return;
+    }
     const { userId, workspaceId } = getRequestContext(req);
     const parsedComment = parseApprovalComment(req.body);
     if (parsedComment.error) {
@@ -2778,7 +2830,11 @@ router.post('/:id/approve-plan', authMiddleware, async (req: Request, res: Respo
 // POST /api/weeks/:id/unapprove-plan - Revoke plan approval (logged to history)
 router.post('/:id/unapprove-plan', authMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
-    const { id } = req.params;
+    const id = req.params.id;
+    if (typeof id !== 'string') {
+      res.status(400).json({ error: 'Invalid week id' });
+      return;
+    }
     const { userId, workspaceId } = getRequestContext(req);
 
     const { isAdmin } = await getVisibilityContext(userId, workspaceId);
@@ -2836,7 +2892,11 @@ router.post('/:id/unapprove-plan', authMiddleware, async (req: Request, res: Res
 // POST /api/weeks/:id/approve-review - Approve sprint review (rating required)
 router.post('/:id/approve-review', authMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
-    const { id } = req.params;
+    const id = req.params.id;
+    if (typeof id !== 'string') {
+      res.status(400).json({ error: 'Invalid week id' });
+      return;
+    }
     const { rating } = req.body || {};
     const { userId, workspaceId } = getRequestContext(req);
     const parsedComment = parseApprovalComment(req.body);
@@ -2964,7 +3024,11 @@ router.post('/:id/approve-review', authMiddleware, async (req: Request, res: Res
 // POST /api/weeks/:id/request-plan-changes - Request changes on sprint plan
 router.post('/:id/request-plan-changes', authMiddleware, async (req: Request, res: Response): Promise<void> => {
   try {
-    const { id } = req.params;
+    const id = req.params.id;
+    if (typeof id !== 'string') {
+      res.status(400).json({ error: 'Invalid week id' });
+      return;
+    }
     const { feedback } = req.body || {};
     const { userId, workspaceId } = getRequestContext(req);
 

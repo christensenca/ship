@@ -8,6 +8,19 @@ import { extractText } from '../utils/document-content.js';
 type RouterType = ReturnType<typeof Router>;
 const router: RouterType = Router();
 
+type RequestContext = {
+  userId: string;
+  workspaceId: string;
+};
+
+function getRequestContext(req: Request): RequestContext {
+  const { userId, workspaceId } = req;
+  if (!userId || !workspaceId) {
+    throw new Error('Missing authenticated request context');
+  }
+  return { userId, workspaceId };
+}
+
 // Templates for weekly plan and retro documents
 // These provide structure for users to fill in, and "done" status is based on adding content beyond the template
 const WEEKLY_PLAN_TEMPLATE = {
@@ -190,8 +203,7 @@ router.post('/', authMiddleware, async (req: Request, res: Response) => {
     }
 
     const { person_id, project_id, week_number } = parsed.data;
-    const workspaceId = req.workspaceId!;
-    const userId = req.userId!;
+    const { workspaceId, userId } = getRequestContext(req);
 
     // Verify person exists in this workspace
     const personResult = await client.query(
@@ -328,7 +340,7 @@ router.post('/', authMiddleware, async (req: Request, res: Response) => {
  */
 router.get('/', authMiddleware, async (req: Request, res: Response) => {
   try {
-    const workspaceId = req.workspaceId!;
+    const { workspaceId } = getRequestContext(req);
     const { person_id, project_id, week_number } = req.query;
 
     let query = `
@@ -344,19 +356,19 @@ router.get('/', authMiddleware, async (req: Request, res: Response) => {
     const params: (string | number)[] = [workspaceId];
     let paramIndex = 2;
 
-    if (person_id) {
+    if (typeof person_id === 'string') {
       query += ` AND (d.properties->>'person_id') = $${paramIndex++}`;
-      params.push(person_id as string);
+      params.push(person_id);
     }
 
-    if (project_id) {
+    if (typeof project_id === 'string') {
       query += ` AND (d.properties->>'project_id') = $${paramIndex++}`;
-      params.push(project_id as string);
+      params.push(project_id);
     }
 
-    if (week_number) {
+    if (typeof week_number === 'string') {
       query += ` AND (d.properties->>'week_number')::int = $${paramIndex++}`;
-      params.push(parseInt(week_number as string, 10));
+      params.push(parseInt(week_number, 10));
     }
 
     query += ` ORDER BY (d.properties->>'week_number')::int DESC, d.created_at DESC`;
@@ -408,7 +420,7 @@ router.get('/', authMiddleware, async (req: Request, res: Response) => {
 router.get('/:id/history', authMiddleware, async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const workspaceId = req.workspaceId!;
+    const { workspaceId } = getRequestContext(req);
 
     // Verify document exists and is a weekly_plan
     const docCheck = await pool.query(
@@ -473,7 +485,7 @@ router.get('/:id/history', authMiddleware, async (req: Request, res: Response) =
 router.get('/:id', authMiddleware, async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const workspaceId = req.workspaceId!;
+    const { workspaceId } = getRequestContext(req);
 
     const result = await pool.query(
       `SELECT d.id, d.title, d.content, d.properties, d.created_at, d.updated_at,
@@ -567,8 +579,7 @@ weeklyRetrosRouter.post('/', authMiddleware, async (req: Request, res: Response)
     }
 
     const { person_id, project_id, week_number } = parsed.data;
-    const workspaceId = req.workspaceId!;
-    const userId = req.userId!;
+    const { workspaceId, userId } = getRequestContext(req);
 
     // Verify person exists in this workspace
     const personResult = await client.query(
@@ -723,7 +734,7 @@ weeklyRetrosRouter.post('/', authMiddleware, async (req: Request, res: Response)
  */
 weeklyRetrosRouter.get('/', authMiddleware, async (req: Request, res: Response) => {
   try {
-    const workspaceId = req.workspaceId!;
+    const { workspaceId } = getRequestContext(req);
     const { person_id, project_id, week_number } = req.query;
 
     let query = `
@@ -739,19 +750,19 @@ weeklyRetrosRouter.get('/', authMiddleware, async (req: Request, res: Response) 
     const params: (string | number)[] = [workspaceId];
     let paramIndex = 2;
 
-    if (person_id) {
+    if (typeof person_id === 'string') {
       query += ` AND (d.properties->>'person_id') = $${paramIndex++}`;
-      params.push(person_id as string);
+      params.push(person_id);
     }
 
-    if (project_id) {
+    if (typeof project_id === 'string') {
       query += ` AND (d.properties->>'project_id') = $${paramIndex++}`;
-      params.push(project_id as string);
+      params.push(project_id);
     }
 
-    if (week_number) {
+    if (typeof week_number === 'string') {
       query += ` AND (d.properties->>'week_number')::int = $${paramIndex++}`;
-      params.push(parseInt(week_number as string, 10));
+      params.push(parseInt(week_number, 10));
     }
 
     query += ` ORDER BY (d.properties->>'week_number')::int DESC, d.created_at DESC`;
@@ -803,7 +814,7 @@ weeklyRetrosRouter.get('/', authMiddleware, async (req: Request, res: Response) 
 weeklyRetrosRouter.get('/:id/history', authMiddleware, async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const workspaceId = req.workspaceId!;
+    const { workspaceId } = getRequestContext(req);
 
     // Verify document exists and is a weekly_retro
     const docCheck = await pool.query(
@@ -868,7 +879,7 @@ weeklyRetrosRouter.get('/:id/history', authMiddleware, async (req: Request, res:
 weeklyRetrosRouter.get('/:id', authMiddleware, async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const workspaceId = req.workspaceId!;
+    const { workspaceId } = getRequestContext(req);
 
     const result = await pool.query(
       `SELECT d.id, d.title, d.content, d.properties, d.created_at, d.updated_at,
@@ -928,7 +939,7 @@ weeklyRetrosRouter.get('/:id', authMiddleware, async (req: Request, res: Respons
 router.get('/project-allocation-grid/:projectId', authMiddleware, async (req: Request, res: Response) => {
   try {
     const { projectId } = req.params;
-    const workspaceId = req.workspaceId!;
+    const { workspaceId } = getRequestContext(req);
 
     // Verify project exists
     const projectResult = await pool.query(
@@ -984,7 +995,10 @@ router.get('/project-allocation-grid/:projectId', authMiddleware, async (req: Re
           allocatedWeeks: new Set(),
         });
       }
-      peopleMap.get(row.person_id)!.allocatedWeeks.add(row.week_number);
+      const person = peopleMap.get(row.person_id);
+      if (person) {
+        person.allocatedWeeks.add(row.week_number);
+      }
     }
 
     // Get all weekly plans for this project (include content to check if "done")

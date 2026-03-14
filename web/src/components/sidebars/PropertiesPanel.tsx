@@ -144,12 +144,14 @@ export type PanelDocument = WikiDocument | IssueDocument | ProjectDocument | Spr
 
 // Props for wiki panel
 interface WikiPanelProps {
+  kind: 'wiki';
   teamMembers: Person[];
   currentUserId?: string;
 }
 
 // Props for issue panel
 interface IssuePanelProps {
+  kind: 'issue';
   teamMembers: Array<{ id: string; user_id: string; name: string }>;
   programs: Array<{ id: string; name: string; color?: string }>;
   projects?: Array<{ id: string; title: string; color?: string }>;
@@ -166,6 +168,7 @@ interface IssuePanelProps {
 
 // Props for project panel
 interface ProjectPanelProps {
+  kind: 'project';
   programs: Array<{ id: string; name: string; color: string; emoji?: string | null }>;
   people: Person[];
   onConvert?: () => void;
@@ -184,6 +187,7 @@ interface ProjectPanelProps {
 
 // Props for sprint panel
 interface SprintPanelProps {
+  kind: 'sprint';
   people?: Array<{ id: string; user_id: string; name: string }>;
   existingSprints?: Array<{ owner?: { id: string; name: string; email: string } | null }>;
   /** Whether current user can approve (is accountable or workspace admin) */
@@ -196,11 +200,12 @@ interface SprintPanelProps {
 
 // Props for program panel
 interface ProgramPanelProps {
+  kind: 'program';
   people: Person[];
 }
 
 // Combined props type that includes all panel-specific props
-type PanelSpecificProps = WikiPanelProps | IssuePanelProps | ProjectPanelProps | SprintPanelProps | ProgramPanelProps;
+export type PanelSpecificProps = WikiPanelProps | IssuePanelProps | ProjectPanelProps | SprintPanelProps | ProgramPanelProps | null;
 
 interface PropertiesPanelProps {
   /** The document to render properties for */
@@ -237,9 +242,9 @@ function WeeklyDocumentSidebar({
   weeklyReviewState?: WeeklyReviewActionsState | null;
 }) {
   const docProperties = document.properties || {};
-  const weekNumber = docProperties.week_number as number | undefined;
-  const personId = docProperties.person_id as string | undefined;
-  const projectId = docProperties.project_id as string | undefined;
+  const weekNumber = typeof docProperties.week_number === 'number' ? docProperties.week_number : undefined;
+  const personId = typeof docProperties.person_id === 'string' ? docProperties.person_id : undefined;
+  const projectId = typeof docProperties.project_id === 'string' ? docProperties.project_id : undefined;
 
   const isRetro = document.document_type === 'weekly_retro';
   const isReviewMode = weeklyReviewState?.isReviewMode ?? false;
@@ -391,7 +396,7 @@ function WeeklyDocumentSidebar({
       {/* Content History Panel */}
       <ContentHistoryPanel
         documentId={document.id}
-        documentType={document.document_type as 'weekly_plan' | 'weekly_retro'}
+        documentType={document.document_type}
       />
     </div>
   );
@@ -463,16 +468,13 @@ export function PropertiesPanel({
     if (isWorkspaceAdmin) return true;
     if (!user?.id) return false;
 
-    // Check document's accountable_id (used by projects)
-    const docWithAccountable = document as { accountable_id?: string | null };
-    if (docWithAccountable.accountable_id === user.id) return true;
+    if ('accountable_id' in document && document.accountable_id === user.id) return true;
 
     // For sprints, also check program_accountable_id (inherited from program)
     // and supervisor relationship (reports_to on the sprint owner's person document)
     if (document.document_type === 'sprint') {
-      const sprintDoc = document as SprintDocument;
-      if (sprintDoc.program_accountable_id === user.id) return true;
-      if (sprintDoc.owner_reports_to === user.id) return true;
+      if (document.program_accountable_id === user.id) return true;
+      if (document.owner_reports_to === user.id) return true;
     }
 
     return false;
@@ -481,10 +483,8 @@ export function PropertiesPanel({
   // Build userNames from people in panelProps (for displaying approver names)
   const userNames = useMemo(() => {
     const names: Record<string, string> = {};
-    // Try to get people from various panel props
-    const props = panelProps as { people?: Array<{ id?: string; user_id?: string; name: string }> };
-    if (props.people) {
-      props.people.forEach(p => {
+    if (panelProps && 'people' in panelProps && panelProps.people) {
+      panelProps.people.forEach((p) => {
         if (p.user_id) names[p.user_id] = p.name;
         if (p.id) names[p.id] = p.name;
       });
@@ -499,56 +499,57 @@ export function PropertiesPanel({
   }, []);
 
   const panel = useMemo(() => {
+    if (!panelProps && document.document_type !== 'weekly_plan' && document.document_type !== 'weekly_retro') {
+      return null;
+    }
+
     switch (document.document_type) {
       case 'wiki': {
-        const wikiProps = panelProps as WikiPanelProps;
         return (
           <WikiSidebar
-            document={document as WikiDocument}
-            teamMembers={wikiProps.teamMembers || []}
-            currentUserId={wikiProps.currentUserId}
-            onUpdate={onUpdate as (updates: Partial<WikiDocument>) => Promise<void>}
+            document={document}
+            teamMembers={panelProps?.kind === 'wiki' ? panelProps.teamMembers : []}
+            currentUserId={panelProps?.kind === 'wiki' ? panelProps.currentUserId : undefined}
+            onUpdate={onUpdate}
           />
         );
       }
 
       case 'issue': {
-        const issueProps = panelProps as IssuePanelProps;
         return (
           <IssueSidebar
-            issue={document as IssueDocument}
-            teamMembers={issueProps.teamMembers || []}
-            programs={issueProps.programs || []}
-            projects={issueProps.projects || []}
-            onUpdate={onUpdate as (updates: Partial<IssueDocument>) => Promise<void>}
-            onConvert={issueProps.onConvert}
-            onUndoConversion={issueProps.onUndoConversion}
-            onAccept={issueProps.onAccept}
-            onReject={issueProps.onReject}
-            isConverting={issueProps.isConverting}
-            isUndoing={issueProps.isUndoing}
-            canConvert={issueProps.canConvert}
-            conversionDisabledReason={issueProps.conversionDisabledReason}
+            issue={document}
+            teamMembers={panelProps?.kind === 'issue' ? panelProps.teamMembers : []}
+            programs={panelProps?.kind === 'issue' ? panelProps.programs : []}
+            projects={panelProps?.kind === 'issue' ? panelProps.projects : []}
+            onUpdate={onUpdate}
+            onConvert={panelProps?.kind === 'issue' ? panelProps.onConvert : undefined}
+            onUndoConversion={panelProps?.kind === 'issue' ? panelProps.onUndoConversion : undefined}
+            onAccept={panelProps?.kind === 'issue' ? panelProps.onAccept : undefined}
+            onReject={panelProps?.kind === 'issue' ? panelProps.onReject : undefined}
+            isConverting={panelProps?.kind === 'issue' ? panelProps.isConverting : undefined}
+            isUndoing={panelProps?.kind === 'issue' ? panelProps.isUndoing : undefined}
+            canConvert={panelProps?.kind === 'issue' ? panelProps.canConvert : undefined}
+            conversionDisabledReason={panelProps?.kind === 'issue' ? panelProps.conversionDisabledReason : undefined}
             highlightedFields={highlightedFields}
-            onAssociationChange={issueProps.onAssociationChange}
+            onAssociationChange={panelProps?.kind === 'issue' ? panelProps.onAssociationChange : undefined}
           />
         );
       }
 
       case 'project': {
-        const projectProps = panelProps as ProjectPanelProps;
         return (
           <ProjectSidebar
-            project={document as ProjectDocument}
-            programs={projectProps.programs || []}
-            people={projectProps.people || []}
-            onUpdate={onUpdate as (updates: Partial<ProjectDocument>) => Promise<void>}
-            onConvert={projectProps.onConvert}
-            onUndoConversion={projectProps.onUndoConversion}
-            isConverting={projectProps.isConverting}
-            isUndoing={projectProps.isUndoing}
-            canConvert={projectProps.canConvert}
-            conversionDisabledReason={projectProps.conversionDisabledReason}
+            project={document}
+            programs={panelProps?.kind === 'project' ? panelProps.programs : []}
+            people={panelProps?.kind === 'project' ? panelProps.people : []}
+            onUpdate={onUpdate}
+            onConvert={panelProps?.kind === 'project' ? panelProps.onConvert : undefined}
+            onUndoConversion={panelProps?.kind === 'project' ? panelProps.onUndoConversion : undefined}
+            isConverting={panelProps?.kind === 'project' ? panelProps.isConverting : undefined}
+            isUndoing={panelProps?.kind === 'project' ? panelProps.isUndoing : undefined}
+            canConvert={panelProps?.kind === 'project' ? panelProps.canConvert : undefined}
+            conversionDisabledReason={panelProps?.kind === 'project' ? panelProps.conversionDisabledReason : undefined}
             highlightedFields={highlightedFields}
             canApprove={canApprove}
             userNames={userNames}
@@ -558,14 +559,13 @@ export function PropertiesPanel({
       }
 
       case 'sprint': {
-        const sprintProps = panelProps as SprintPanelProps;
         return (
           <WeekSidebar
-            sprint={document as SprintDocument}
-            onUpdate={onUpdate as (updates: Partial<SprintDocument>) => Promise<void>}
+            sprint={document}
+            onUpdate={onUpdate}
             highlightedFields={highlightedFields}
-            people={sprintProps.people}
-            existingSprints={sprintProps.existingSprints}
+            people={panelProps?.kind === 'sprint' ? panelProps.people : undefined}
+            existingSprints={panelProps?.kind === 'sprint' ? panelProps.existingSprints : undefined}
             canApprove={canApprove}
             userNames={userNames}
             onApprovalUpdate={handleApprovalUpdate}
@@ -574,12 +574,11 @@ export function PropertiesPanel({
       }
 
       case 'program': {
-        const programProps = panelProps as ProgramPanelProps;
         return (
           <ProgramSidebar
-            program={document as ProgramDocument}
-            people={programProps.people || []}
-            onUpdate={onUpdate as (updates: Partial<ProgramDocument>) => Promise<void>}
+            program={document}
+            people={panelProps?.kind === 'program' ? panelProps.people : []}
+            onUpdate={onUpdate}
             highlightedFields={highlightedFields}
           />
         );
@@ -591,22 +590,14 @@ export function PropertiesPanel({
         // Names are fetched via WeeklyDocumentSidebar component
         return (
           <WeeklyDocumentSidebar
-            document={document as WeeklyPlanDocument | WeeklyRetroDocument}
+            document={document}
             weeklyReviewState={weeklyReviewState}
           />
         );
       }
 
       default:
-        // TypeScript narrows to never here since all cases are handled
-        // Cast to BaseDocument to access document_type for the fallback display
-        return (
-          <div className="p-4">
-            <p className="text-xs text-muted">
-              Document type: {(document as BaseDocument).document_type}
-            </p>
-          </div>
-        );
+        return null;
     }
   }, [document, panelProps, onUpdate, highlightedFields, canApprove, userNames, handleApprovalUpdate, weeklyReviewState]);
 

@@ -17,6 +17,32 @@ import {
   getDocumentConversionPermission,
 } from '@/lib/documentConversion';
 
+function getString(value: unknown): string | undefined {
+  return typeof value === 'string' ? value : undefined;
+}
+
+function getNullableString(value: unknown): string | null {
+  return typeof value === 'string' ? value : null;
+}
+
+function getNullableNumber(value: unknown): number | null {
+  return typeof value === 'number' ? value : null;
+}
+
+function getStringArray(value: unknown): string[] {
+  return Array.isArray(value) && value.every((item) => typeof item === 'string') ? value : [];
+}
+
+function getOwner(value: unknown): { id: string; name: string; email: string } | null {
+  if (!value || typeof value !== 'object') return null;
+  const record = value as Record<string, unknown>;
+  const id = getString(record.id);
+  const name = getString(record.name);
+  const email = getString(record.email);
+
+  return id && name && email ? { id, name, email } : null;
+}
+
 /**
  * ProjectDetailsTab - Renders the project document in the UnifiedEditor
  *
@@ -46,12 +72,12 @@ export default function ProjectDetailsTab({ documentId, document }: DocumentTabP
   const programs = useMemo(() => programsData.map(p => ({
     id: p.id,
     name: p.name,
-    color: p.color,
+    color: p.color || '#6366f1',
     emoji: p.emoji,
   })), [programsData]);
   const conversionPermission = useMemo(() => getDocumentConversionPermission({
     documentType: document.document_type,
-    createdBy: document.created_by as string | null | undefined,
+    createdBy: document.created_by,
     currentUserId: user?.id,
   }), [document.created_by, document.document_type, user?.id]);
 
@@ -74,15 +100,13 @@ export default function ProjectDetailsTab({ documentId, document }: DocumentTabP
 
       // Optimistically update the document cache
       if (previousDocument) {
-        // Cast updates to Record since we're in ProjectDetailsTab and know these fields exist
-        const projectUpdates = updates as Record<string, unknown>;
-        const updatedDocument = { ...previousDocument, ...projectUpdates };
+        const updatedDocument: Record<string, unknown> = { ...previousDocument, ...updates };
 
         // Recompute ICE score if any ICE property changed
-        if ('impact' in projectUpdates || 'confidence' in projectUpdates || 'ease' in projectUpdates) {
-          const impact = (projectUpdates.impact ?? previousDocument.impact) as number | null;
-          const confidence = (projectUpdates.confidence ?? previousDocument.confidence) as number | null;
-          const ease = (projectUpdates.ease ?? previousDocument.ease) as number | null;
+        if ('impact' in updates || 'confidence' in updates || 'ease' in updates) {
+          const impact = getNullableNumber(updates.impact ?? previousDocument.impact);
+          const confidence = getNullableNumber(updates.confidence ?? previousDocument.confidence);
+          const ease = getNullableNumber(updates.ease ?? previousDocument.ease);
           updatedDocument.ice_score = computeICEScore(impact, confidence, ease);
         }
 
@@ -203,6 +227,7 @@ export default function ProjectDetailsTab({ documentId, document }: DocumentTabP
 
   // Build sidebar data
   const sidebarData: SidebarData = useMemo(() => ({
+    kind: 'project',
     programs,
     people: teamMembers,
     onConvert: handleConvert,
@@ -214,7 +239,7 @@ export default function ProjectDetailsTab({ documentId, document }: DocumentTabP
   }), [programs, teamMembers, handleConvert, handleUndoConversion, isConverting, isUndoing, conversionPermission.canConvert, conversionPermission.reason]);
 
   // Get program_id from belongs_to array (project's parent program via document_associations)
-  const belongsTo = (document as { belongs_to?: Array<{ id: string; type: string }> }).belongs_to;
+  const belongsTo = Array.isArray(document.belongs_to) ? document.belongs_to : undefined;
   const programId = belongsTo?.find(b => b.type === 'program')?.id;
 
   // Transform to UnifiedDocument format
@@ -224,24 +249,24 @@ export default function ProjectDetailsTab({ documentId, document }: DocumentTabP
     document_type: 'project',
     created_at: document.created_at,
     updated_at: document.updated_at,
-    created_by: document.created_by as string | undefined,
-    properties: document.properties as Record<string, unknown> | undefined,
-    impact: (document.impact as number | null) ?? null,
-    confidence: (document.confidence as number | null) ?? null,
-    ease: (document.ease as number | null) ?? null,
-    color: (document.color as string) || '#3b82f6',
+    created_by: document.created_by ?? undefined,
+    properties: document.properties,
+    impact: getNullableNumber(document.impact),
+    confidence: getNullableNumber(document.confidence),
+    ease: getNullableNumber(document.ease),
+    color: getString(document.color) ?? '#3b82f6',
     emoji: null,
-    program_id: programId,
-    owner: document.owner as { id: string; name: string; email: string } | null,
-    owner_id: document.owner_id as string | undefined,
+    program_id: programId ?? null,
+    owner: getOwner(document.owner),
+    owner_id: getNullableString(document.owner_id),
     // RACI fields
-    accountable_id: document.accountable_id as string | undefined,
-    consulted_ids: (document.consulted_ids as string[]) || [],
-    informed_ids: (document.informed_ids as string[]) || [],
-    converted_from_id: document.converted_from_id as string | undefined,
+    accountable_id: getNullableString(document.accountable_id),
+    consulted_ids: getStringArray(document.consulted_ids),
+    informed_ids: getStringArray(document.informed_ids),
+    converted_from_id: getNullableString(document.converted_from_id),
     // Design review
-    has_design_review: document.has_design_review as boolean | null | undefined,
-    design_review_notes: document.design_review_notes as string | null | undefined,
+    has_design_review: typeof document.has_design_review === 'boolean' ? document.has_design_review : null,
+    design_review_notes: getNullableString(document.design_review_notes),
   }), [document, programId]);
 
   if (!user) return null;

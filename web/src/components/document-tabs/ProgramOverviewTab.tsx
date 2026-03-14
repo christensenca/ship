@@ -8,6 +8,14 @@ import { useAssignableMembersQuery } from '@/hooks/useTeamMembersQuery';
 import { apiPatch, apiDelete } from '@/lib/api';
 import type { DocumentTabProps } from '@/lib/document-tabs';
 
+function getString(value: unknown): string | undefined {
+  return typeof value === 'string' ? value : undefined;
+}
+
+function getStringArray(value: unknown): string[] {
+  return Array.isArray(value) && value.every((item) => typeof item === 'string') ? value : [];
+}
+
 /**
  * ProgramOverviewTab - Renders the program document in the UnifiedEditor
  *
@@ -46,8 +54,7 @@ export default function ProgramOverviewTab({ documentId, document }: DocumentTab
 
       // Optimistically update the document cache
       if (previousDocument) {
-        const programUpdates = updates as Record<string, unknown>;
-        queryClient.setQueryData(['document', documentId], { ...previousDocument, ...programUpdates });
+        queryClient.setQueryData(['document', documentId], { ...previousDocument, ...updates });
       }
 
       // Return context with the previous value for rollback
@@ -96,6 +103,7 @@ export default function ProgramOverviewTab({ documentId, document }: DocumentTab
 
   // Build sidebar data
   const sidebarData: SidebarData = useMemo(() => ({
+    kind: 'program',
     people: teamMembers,
   }), [teamMembers]);
 
@@ -106,15 +114,15 @@ export default function ProgramOverviewTab({ documentId, document }: DocumentTab
     document_type: 'program',
     created_at: document.created_at,
     updated_at: document.updated_at,
-    created_by: document.created_by as string | undefined,
-    properties: document.properties as Record<string, unknown> | undefined,
-    color: (document.color as string) || '#6366f1',
-    emoji: (document.emoji as string) || null,
-    owner_id: document.owner_id as string | undefined,
+    created_by: document.created_by ?? undefined,
+    properties: document.properties,
+    color: getString(document.color) ?? '#6366f1',
+    emoji: getString(document.emoji) ?? null,
+    owner_id: getString(document.owner_id) ?? null,
     // RACI fields
-    accountable_id: document.accountable_id as string | undefined,
-    consulted_ids: (document.consulted_ids as string[]) || [],
-    informed_ids: (document.informed_ids as string[]) || [],
+    accountable_id: getString(document.accountable_id) ?? null,
+    consulted_ids: getStringArray(document.consulted_ids),
+    informed_ids: getStringArray(document.informed_ids),
   }), [document]);
 
   if (!user) return null;
