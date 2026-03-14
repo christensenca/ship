@@ -114,4 +114,23 @@ describe('Dashboard API', () => {
     expect(res.headers['server-timing']).toContain('auth_session');
     expect(res.headers['server-timing']).toContain('total');
   });
+
+  it('returns historical week metadata and a null previous retro placeholder when no earlier retro exists', async () => {
+    const res = await request(app)
+      .get('/api/dashboard/my-week?week_number=2')
+      .set('Cookie', sessionCookie);
+
+    expect(res.status).toBe(200);
+    expect(res.body.week.week_number).toBe(2);
+    expect(res.body.week.current_week_number).toBe(3);
+    expect(res.body.week.is_current).toBe(false);
+    expect(res.body.plan).toBeNull();
+    expect(res.body.retro?.title).toBe('Previous Retro');
+    expect(res.body.previous_retro).toEqual({
+      id: null,
+      title: null,
+      submitted_at: null,
+      week_number: 1,
+    });
+  });
 });

@@ -388,7 +388,13 @@ async function loadContext() {
     SELECT u.id AS user_id, u.email, wm.workspace_id
     FROM users u
     JOIN workspace_memberships wm ON wm.user_id = u.id
-    ORDER BY CASE WHEN u.email = 'dev@ship.local' THEN 0 ELSE 1 END, u.created_at ASC
+    ORDER BY
+      CASE
+        WHEN u.email = 'perf.admin@ship.local' THEN 0
+        WHEN u.email = 'dev@ship.local' THEN 1
+        ELSE 2
+      END,
+      u.created_at ASC
     LIMIT 1
   `);
 

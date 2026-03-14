@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="560" viewBox="0 0 1100 560">
+  <rect width="100%" height="100%" fill="white" />
+  <text x="72" y="34" font-family="ui-sans-serif, system-ui, sans-serif" font-size="28" font-weight="700" fill="#111827">DB Efficiency: Request DB Time</text>
+  <g transform="translate(72, 76)">
+    
+    <g font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#111827">
+      <rect x="0" y="0" width="12" height="12" rx="2" fill="#9ca3af" />
+      <text x="18" y="10">Baseline</text>
+      <rect x="96" y="0" width="12" height="12" rx="2" fill="#2563eb" />
+      <text x="114" y="10">Current</text>
+    </g>
+  
+  </g>
+  <line x1="72" y1="350" x2="1052" y2="350" stroke="#6b7280" />
+  
+      <line x1="72" y1="350" x2="1052" y2="350" stroke="#e5e7eb" />
+      <text x="62" y="354" text-anchor="end" font-size="12" fill="#6b7280">0</text>
+    
+      <line x1="72" y1="304.4" x2="1052" y2="304.4" stroke="#e5e7eb" />
+      <text x="62" y="308.4" text-anchor="end" font-size="12" fill="#6b7280">7.84</text>
+    
+      <line x1="72" y1="258.8" x2="1052" y2="258.8" stroke="#e5e7eb" />
+      <text x="62" y="262.8" text-anchor="end" font-size="12" fill="#6b7280">15.68</text>
+    
+      <line x1="72" y1="213.2" x2="1052" y2="213.2" stroke="#e5e7eb" />
+      <text x="62" y="217.2" text-anchor="end" font-size="12" fill="#6b7280">23.53</text>
+    
+      <line x1="72" y1="167.6" x2="1052" y2="167.6" stroke="#e5e7eb" />
+      <text x="62" y="171.6" text-anchor="end" font-size="12" fill="#6b7280">31.37</text>
+    
+      <line x1="72" y1="122" x2="1052" y2="122" stroke="#e5e7eb" />
+      <text x="62" y="126" text-anchor="end" font-size="12" fill="#6b7280">39.21</text>
+    
+  
+      <g font-family="ui-sans-serif, system-ui, sans-serif">
+        <rect x="92" y="122" width="16.833333333333336" height="228" rx="4" fill="#9ca3af" />
+        <rect x="116.83333333333334" y="210.0948737566947" width="16.833333333333336" height="139.9051262433053" rx="4" fill="#2563eb" />
+        <text x="100.41666666666667" y="114" text-anchor="middle" font-size="11" fill="#6b7280">39.21</text>
+        <text x="125.25000000000001" y="202.0948737566947" text-anchor="middle" font-size="11" fill="#6b7280">24.06</text>
+        <text x="112.83333333333334" y="374" text-anchor="end" font-size="12" fill="#111827" transform="rotate(-45 112.83333333333334 374)">dashboard data</text>
+        <text x="112.83333333333334" y="470" text-anchor="middle" font-size="11" fill="#047857">-38.6%</text>
+      </g>
+    
+      <g font-family="ui-sans-serif, system-ui, sans-serif">
+        <rect x="173.66666666666669" y="322.67023718439174" width="16.833333333333336" height="27.32976281560826" rx="4" fill="#9ca3af" />
+        <rect x="198.50000000000003" y="327.26396327467484" width="16.833333333333336" height="22.736036725325167" rx="4" fill="#2563eb" />
+        <text x="182.08333333333334" y="314.67023718439174" text-anchor="middle" font-size="11" fill="#6b7280">4.7</text>
+        <text x="206.91666666666669" y="319.26396327467484" text-anchor="middle" font-size="11" fill="#6b7280">3.91</text>
+        <text x="194.50000000000003" y="374" text-anchor="end" font-size="12" fill="#111827" transform="rotate(-45 194.50000000000003 374)">document</text>
+        <text x="194.50000000000003" y="470" text-anchor="middle" font-size="11" fill="#047857">-16.8%</text>
+      </g>
+    
+      <g font-family="ui-sans-serif, system-ui, sans-serif">
+        <rect x="255.33333333333334" y="309.4123947972456" width="16.833333333333336" height="40.5876052027544" rx="4" fill="#9ca3af" />
+        <rect x="280.1666666666667" y="317.0879877582249" width="16.833333333333336" height="32.91201224177506" rx="4" fill="#2563eb" />
+        <text x="263.75" y="301.4123947972456" text-anchor="middle" font-size="11" fill="#6b7280">6.98</text>
+        <text x="288.58333333333337" y="309.0879877582249" text-anchor="middle" font-size="11" fill="#6b7280">5.66</text>
+        <text x="276.1666666666667" y="374" text-anchor="end" font-size="12" fill="#111827" transform="rotate(-45 276.1666666666667 374)">document context</text>
+        <text x="276.1666666666667" y="470" text-anchor="middle" font-size="11" fill="#047857">-18.9%</text>
+      </g>
+    
+      <g font-family="ui-sans-serif, system-ui, sans-serif">
+        <rect x="337" y="333.6602907421576" width="16.833333333333336" height="16.339709257842387" rx="4" fill="#9ca3af" />
+        <rect x="361.8333333333333" y="342.7895944912012" width="16.833333333333336" height="7.210405508798775" rx="4" fill="#2563eb" />
+        <text x="345.4166666666667" y="325.6602907421576" text-anchor="middle" font-size="11" fill="#6b7280">2.81</text>
+        <text x="370.25" y="334.7895944912012" text-anchor="middle" font-size="11" fill="#6b7280">1.24</text>
+        <text x="357.8333333333333" y="374" text-anchor="end" font-size="12" fill="#111827" transform="rotate(-45 357.8333333333333 374)">document comments</text>
+        <text x="357.8333333333333" y="470" text-anchor="middle" font-size="11" fill="#047857">-55.9%</text>
+      </g>
+    
+      <g font-family="ui-sans-serif, system-ui, sans-serif">
+        <rect x="418.6666666666667" y="332.84621270084165" width="16.833333333333336" height="17.15378729915838" rx="4" fill="#9ca3af" />
+        <rect x="443.5" y="341.8010711553175" width="16.833333333333336" height="8.198928844682479" rx="4" fill="#2563eb" />
+        <text x="427.08333333333337" y="324.84621270084165" text-anchor="middle" font-size="11" fill="#6b7280">2.95</text>
+        <text x="451.9166666666667" y="333.8010711553175" text-anchor="middle" font-size="11" fill="#6b7280">1.41</text>
+        <text x="439.5" y="374" text-anchor="end" font-size="12" fill="#111827" transform="rotate(-45 439.5 374)">team members</text>
+        <text x="439.5" y="470" text-anchor="middle" font-size="11" fill="#047857">-52.2%</text>
+      </g>
+    
+      <g font-family="ui-sans-serif, system-ui, sans-serif">
+        <rect x="500.33333333333337" y="327.7291507268554" width="16.833333333333336" height="22.270849273144606" rx="4" fill="#9ca3af" />
+        <rect x="525.1666666666667" y="335.637337413925" width="16.833333333333336" height="14.36266258607498" rx="4" fill="#2563eb" />
+        <text x="508.75000000000006" y="319.7291507268554" text-anchor="middle" font-size="11" fill="#6b7280">3.83</text>
+        <text x="533.5833333333334" y="327.637337413925" text-anchor="middle" font-size="11" fill="#6b7280">2.47</text>
+        <text x="521.1666666666667" y="374" text-anchor="end" font-size="12" fill="#111827" transform="rotate(-45 521.1666666666667 374)">programs</text>
+        <text x="521.1666666666667" y="470" text-anchor="middle" font-size="11" fill="#047857">-35.5%</text>
+      </g>
+    
+      <g font-family="ui-sans-serif, system-ui, sans-serif">
+        <rect x="582" y="319.7628156082632" width="16.833333333333336" height="30.2371843917368" rx="4" fill="#9ca3af" />
+        <rect x="606.8333333333334" y="322.2050497322112" width="16.833333333333336" height="27.794950267788824" rx="4" fill="#2563eb" />
+        <text x="590.4166666666666" y="311.7628156082632" text-anchor="middle" font-size="11" fill="#6b7280">5.2</text>
+        <text x="615.25" y="314.2050497322112" text-anchor="middle" font-size="11" fill="#6b7280">4.78</text>
+        <text x="602.8333333333334" y="374" text-anchor="end" font-size="12" fill="#111827" transform="rotate(-45 602.8333333333334 374)">projects</text>
+        <text x="602.8333333333334" y="470" text-anchor="middle" font-size="11" fill="#047857">-8.1%</text>
+      </g>
+    
+      <g font-family="ui-sans-serif, system-ui, sans-serif">
+        <rect x="663.6666666666667" y="241.3787299158378" width="16.833333333333336" height="108.6212700841622" rx="4" fill="#9ca3af" />
+        <rect x="688.5000000000001" y="329.5317521040551" width="16.833333333333336" height="20.468247895944913" rx="4" fill="#2563eb" />
+        <text x="672.0833333333334" y="233.3787299158378" text-anchor="middle" font-size="11" fill="#6b7280">18.68</text>
+        <text x="696.9166666666667" y="321.5317521040551" text-anchor="middle" font-size="11" fill="#6b7280">3.52</text>
+        <text x="684.5000000000001" y="374" text-anchor="end" font-size="12" fill="#111827" transform="rotate(-45 684.5000000000001 374)">issues</text>
+        <text x="684.5000000000001" y="470" text-anchor="middle" font-size="11" fill="#047857">-81.2%</text>
+      </g>
+    
+      <g font-family="ui-sans-serif, system-ui, sans-serif">
+        <rect x="745.3333333333334" y="326.79877582249424" width="16.833333333333336" height="23.201224177505736" rx="4" fill="#9ca3af" />
+        <rect x="770.1666666666667" y="332.9043611323642" width="16.833333333333336" height="17.095638867635806" rx="4" fill="#2563eb" />
+        <text x="753.75" y="318.79877582249424" text-anchor="middle" font-size="11" fill="#6b7280">3.99</text>
+        <text x="778.5833333333334" y="324.9043611323642" text-anchor="middle" font-size="11" fill="#6b7280">2.94</text>
+        <text x="766.1666666666667" y="374" text-anchor="end" font-size="12" fill="#111827" transform="rotate(-45 766.1666666666667 374)">team grid</text>
+        <text x="766.1666666666667" y="470" text-anchor="middle" font-size="11" fill="#047857">-26.3%</text>
+      </g>
+    
+      <g font-family="ui-sans-serif, system-ui, sans-serif">
+        <rect x="827" y="341.16143840856927" width="16.833333333333336" height="8.838561591430757" rx="4" fill="#9ca3af" />
+        <rect x="851.8333333333334" y="342.6732976281561" width="16.833333333333336" height="7.326702371843917" rx="4" fill="#2563eb" />
+        <text x="835.4166666666666" y="333.16143840856927" text-anchor="middle" font-size="11" fill="#6b7280">1.52</text>
+        <text x="860.25" y="334.6732976281561" text-anchor="middle" font-size="11" fill="#6b7280">1.26</text>
+        <text x="847.8333333333334" y="374" text-anchor="end" font-size="12" fill="#111827" transform="rotate(-45 847.8333333333334 374)">team projects</text>
+        <text x="847.8333333333334" y="470" text-anchor="middle" font-size="11" fill="#047857">-17.1%</text>
+      </g>
+    
+      <g font-family="ui-sans-serif, system-ui, sans-serif">
+        <rect x="908.6666666666667" y="329.0665646518745" width="16.833333333333336" height="20.933435348125478" rx="4" fill="#9ca3af" />
+        <rect x="933.5000000000001" y="329.24100994644226" width="16.833333333333336" height="20.758990053557763" rx="4" fill="#2563eb" />
+        <text x="917.0833333333334" y="321.0665646518745" text-anchor="middle" font-size="11" fill="#6b7280">3.6</text>
+        <text x="941.9166666666667" y="321.24100994644226" text-anchor="middle" font-size="11" fill="#6b7280">3.57</text>
+        <text x="929.5000000000001" y="374" text-anchor="end" font-size="12" fill="#111827" transform="rotate(-45 929.5000000000001 374)">team assignments</text>
+        <text x="929.5000000000001" y="470" text-anchor="middle" font-size="11" fill="#047857">-0.8%</text>
+      </g>
+    
+      <g font-family="ui-sans-serif, system-ui, sans-serif">
+        <rect x="990.3333333333334" y="339.1262433052793" width="16.833333333333336" height="10.873756694720734" rx="4" fill="#9ca3af" />
+        <rect x="1015.1666666666667" y="339.6495791889824" width="16.833333333333336" height="10.350420811017596" rx="4" fill="#2563eb" />
+        <text x="998.75" y="331.1262433052793" text-anchor="middle" font-size="11" fill="#6b7280">1.87</text>
+        <text x="1023.5833333333334" y="331.6495791889824" text-anchor="middle" font-size="11" fill="#6b7280">1.78</text>
+        <text x="1011.1666666666667" y="374" text-anchor="end" font-size="12" fill="#111827" transform="rotate(-45 1011.1666666666667 374)">mentions</text>
+        <text x="1011.1666666666667" y="470" text-anchor="middle" font-size="11" fill="#047857">-4.8%</text>
+      </g>
+    
+</svg>

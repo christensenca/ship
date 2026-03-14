@@ -535,35 +535,36 @@ router.get('/my-week', authMiddleware, async (req: Request, res: Response) => {
     const userId = req.userId!;
     const workspaceId = req.workspaceId!;
 
-    const [personResult, workspaceResult] = await measureRequestPerfAsync(req, 'db_main', () => Promise.all([
-      pool.query(
-        `SELECT id, title FROM documents
-         WHERE workspace_id = $1 AND document_type = 'person'
+    const bootstrapResult = await measureRequestPerfAsync(req, 'db_main', () => pool.query(
+      `SELECT w.sprint_start_date, person.id AS person_id, person.title AS person_title
+       FROM workspaces w
+       LEFT JOIN LATERAL (
+         SELECT id, title
+         FROM documents
+         WHERE workspace_id = $1
+           AND document_type = 'person'
            AND (properties->>'user_id') = $2
-         LIMIT 1`,
-        [workspaceId, userId]
-      ),
-      pool.query(
-        `SELECT sprint_start_date FROM workspaces WHERE id = $1`,
-        [workspaceId]
-      ),
-    ]));
+         LIMIT 1
+       ) person ON TRUE
+       WHERE w.id = $1`,
+      [workspaceId, userId]
+    ));
 
-    if (personResult.rows.length === 0) {
-      res.status(404).json({ error: 'Person not found for current user' });
-      return;
-    }
-
-    const personId = personResult.rows[0].id;
-    const personName = personResult.rows[0].title;
-
-    if (workspaceResult.rows.length === 0) {
+    if (bootstrapResult.rows.length === 0) {
       res.status(404).json({ error: 'Workspace not found' });
       return;
     }
 
+    if (!bootstrapResult.rows[0].person_id) {
+      res.status(404).json({ error: 'Person not found for current user' });
+      return;
+    }
+
+    const personId = bootstrapResult.rows[0].person_id;
+    const personName = bootstrapResult.rows[0].person_title;
+
     const weekContext = buildWeekContext(
-      normalizeWorkspaceStartDate(workspaceResult.rows[0].sprint_start_date),
+      normalizeWorkspaceStartDate(bootstrapResult.rows[0].sprint_start_date),
       typeof req.query.week_number === 'string' ? req.query.week_number : undefined
     );
     const { currentWeekNumber, targetWeekNumber, previousWeekNumber, weekStart, weekEnd, isCurrent } = weekContext;
@@ -578,45 +579,23 @@ router.get('/my-week', authMiddleware, async (req: Request, res: Response) => {
       standupDates.push(dateStr);
     }
 
-    const [planResult, retroResult, previousRetroResult, standupsResult, allocationsResult] = await measureRequestPerfAsync(req, 'db_main', () => Promise.all([
+    const weekNumbers = previousWeekNumber > 0
+      ? [targetWeekNumber, previousWeekNumber]
+      : [targetWeekNumber];
+
+    const [weeklyDocsResult, standupsResult, allocationsResult] = await measureRequestPerfAsync(req, 'db_main', () => Promise.all([
       pool.query(
-        `SELECT id, title, content, properties, created_at, updated_at
+        `SELECT id, title, content, properties, document_type
          FROM documents
          WHERE workspace_id = $1
-           AND document_type = 'weekly_plan'
+           AND document_type IN ('weekly_plan', 'weekly_retro')
            AND (properties->>'person_id') = $2
-           AND (properties->>'week_number')::int = $3
+           AND (properties->>'week_number')::int = ANY($3)
            AND archived_at IS NULL
            AND deleted_at IS NULL
-         LIMIT 1`,
-        [workspaceId, personId, targetWeekNumber]
+         ORDER BY ((properties->>'week_number')::int) DESC, updated_at DESC`,
+        [workspaceId, personId, weekNumbers]
       ),
-      pool.query(
-        `SELECT id, title, content, properties, created_at, updated_at
-         FROM documents
-         WHERE workspace_id = $1
-           AND document_type = 'weekly_retro'
-           AND (properties->>'person_id') = $2
-           AND (properties->>'week_number')::int = $3
-           AND archived_at IS NULL
-           AND deleted_at IS NULL
-         LIMIT 1`,
-        [workspaceId, personId, targetWeekNumber]
-      ),
-      previousWeekNumber > 0
-        ? pool.query(
-          `SELECT id, title, properties
-           FROM documents
-           WHERE workspace_id = $1
-             AND document_type = 'weekly_retro'
-             AND (properties->>'person_id') = $2
-             AND (properties->>'week_number')::int = $3
-             AND archived_at IS NULL
-             AND deleted_at IS NULL
-           LIMIT 1`,
-          [workspaceId, personId, previousWeekNumber]
-        )
-        : Promise.resolve({ rows: [] }),
       pool.query(
         `SELECT id, title, properties, created_at, updated_at
          FROM documents
@@ -647,30 +626,40 @@ router.get('/my-week', authMiddleware, async (req: Request, res: Response) => {
       ),
     ]));
 
-    const plan = planResult.rows.length > 0
+    const currentPlanRow = weeklyDocsResult.rows.find((row) =>
+      row.document_type === 'weekly_plan' && Number(row.properties?.week_number) === targetWeekNumber
+    );
+    const currentRetroRow = weeklyDocsResult.rows.find((row) =>
+      row.document_type === 'weekly_retro' && Number(row.properties?.week_number) === targetWeekNumber
+    );
+    const previousRetroRow = weeklyDocsResult.rows.find((row) =>
+      row.document_type === 'weekly_retro' && Number(row.properties?.week_number) === previousWeekNumber
+    );
+
+    const plan = currentPlanRow
       ? {
-        id: planResult.rows[0].id,
-        title: planResult.rows[0].title,
-        submitted_at: planResult.rows[0].properties?.submitted_at || null,
-        items: extractPlanItems(planResult.rows[0].content),
+        id: currentPlanRow.id,
+        title: currentPlanRow.title,
+        submitted_at: currentPlanRow.properties?.submitted_at || null,
+        items: extractPlanItems(currentPlanRow.content),
       }
       : null;
 
-    const retro = retroResult.rows.length > 0
+    const retro = currentRetroRow
       ? {
-        id: retroResult.rows[0].id,
-        title: retroResult.rows[0].title,
-        submitted_at: retroResult.rows[0].properties?.submitted_at || null,
-        items: extractPlanItems(retroResult.rows[0].content),
+        id: currentRetroRow.id,
+        title: currentRetroRow.title,
+        submitted_at: currentRetroRow.properties?.submitted_at || null,
+        items: extractPlanItems(currentRetroRow.content),
       }
       : null;
 
     const previousRetro = previousWeekNumber > 0
-      ? (previousRetroResult.rows.length > 0
+      ? (previousRetroRow
         ? {
-          id: previousRetroResult.rows[0].id,
-          title: previousRetroResult.rows[0].title,
-          submitted_at: previousRetroResult.rows[0].properties?.submitted_at || null,
+          id: previousRetroRow.id,
+          title: previousRetroRow.title,
+          submitted_at: previousRetroRow.properties?.submitted_at || null,
           week_number: previousWeekNumber,
         }
         : { id: null, title: null, submitted_at: null, week_number: previousWeekNumber })

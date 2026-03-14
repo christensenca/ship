@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="500" viewBox="0 0 1100 500">
+  <rect width="100%" height="100%" fill="white" />
+  <text x="72" y="34" font-family="ui-sans-serif, system-ui, sans-serif" font-size="28" font-weight="700" fill="#111827">DB Efficiency: User Flow Total DB Time</text>
+  <g transform="translate(72, 76)">
+    
+    <g font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#111827">
+      <rect x="0" y="0" width="12" height="12" rx="2" fill="#9ca3af" />
+      <text x="18" y="10">Baseline</text>
+      <rect x="96" y="0" width="12" height="12" rx="2" fill="#2563eb" />
+      <text x="114" y="10">Current</text>
+    </g>
+  
+  </g>
+  <line x1="72" y1="380" x2="1052" y2="380" stroke="#6b7280" />
+  
+      <line x1="72" y1="380" x2="1052" y2="380" stroke="#e5e7eb" />
+      <text x="62" y="384" text-anchor="end" font-size="12" fill="#6b7280">0</text>
+    
+      <line x1="72" y1="328.4" x2="1052" y2="328.4" stroke="#e5e7eb" />
+      <text x="62" y="332.4" text-anchor="end" font-size="12" fill="#6b7280">7.84</text>
+    
+      <line x1="72" y1="276.8" x2="1052" y2="276.8" stroke="#e5e7eb" />
+      <text x="62" y="280.8" text-anchor="end" font-size="12" fill="#6b7280">15.68</text>
+    
+      <line x1="72" y1="225.2" x2="1052" y2="225.2" stroke="#e5e7eb" />
+      <text x="62" y="229.2" text-anchor="end" font-size="12" fill="#6b7280">23.53</text>
+    
+      <line x1="72" y1="173.6" x2="1052" y2="173.6" stroke="#e5e7eb" />
+      <text x="62" y="177.6" text-anchor="end" font-size="12" fill="#6b7280">31.37</text>
+    
+      <line x1="72" y1="122" x2="1052" y2="122" stroke="#e5e7eb" />
+      <text x="62" y="126" text-anchor="end" font-size="12" fill="#6b7280">39.21</text>
+    
+  
+      <g font-family="ui-sans-serif, system-ui, sans-serif">
+        <rect x="92" y="122" width="74" height="258" rx="4" fill="#9ca3af" />
+        <rect x="174" y="221.68630451415459" width="74" height="158.31369548584541" rx="4" fill="#2563eb" />
+        <text x="129" y="114" text-anchor="middle" font-size="11" fill="#6b7280">39.21</text>
+        <text x="211" y="213.68630451415459" text-anchor="middle" font-size="11" fill="#6b7280">24.06</text>
+        <text x="170" y="404" text-anchor="middle" font-size="12" fill="#111827">Load main page</text>
+        <text x="170" y="424" text-anchor="middle" font-size="11" fill="#047857">-38.6%</text>
+      </g>
+    
+      <g font-family="ui-sans-serif, system-ui, sans-serif">
+        <rect x="288" y="205.82861514919665" width="74" height="174.17138485080335" rx="4" fill="#9ca3af" />
+        <rect x="370" y="251.8882938026014" width="74" height="128.1117061973986" rx="4" fill="#2563eb" />
+        <text x="325" y="197.82861514919665" text-anchor="middle" font-size="11" fill="#6b7280">26.47</text>
+        <text x="407" y="243.8882938026014" text-anchor="middle" font-size="11" fill="#6b7280">19.47</text>
+        <text x="366" y="404" text-anchor="middle" font-size="12" fill="#111827">View a document</text>
+        <text x="366" y="424" text-anchor="middle" font-size="11" fill="#047857">-26.4%</text>
+      </g>
+    
+      <g font-family="ui-sans-serif, system-ui, sans-serif">
+        <rect x="484" y="257.0864575363428" width="74" height="122.91354246365724" rx="4" fill="#9ca3af" />
+        <rect x="566" y="356.83856159143073" width="74" height="23.161438408569243" rx="4" fill="#2563eb" />
+        <text x="521" y="249.08645753634278" text-anchor="middle" font-size="11" fill="#6b7280">18.68</text>
+        <text x="603" y="348.83856159143073" text-anchor="middle" font-size="11" fill="#6b7280">3.52</text>
+        <text x="562" y="404" text-anchor="middle" font-size="12" fill="#111827">List issues</text>
+        <text x="562" y="424" text-anchor="middle" font-size="11" fill="#047857">-81.2%</text>
+      </g>
+    
+      <g font-family="ui-sans-serif, system-ui, sans-serif">
+        <rect x="680" y="320.0566182096404" width="74" height="59.943381790359595" rx="4" fill="#9ca3af" />
+        <rect x="762" y="328.8737566947207" width="74" height="51.12624330527926" rx="4" fill="#2563eb" />
+        <text x="717" y="312.0566182096404" text-anchor="middle" font-size="11" fill="#6b7280">9.11</text>
+        <text x="799" y="320.8737566947207" text-anchor="middle" font-size="11" fill="#6b7280">7.77</text>
+        <text x="758" y="404" text-anchor="middle" font-size="12" fill="#111827">Load sprint board</text>
+        <text x="758" y="424" text-anchor="middle" font-size="11" fill="#047857">-14.7%</text>
+      </g>
+    
+      <g font-family="ui-sans-serif, system-ui, sans-serif">
+        <rect x="876" y="367.6954858454476" width="74" height="12.304514154552411" rx="4" fill="#9ca3af" />
+        <rect x="958" y="368.2876817138485" width="74" height="11.712318286151493" rx="4" fill="#2563eb" />
+        <text x="913" y="359.6954858454476" text-anchor="middle" font-size="11" fill="#6b7280">1.87</text>
+        <text x="995" y="360.2876817138485" text-anchor="middle" font-size="11" fill="#6b7280">1.78</text>
+        <text x="954" y="404" text-anchor="middle" font-size="12" fill="#111827">Search content</text>
+        <text x="954" y="424" text-anchor="middle" font-size="11" fill="#047857">-4.8%</text>
+      </g>
+    
+</svg>

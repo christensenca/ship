@@ -1,0 +1,543 @@
+{
+  "generated_at": "2026-03-14T19:51:06.000Z",
+  "baseline": {
+    "label": "2026-03-12T-baseline-preopt",
+    "generated_at": "2026-03-12T15:25:30.786Z",
+    "path": "/Users/cadechristensen/Source/ship/reports/db-query-efficiency/snapshots/2026-03-12T-baseline-preopt.json"
+  },
+  "current": {
+    "label": "current",
+    "generated_at": "2026-03-14T19:50:37.594Z",
+    "path": "/Users/cadechristensen/Source/ship/reports/db-query-efficiency/latest.json"
+  },
+  "target": {
+    "metric": "slowest_query_ms",
+    "threshold_pct": -50,
+    "met": false
+  },
+  "flows": [
+    {
+      "flow": "Load main page",
+      "query_count": {
+        "label": "query_count",
+        "baseline": 9,
+        "current": 6,
+        "delta_ms": -3,
+        "delta_pct": -33.33333333333333
+      },
+      "total_db_time_ms": {
+        "label": "total_db_time_ms",
+        "baseline": 39.21,
+        "current": 24.06,
+        "delta_ms": -15.150000000000002,
+        "delta_pct": -38.638102524866106
+      },
+      "slowest_query_ms": {
+        "label": "slowest_query_ms",
+        "baseline": 9.18,
+        "current": 10.58,
+        "delta_ms": 1.4000000000000004,
+        "delta_pct": 15.250544662309373
+      }
+    },
+    {
+      "flow": "View a document",
+      "query_count": {
+        "label": "query_count",
+        "baseline": 24,
+        "current": 24,
+        "delta_ms": 0,
+        "delta_pct": 0
+      },
+      "total_db_time_ms": {
+        "label": "total_db_time_ms",
+        "baseline": 26.47,
+        "current": 19.47,
+        "delta_ms": -7,
+        "delta_pct": -26.445032111824705
+      },
+      "slowest_query_ms": {
+        "label": "slowest_query_ms",
+        "baseline": 4.32,
+        "current": 3.78,
+        "delta_ms": -0.5400000000000005,
+        "delta_pct": -12.50000000000001
+      }
+    },
+    {
+      "flow": "List issues",
+      "query_count": {
+        "label": "query_count",
+        "baseline": 4,
+        "current": 4,
+        "delta_ms": 0,
+        "delta_pct": 0
+      },
+      "total_db_time_ms": {
+        "label": "total_db_time_ms",
+        "baseline": 18.68,
+        "current": 3.52,
+        "delta_ms": -15.16,
+        "delta_pct": -81.15631691648822
+      },
+      "slowest_query_ms": {
+        "label": "slowest_query_ms",
+        "baseline": 15.93,
+        "current": 1.75,
+        "delta_ms": -14.18,
+        "delta_pct": -89.01443816698054
+      }
+    },
+    {
+      "flow": "Load sprint board",
+      "query_count": {
+        "label": "query_count",
+        "baseline": 17,
+        "current": 17,
+        "delta_ms": 0,
+        "delta_pct": 0
+      },
+      "total_db_time_ms": {
+        "label": "total_db_time_ms",
+        "baseline": 9.11,
+        "current": 7.77,
+        "delta_ms": -1.3399999999999999,
+        "delta_pct": -14.709110867178923
+      },
+      "slowest_query_ms": {
+        "label": "slowest_query_ms",
+        "baseline": 1.69,
+        "current": 1.63,
+        "delta_ms": -0.06000000000000005,
+        "delta_pct": -3.550295857988169
+      }
+    },
+    {
+      "flow": "Search content",
+      "query_count": {
+        "label": "query_count",
+        "baseline": 5,
+        "current": 5,
+        "delta_ms": 0,
+        "delta_pct": 0
+      },
+      "total_db_time_ms": {
+        "label": "total_db_time_ms",
+        "baseline": 1.87,
+        "current": 1.78,
+        "delta_ms": -0.09000000000000008,
+        "delta_pct": -4.812834224598935
+      },
+      "slowest_query_ms": {
+        "label": "slowest_query_ms",
+        "baseline": 0.57,
+        "current": 0.63,
+        "delta_ms": 0.06000000000000005,
+        "delta_pct": 10.526315789473696
+      }
+    }
+  ],
+  "requests": [
+    {
+      "flow": "Load main page",
+      "request_label": "dashboard data",
+      "path": "/api/dashboard/my-week",
+      "db_time_ms": {
+        "label": "db_time_ms",
+        "baseline": 39.21,
+        "current": 24.060000000000002,
+        "delta_ms": -15.149999999999999,
+        "delta_pct": -38.6381025248661
+      },
+      "slowest_query_ms": {
+        "label": "slowest_query_ms",
+        "baseline": 9.18,
+        "current": 10.58,
+        "delta_ms": 1.4000000000000004,
+        "delta_pct": 15.250544662309373
+      }
+    },
+    {
+      "flow": "View a document",
+      "request_label": "document",
+      "path": "/api/documents/db4c952d-0abb-4271-912c-6c67ec62b6ed",
+      "db_time_ms": {
+        "label": "db_time_ms",
+        "baseline": 4.699999999999999,
+        "current": 3.9099999999999997,
+        "delta_ms": -0.7899999999999996,
+        "delta_pct": -16.808510638297864
+      },
+      "slowest_query_ms": {
+        "label": "slowest_query_ms",
+        "baseline": 1.79,
+        "current": 1.61,
+        "delta_ms": -0.17999999999999994,
+        "delta_pct": -10.055865921787706
+      }
+    },
+    {
+      "flow": "View a document",
+      "request_label": "document context",
+      "path": "/api/documents/db4c952d-0abb-4271-912c-6c67ec62b6ed/context",
+      "db_time_ms": {
+        "label": "db_time_ms",
+        "baseline": 6.98,
+        "current": 5.66,
+        "delta_ms": -1.3200000000000003,
+        "delta_pct": -18.91117478510029
+      },
+      "slowest_query_ms": {
+        "label": "slowest_query_ms",
+        "baseline": 1.92,
+        "current": 1.37,
+        "delta_ms": -0.5499999999999998,
+        "delta_pct": -28.645833333333325
+      }
+    },
+    {
+      "flow": "View a document",
+      "request_label": "document comments",
+      "path": "/api/documents/db4c952d-0abb-4271-912c-6c67ec62b6ed/comments",
+      "db_time_ms": {
+        "label": "db_time_ms",
+        "baseline": 2.81,
+        "current": 1.24,
+        "delta_ms": -1.57,
+        "delta_pct": -55.871886120996436
+      },
+      "slowest_query_ms": {
+        "label": "slowest_query_ms",
+        "baseline": 1.8,
+        "current": 0.57,
+        "delta_ms": -1.23,
+        "delta_pct": -68.33333333333333
+      }
+    },
+    {
+      "flow": "View a document",
+      "request_label": "team members",
+      "path": "/api/team/people",
+      "db_time_ms": {
+        "label": "db_time_ms",
+        "baseline": 2.95,
+        "current": 1.4100000000000001,
+        "delta_ms": -1.54,
+        "delta_pct": -52.20338983050847
+      },
+      "slowest_query_ms": {
+        "label": "slowest_query_ms",
+        "baseline": 1.42,
+        "current": 0.59,
+        "delta_ms": -0.83,
+        "delta_pct": -58.45070422535211
+      }
+    },
+    {
+      "flow": "View a document",
+      "request_label": "programs",
+      "path": "/api/programs",
+      "db_time_ms": {
+        "label": "db_time_ms",
+        "baseline": 3.83,
+        "current": 2.4699999999999998,
+        "delta_ms": -1.3600000000000003,
+        "delta_pct": -35.50913838120105
+      },
+      "slowest_query_ms": {
+        "label": "slowest_query_ms",
+        "baseline": 2.79,
+        "current": 1.91,
+        "delta_ms": -0.8800000000000001,
+        "delta_pct": -31.541218637992834
+      }
+    },
+    {
+      "flow": "View a document",
+      "request_label": "projects",
+      "path": "/api/projects",
+      "db_time_ms": {
+        "label": "db_time_ms",
+        "baseline": 5.2,
+        "current": 4.779999999999999,
+        "delta_ms": -0.4200000000000008,
+        "delta_pct": -8.076923076923093
+      },
+      "slowest_query_ms": {
+        "label": "slowest_query_ms",
+        "baseline": 4.32,
+        "current": 3.78,
+        "delta_ms": -0.5400000000000005,
+        "delta_pct": -12.50000000000001
+      }
+    },
+    {
+      "flow": "List issues",
+      "request_label": "issues",
+      "path": "/api/issues",
+      "db_time_ms": {
+        "label": "db_time_ms",
+        "baseline": 18.68,
+        "current": 3.52,
+        "delta_ms": -15.16,
+        "delta_pct": -81.15631691648822
+      },
+      "slowest_query_ms": {
+        "label": "slowest_query_ms",
+        "baseline": 15.93,
+        "current": 1.75,
+        "delta_ms": -14.18,
+        "delta_pct": -89.01443816698054
+      }
+    },
+    {
+      "flow": "Load sprint board",
+      "request_label": "team grid",
+      "path": "/api/team/grid",
+      "db_time_ms": {
+        "label": "db_time_ms",
+        "baseline": 3.9899999999999998,
+        "current": 2.94,
+        "delta_ms": -1.0499999999999998,
+        "delta_pct": -26.31578947368421
+      },
+      "slowest_query_ms": {
+        "label": "slowest_query_ms",
+        "baseline": 1.04,
+        "current": 0.99,
+        "delta_ms": -0.050000000000000044,
+        "delta_pct": -4.807692307692312
+      }
+    },
+    {
+      "flow": "Load sprint board",
+      "request_label": "team projects",
+      "path": "/api/team/projects",
+      "db_time_ms": {
+        "label": "db_time_ms",
+        "baseline": 1.52,
+        "current": 1.26,
+        "delta_ms": -0.26,
+        "delta_pct": -17.105263157894736
+      },
+      "slowest_query_ms": {
+        "label": "slowest_query_ms",
+        "baseline": 0.53,
+        "current": 0.52,
+        "delta_ms": -0.010000000000000009,
+        "delta_pct": -1.8867924528301903
+      }
+    },
+    {
+      "flow": "Load sprint board",
+      "request_label": "team assignments",
+      "path": "/api/team/assignments",
+      "db_time_ms": {
+        "label": "db_time_ms",
+        "baseline": 3.5999999999999996,
+        "current": 3.57,
+        "delta_ms": -0.029999999999999805,
+        "delta_pct": -0.8333333333333279
+      },
+      "slowest_query_ms": {
+        "label": "slowest_query_ms",
+        "baseline": 1.69,
+        "current": 1.63,
+        "delta_ms": -0.06000000000000005,
+        "delta_pct": -3.550295857988169
+      }
+    },
+    {
+      "flow": "Search content",
+      "request_label": "mentions",
+      "path": "/api/search/mentions?q=Standup",
+      "db_time_ms": {
+        "label": "db_time_ms",
+        "baseline": 1.8699999999999999,
+        "current": 1.7799999999999998,
+        "delta_ms": -0.09000000000000008,
+        "delta_pct": -4.8128342245989355
+      },
+      "slowest_query_ms": {
+        "label": "slowest_query_ms",
+        "baseline": 0.57,
+        "current": 0.63,
+        "delta_ms": 0.06000000000000005,
+        "delta_pct": 10.526315789473696
+      }
+    }
+  ],
+  "affected_requests": [
+    {
+      "request_label": "programs",
+      "path": "/api/programs",
+      "db_time_ms": {
+        "label": "db_time_ms",
+        "baseline": 3.83,
+        "current": 2.4699999999999998,
+        "delta_ms": -1.3600000000000003,
+        "delta_pct": -35.50913838120105
+      },
+      "slowest_query_ms": {
+        "label": "slowest_query_ms",
+        "baseline": 2.79,
+        "current": 1.91,
+        "delta_ms": -0.8800000000000001,
+        "delta_pct": -31.541218637992834
+      },
+      "baseline_query": {
+        "sql_summary": "SELECT d.id, d.title, d.properties, d.archived_at, d.created_at, d.updated_at, COALESCE((d.properties->>'owner_id')::uuid, d.created_by) as owner_id, u.name as owner_name, u.ema...",
+        "observed_duration_ms": 2.79,
+        "explain_total_time_ms": 0.71,
+        "plan_summary": [
+          "Sort (0.5ms, 8 rows)",
+          "  Hash Join (0.49ms, 8 rows)",
+          "    Seq Scan (0ms, 24 rows)",
+          "    Hash (0.04ms, 8 rows)",
+          "      Index Scan (0.04ms, 8 rows)",
+          "    Aggregate (0.03ms, 1 rows)",
+          "      Nested Loop (0.03ms, 20 rows)",
+          "        Bitmap Heap Scan (0.01ms, 26 rows)",
+          "          Bitmap Index Scan (0ms, 26 rows)",
+          "        Memoize (0ms, 1 rows)",
+          "          Index Scan (0ms, 1 rows)",
+          "    Aggregate (0.03ms, 1 rows)",
+          "      Nested Loop (0.02ms, 3 rows)",
+          "        Bitmap Heap Scan (0.01ms, 26 rows)",
+          "          Bitmap Index Scan (0ms, 26 rows)",
+          "        Memoize (0ms, 0 rows)",
+          "          Index Scan (0ms, 0 rows)"
+        ]
+      },
+      "current_query": {
+        "sql_summary": "WITH program_issue_counts AS ( SELECT da.related_id AS program_id, COUNT(*)::int AS issue_count FROM document_associations da JOIN documents i ON i.id = da.document_id WHERE da....",
+        "observed_duration_ms": 1.91,
+        "explain_total_time_ms": 0.46,
+        "plan_summary": [
+          "Sort (0.23ms, 8 rows)",
+          "  Hash Join (0.23ms, 8 rows)",
+          "    Hash Join (0.15ms, 8 rows)",
+          "      Hash Join (0.02ms, 8 rows)",
+          "        Bitmap Heap Scan (0ms, 8 rows)",
+          "          Bitmap Index Scan (0ms, 13 rows)",
+          "        Hash (0.01ms, 35 rows)",
+          "          Seq Scan (0ms, 35 rows)",
+          "      Hash (0.13ms, 13 rows)",
+          "        Subquery Scan (0.13ms, 13 rows)",
+          "          Aggregate (0.13ms, 13 rows)",
+          "            Hash Join (0.11ms, 264 rows)",
+          "              Seq Scan (0.04ms, 362 rows)",
+          "              Hash (0.04ms, 264 rows)",
+          "                Bitmap Heap Scan (0.03ms, 264 rows)",
+          "                  Bitmap Index Scan (0ms, 264 rows)",
+          "    Hash (0.08ms, 13 rows)",
+          "      Subquery Scan (0.07ms, 13 rows)",
+          "        Aggregate (0.07ms, 13 rows)",
+          "          Sort (0.07ms, 59 rows)",
+          "            Hash Join (0.06ms, 59 rows)",
+          "              Seq Scan (0.03ms, 362 rows)",
+          "              Hash (0.01ms, 59 rows)",
+          "                Bitmap Heap Scan (0.01ms, 59 rows)",
+          "                  Bitmap Index Scan (0ms, 59 rows)"
+        ]
+      }
+    },
+    {
+      "request_label": "projects",
+      "path": "/api/projects",
+      "db_time_ms": {
+        "label": "db_time_ms",
+        "baseline": 5.2,
+        "current": 4.779999999999999,
+        "delta_ms": -0.4200000000000008,
+        "delta_pct": -8.076923076923093
+      },
+      "slowest_query_ms": {
+        "label": "slowest_query_ms",
+        "baseline": 4.32,
+        "current": 3.78,
+        "delta_ms": -0.5400000000000005,
+        "delta_pct": -12.50000000000001
+      },
+      "baseline_query": {
+        "sql_summary": "SELECT d.id, d.title, d.properties, prog_da.related_id as program_id, d.archived_at, d.created_at, d.updated_at, d.converted_from_id, (d.properties->>'owner_id')::uuid as owner_...",
+        "observed_duration_ms": 4.32,
+        "explain_total_time_ms": 1.27,
+        "plan_summary": [
+          "Sort (0.94ms, 24 rows)",
+          "  Hash Join (0.93ms, 24 rows)",
+          "    Nested Loop (0.1ms, 24 rows)",
+          "      Index Scan (0.05ms, 24 rows)",
+          "      Index Scan (0ms, 1 rows)",
+          "    Hash (0.02ms, 24 rows)",
+          "      Seq Scan (0ms, 24 rows)",
+          "    Aggregate (0.01ms, 1 rows)",
+          "      Nested Loop (0.01ms, 1 rows)",
+          "        Bitmap Heap Scan (0ms, 8 rows)",
+          "          Bitmap Index Scan (0ms, 8 rows)",
+          "        Memoize (0ms, 0 rows)",
+          "          Index Scan (0ms, 0 rows)",
+          "    Aggregate (0.01ms, 1 rows)",
+          "      Nested Loop (0.01ms, 7 rows)",
+          "        Bitmap Heap Scan (0ms, 8 rows)",
+          "          Bitmap Index Scan (0ms, 8 rows)",
+          "        Memoize (0ms, 1 rows)",
+          "          Index Scan (0ms, 1 rows)",
+          "    Aggregate (0.01ms, 1 rows)",
+          "      Nested Loop (0.01ms, 1 rows)",
+          "        Bitmap Heap Scan (0.01ms, 1 rows)",
+          "          Bitmap Index Scan (0ms, 24 rows)",
+          "        Seq Scan (0ms, 1 rows)"
+        ]
+      },
+      "current_query": {
+        "sql_summary": "WITH project_sprint_counts AS ( SELECT da.related_id AS project_id, COUNT(*)::int AS sprint_count FROM document_associations da JOIN documents s ON s.id = da.document_id WHERE d...",
+        "observed_duration_ms": 3.78,
+        "explain_total_time_ms": 1.42,
+        "plan_summary": [
+          "Sort (0.69ms, 24 rows)",
+          "  Hash Join (0.68ms, 24 rows)",
+          "    Hash Join (0.54ms, 24 rows)",
+          "      Hash Join (0.32ms, 24 rows)",
+          "        Hash Join (0.14ms, 24 rows)",
+          "          Hash Join (0.11ms, 24 rows)",
+          "            Seq Scan (0.05ms, 362 rows)",
+          "            Hash (0.02ms, 24 rows)",
+          "              Bitmap Heap Scan (0.02ms, 24 rows)",
+          "                Bitmap Index Scan (0.01ms, 39 rows)",
+          "          Hash (0.01ms, 35 rows)",
+          "            Seq Scan (0.01ms, 35 rows)",
+          "        Hash (0.17ms, 39 rows)",
+          "          Subquery Scan (0.16ms, 39 rows)",
+          "            Aggregate (0.16ms, 39 rows)",
+          "              Sort (0.14ms, 59 rows)",
+          "                Hash Join (0.1ms, 59 rows)",
+          "                  Bitmap Heap Scan (0.04ms, 323 rows)",
+          "                    Bitmap Index Scan (0.01ms, 323 rows)",
+          "                  Hash (0.03ms, 59 rows)",
+          "                    Bitmap Heap Scan (0.02ms, 59 rows)",
+          "                      Bitmap Index Scan (0.01ms, 59 rows)",
+          "      Hash (0.22ms, 39 rows)",
+          "        Subquery Scan (0.21ms, 39 rows)",
+          "          Aggregate (0.21ms, 39 rows)",
+          "            Hash Join (0.17ms, 264 rows)",
+          "              Bitmap Heap Scan (0.04ms, 323 rows)",
+          "                Bitmap Index Scan (0.01ms, 323 rows)",
+          "              Hash (0.07ms, 264 rows)",
+          "                Bitmap Heap Scan (0.04ms, 264 rows)",
+          "                  Bitmap Index Scan (0.01ms, 264 rows)",
+          "    Hash (0.12ms, 24 rows)",
+          "      Subquery Scan (0.11ms, 24 rows)",
+          "        Aggregate (0.11ms, 24 rows)",
+          "          Sort (0.1ms, 24 rows)",
+          "            Nested Loop (0.07ms, 24 rows)",
+          "              Seq Scan (0ms, 1 rows)",
+          "              Bitmap Heap Scan (0.06ms, 24 rows)",
+          "                BitmapAnd (0.04ms, 0 rows)",
+          "                  Bitmap Index Scan (0.01ms, 59 rows)",
+          "                  Bitmap Index Scan (0.02ms, 120 rows)"
+        ]
+      }
+    }
+  ]
+}
