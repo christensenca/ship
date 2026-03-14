@@ -31,7 +31,9 @@ export function buildDocumentTree(documents: WikiDocument[]): DocumentTreeNode[]
   // Sort by position, then by created_at descending
   const sortNodes = (a: DocumentTreeNode, b: DocumentTreeNode) => {
     if (a.position !== b.position) return a.position - b.position;
-    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    const aCreatedAt = a.created_at ? new Date(a.created_at).getTime() : 0;
+    const bCreatedAt = b.created_at ? new Date(b.created_at).getTime() : 0;
+    return bCreatedAt - aCreatedAt;
   };
 
   rootNodes.sort(sortNodes);

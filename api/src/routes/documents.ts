@@ -13,16 +13,15 @@ const router: RouterType = Router();
 
 type DocumentListRow = {
   id: string;
-  workspace_id: string;
   document_type: string;
   title: string;
   parent_id: string | null;
   position: number;
   ticket_number?: number | null;
   properties?: Record<string, unknown> | null;
-  created_at: string;
-  updated_at: string;
-  created_by: string | null;
+  created_at?: string;
+  updated_at?: string;
+  created_by?: string | null;
   visibility: 'private' | 'workspace';
 };
 
@@ -109,18 +108,21 @@ const updateDocumentSchema = z.object({
 // List documents
 router.get('/', authMiddleware, async (req: Request, res: Response) => {
   try {
-    const { type, parent_id } = req.query;
+    const { type, parent_id, view } = req.query;
     const userId = req.userId!;
     const workspaceId = req.workspaceId!;
     const requestedType = typeof type === 'string' ? type : null;
     const isWikiList = requestedType === 'wiki';
+    const isWikiTreeView = isWikiList && view === 'tree';
 
     const { isAdmin } = await resolveVisibilityContextFromRequest(req, userId, workspaceId);
 
     let query = `
-      SELECT id, workspace_id, document_type, title, parent_id, position,
+      SELECT id, document_type, title, parent_id, position,
              ${isWikiList ? '' : 'ticket_number, properties,'}
-             created_at, updated_at, created_by, visibility
+             created_at,
+             ${isWikiTreeView ? '' : 'updated_at, created_by,'}
+             visibility
       FROM documents
       WHERE workspace_id = $1
         AND archived_at IS NULL

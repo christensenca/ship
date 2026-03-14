@@ -164,6 +164,62 @@ describe('Issues API', () => {
       expect(hasSprintIssue).toBe(true)
     })
 
+    it('should filter issues by project_id on the API', async () => {
+      const projectIssueResult = await pool.query(
+        `INSERT INTO documents (workspace_id, document_type, title, visibility, created_by, properties)
+         VALUES ($1, 'issue', 'Project Filter Issue', 'workspace', $2, $3)
+         RETURNING id`,
+        [testWorkspaceId, testUserId, JSON.stringify({ state: 'backlog', priority: 'medium' })]
+      )
+      const projectIssueId = projectIssueResult.rows[0].id
+
+      const otherIssueResult = await pool.query(
+        `INSERT INTO documents (workspace_id, document_type, title, visibility, created_by, properties)
+         VALUES ($1, 'issue', 'Other Project Issue', 'workspace', $2, $3)
+         RETURNING id`,
+        [testWorkspaceId, testUserId, JSON.stringify({ state: 'backlog', priority: 'medium' })]
+      )
+      const otherIssueId = otherIssueResult.rows[0].id
+
+      await pool.query(
+        `INSERT INTO document_associations (document_id, related_id, relationship_type)
+         VALUES ($1, $2, 'project')`,
+        [projectIssueId, testProjectId]
+      )
+
+      const res = await request(app)
+        .get(`/api/issues?project_id=${testProjectId}`)
+        .set('Cookie', sessionCookie)
+
+      expect(res.status).toBe(200)
+      expect(res.body.some((i: { id: string }) => i.id === projectIssueId)).toBe(true)
+      expect(res.body.some((i: { id: string }) => i.id === otherIssueId)).toBe(false)
+    })
+
+    it('should emit benchmark timing phases for issues list responses', async () => {
+      const previousBenchmark = process.env.API_BENCHMARK
+      process.env.API_BENCHMARK = '1'
+
+      try {
+        const res = await request(app)
+          .get('/api/issues')
+          .set('Cookie', sessionCookie)
+
+        expect(res.status).toBe(200)
+        expect(res.headers['server-timing']).toContain('auth_session')
+        expect(res.headers['server-timing']).toContain('db_main')
+        expect(res.headers['server-timing']).toContain('db_related')
+        expect(res.headers['server-timing']).toContain('serialize')
+        expect(res.headers['server-timing']).toContain('total')
+      } finally {
+        if (previousBenchmark === undefined) {
+          delete process.env.API_BENCHMARK
+        } else {
+          process.env.API_BENCHMARK = previousBenchmark
+        }
+      }
+    })
+
     it('should reject unauthenticated request', async () => {
       const res = await request(app)
         .get('/api/issues')

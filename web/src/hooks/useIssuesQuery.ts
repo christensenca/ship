@@ -178,8 +178,8 @@ function transformIssue(apiIssue: ApiIssueShape): Issue {
 async function fetchIssues(filters?: IssueFilters): Promise<Issue[]> {
   const params = new URLSearchParams();
   if (filters?.programId) params.append('program_id', filters.programId);
+  if (filters?.projectId) params.append('project_id', filters.projectId);
   if (filters?.sprintId) params.append('sprint_id', filters.sprintId);
-  // Note: projectId filtering is done client-side via belongs_to array
 
   const queryString = params.toString();
   const url = queryString ? `/api/issues?${queryString}` : '/api/issues';
@@ -189,17 +189,7 @@ async function fetchIssues(filters?: IssueFilters): Promise<Issue[]> {
     throw createApiError('Failed to fetch issues', res.status);
   }
   const data: ApiIssueShape[] = await res.json();
-  let issues = data.map(transformIssue);
-
-  // Client-side filter for projectId (API doesn't support direct project_id param)
-  if (filters?.projectId) {
-    issues = issues.filter((issue: Issue): boolean => {
-      const projectAssoc = issue.belongs_to?.find((a: BelongsTo): boolean => a.type === 'project');
-      return projectAssoc?.id === filters.projectId;
-    });
-  }
-
-  return issues;
+  return data.map(transformIssue);
 }
 
 // Create issue

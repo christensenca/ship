@@ -1,6 +1,7 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useDocuments, WikiDocument } from '@/contexts/DocumentsContext';
+import { useDocumentsQuery } from '@/hooks/useDocumentsQuery';
 import { buildDocumentTree } from '@/lib/documentTree';
 import { DocumentTreeItem } from '@/components/DocumentTreeItem';
 import { DocumentsListSkeleton } from '@/components/ui/Skeleton';
@@ -36,7 +37,8 @@ const COLUMN_VISIBILITY_KEY = 'documents-column-visibility';
 type VisibilityFilter = 'all' | 'workspace' | 'private';
 
 export function DocumentsPage(): React.JSX.Element {
-  const { documents, loading, createDocument, deleteDocument } = useDocuments();
+  const { createDocument, deleteDocument } = useDocuments();
+  const { data: documents = [], isLoading: loading } = useDocumentsQuery('wiki', 'full');
   const [creating, setCreating] = useState(false);
   const [search, setSearch] = useState('');
   const [searchParams, setSearchParams] = useSearchParams();

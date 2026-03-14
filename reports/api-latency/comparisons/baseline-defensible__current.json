@@ -1,0 +1,174 @@
+{
+  "generated_at": "2026-03-14T18:01:07.824Z",
+  "baseline": {
+    "label": "baseline-defensible",
+    "generated_at": "2026-03-11T23:59:00.279Z",
+    "path": "/Users/cadechristensen/Source/ship/reports/api-latency/snapshots/2026-03-11T23-59-00-279Z--baseline-defensible.json"
+  },
+  "current": {
+    "label": "current",
+    "generated_at": "2026-03-14T17:40:33.349Z",
+    "path": "/Users/cadechristensen/Source/ship/reports/api-latency/snapshots/2026-03-14T17-40-33-349Z--current.json"
+  },
+  "gate": {
+    "metric": "p95_ms",
+    "concurrency": 25,
+    "threshold_pct": -20
+  },
+  "c25": [
+    {
+      "path": "/api/documents?type=wiki",
+      "p95_ms": {
+        "label": "p95_ms",
+        "baseline": 57,
+        "current": 38,
+        "delta_ms": -19,
+        "delta_pct": -33.33333333333333
+      },
+      "p99_ms": {
+        "label": "p99_ms",
+        "baseline": 60,
+        "current": 40,
+        "delta_ms": -20,
+        "delta_pct": -33.33333333333333
+      }
+    },
+    {
+      "path": "/api/issues",
+      "p95_ms": {
+        "label": "p95_ms",
+        "baseline": 54,
+        "current": 40,
+        "delta_ms": -14,
+        "delta_pct": -25.925925925925924
+      },
+      "p99_ms": {
+        "label": "p99_ms",
+        "baseline": 57,
+        "current": 43,
+        "delta_ms": -14,
+        "delta_pct": -24.561403508771928
+      }
+    },
+    {
+      "path": "/api/projects",
+      "p95_ms": {
+        "label": "p95_ms",
+        "baseline": 32,
+        "current": 16,
+        "delta_ms": -16,
+        "delta_pct": -50
+      },
+      "p99_ms": {
+        "label": "p99_ms",
+        "baseline": 37,
+        "current": 18,
+        "delta_ms": -19,
+        "delta_pct": -51.35135135135135
+      }
+    },
+    {
+      "path": "/api/programs",
+      "p95_ms": {
+        "label": "p95_ms",
+        "baseline": 24,
+        "current": 9,
+        "delta_ms": -15,
+        "delta_pct": -62.5
+      },
+      "p99_ms": {
+        "label": "p99_ms",
+        "baseline": 30,
+        "current": 11,
+        "delta_ms": -19,
+        "delta_pct": -63.33333333333333
+      }
+    },
+    {
+      "path": "/api/dashboard/my-week",
+      "p95_ms": {
+        "label": "p95_ms",
+        "baseline": 39,
+        "current": 23,
+        "delta_ms": -16,
+        "delta_pct": -41.02564102564102
+      },
+      "p99_ms": {
+        "label": "p99_ms",
+        "baseline": 42,
+        "current": 25,
+        "delta_ms": -17,
+        "delta_pct": -40.476190476190474
+      }
+    }
+  ],
+  "docs_and_issues_by_concurrency": [
+    {
+      "path": "/api/documents?type=wiki",
+      "concurrency": 10,
+      "p95_ms": {
+        "label": "p95_ms",
+        "baseline": 27,
+        "current": 19,
+        "delta_ms": -8,
+        "delta_pct": -29.629629629629626
+      }
+    },
+    {
+      "path": "/api/documents?type=wiki",
+      "concurrency": 25,
+      "p95_ms": {
+        "label": "p95_ms",
+        "baseline": 57,
+        "current": 38,
+        "delta_ms": -19,
+        "delta_pct": -33.33333333333333
+      }
+    },
+    {
+      "path": "/api/documents?type=wiki",
+      "concurrency": 50,
+      "p95_ms": {
+        "label": "p95_ms",
+        "baseline": 114,
+        "current": 71,
+        "delta_ms": -43,
+        "delta_pct": -37.719298245614034
+      }
+    },
+    {
+      "path": "/api/issues",
+      "concurrency": 10,
+      "p95_ms": {
+        "label": "p95_ms",
+        "baseline": 25,
+        "current": 19,
+        "delta_ms": -6,
+        "delta_pct": -24
+      }
+    },
+    {
+      "path": "/api/issues",
+      "concurrency": 25,
+      "p95_ms": {
+        "label": "p95_ms",
+        "baseline": 54,
+        "current": 40,
+        "delta_ms": -14,
+        "delta_pct": -25.925925925925924
+      }
+    },
+    {
+      "path": "/api/issues",
+      "concurrency": 50,
+      "p95_ms": {
+        "label": "p95_ms",
+        "baseline": 123,
+        "current": 75,
+        "delta_ms": -48,
+        "delta_pct": -39.02439024390244
+      }
+    }
+  ],
+  "phase_breakdowns": []
+}

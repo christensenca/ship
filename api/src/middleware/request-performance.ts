@@ -76,6 +76,34 @@ function buildServerTimingHeader(req: Request): string | null {
   return entries.join(', ');
 }
 
+function escapeJsonString(json: string): string {
+  return json.replace(/[<>&]/g, (char) => {
+    switch (char) {
+      case '<':
+        return '\\u003c';
+      case '>':
+        return '\\u003e';
+      case '&':
+        return '\\u0026';
+      default:
+        return char;
+    }
+  });
+}
+
+function stringifyJsonResponse(res: Response, body: unknown): string {
+  const replacer = res.app.get('json replacer');
+  const spaces = res.app.get('json spaces');
+  const shouldEscape = Boolean(res.app.get('json escape'));
+
+  let json = JSON.stringify(body, replacer, spaces);
+  if (json === undefined) {
+    json = 'null';
+  }
+
+  return shouldEscape ? escapeJsonString(json) : json;
+}
+
 export function requestPerformanceMiddleware(req: Request, res: Response, next: NextFunction): void {
   if (!isBenchmarkEnabled() || !req.path.startsWith('/api/')) {
     next();
@@ -85,19 +113,42 @@ export function requestPerformanceMiddleware(req: Request, res: Response, next: 
   req.perfPhases = new Map<string, number>();
   req.perfRequestStartMs = nowMs();
 
-  const originalJson = res.json.bind(res);
-  res.json = ((body: unknown) => (
-    measureRequestPerf(req, 'serialize', () => originalJson(body))
-  )) as Response['json'];
+  const originalSend = res.send.bind(res);
+  let serverTimingApplied = false;
 
-  const originalWriteHead = res.writeHead.bind(res);
-  res.writeHead = ((...args: Parameters<Response['writeHead']>) => {
+  const applyServerTiming = (): void => {
+    if (serverTimingApplied || res.headersSent) {
+      return;
+    }
+
     const header = buildServerTimingHeader(req);
     if (header) {
       res.setHeader('Server-Timing', header);
     }
+    serverTimingApplied = true;
+  };
+
+  res.json = ((body: unknown) => {
+    const contentType = res.getHeader('Content-Type');
+    if (typeof contentType !== 'string' || !contentType.toLowerCase().includes('application/json')) {
+      res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    }
+
+    const payload = measureRequestPerf(req, 'serialize', () => stringifyJsonResponse(res, body));
+    return originalSend(payload);
+  }) as Response['json'];
+
+  const originalWriteHead = res.writeHead.bind(res);
+  res.writeHead = ((...args: Parameters<Response['writeHead']>) => {
+    applyServerTiming();
     return originalWriteHead(...args);
   }) as Response['writeHead'];
+
+  const originalEnd = res.end.bind(res);
+  res.end = ((...args: Parameters<Response['end']>) => {
+    applyServerTiming();
+    return originalEnd(...args);
+  }) as Response['end'];
 
   next();
 }
