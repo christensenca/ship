@@ -56,7 +56,10 @@ playwright-report/
 test-results/
 
 # Test coverage HTML reports (Istanbul/Vitest - per-file coverage views)
-reports/test-coverage/
+reports/test-coverage/api-coverage/
+reports/test-coverage/web-coverage/
+reports/test-coverage/logs/
+reports/test-coverage/full-run.log
 web/coverage/
 api/coverage/
 *.ts.html
