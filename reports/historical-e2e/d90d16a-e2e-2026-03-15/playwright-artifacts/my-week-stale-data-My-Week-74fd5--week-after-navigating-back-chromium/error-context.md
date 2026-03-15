@@ -1,0 +1,111 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - link "Skip to main content" [ref=e4] [cursor=pointer]:
+    - /url: "#main-content"
+  - button "25 overdue accountability items need attention. 25 View items" [ref=e5] [cursor=pointer]:
+    - img [ref=e6]
+    - generic [ref=e8]: 25 overdue accountability items need attention.
+    - generic [ref=e9]: "25"
+    - generic [ref=e10]: View items
+  - generic [ref=e11]:
+    - navigation "Primary navigation" [ref=e12]:
+      - button "T" [ref=e14] [cursor=pointer]
+      - generic [ref=e15]:
+        - button "Dashboard" [ref=e16] [cursor=pointer]:
+          - img [ref=e17]
+        - button "Docs" [ref=e19] [cursor=pointer]:
+          - img [ref=e20]
+        - button "Programs" [ref=e22] [cursor=pointer]:
+          - img [ref=e23]
+        - button "Projects" [ref=e25] [cursor=pointer]:
+          - img [ref=e26]
+        - button "Teams (standup due)" [ref=e28] [cursor=pointer]:
+          - img [ref=e29]
+      - generic [ref=e32]:
+        - button "Settings" [ref=e33] [cursor=pointer]:
+          - img [ref=e34]
+        - button "D" [ref=e37] [cursor=pointer]
+    - complementary "Document list":
+      - generic [ref=e38]:
+        - generic [ref=e39]:
+          - heading "Dashboard" [level=2] [ref=e40]
+          - button "Collapse sidebar" [ref=e42] [cursor=pointer]:
+            - img [ref=e43]
+        - generic [ref=e46]:
+          - button "My Work" [ref=e47] [cursor=pointer]:
+            - img [ref=e48]
+            - text: My Work
+          - button "Overview" [ref=e50] [cursor=pointer]:
+            - img [ref=e51]
+            - text: Overview
+    - main [active] [ref=e53]:
+      - generic [ref=e54]:
+        - generic [ref=e55]:
+          - generic [ref=e56]:
+            - heading "Week 13" [level=1] [ref=e57]
+            - generic [ref=e58]: Current
+          - generic [ref=e59]:
+            - button "Previous week" [ref=e60] [cursor=pointer]:
+              - img [ref=e61]
+            - generic [ref=e63]: Mar 9 – Mar 15, 2026
+            - button "Next week" [ref=e64] [cursor=pointer]:
+              - img [ref=e65]
+        - generic [ref=e68]:
+          - generic [ref=e69]:
+            - heading "Assigned Projects" [level=2] [ref=e70]
+            - link "Ship Core Redesign Ship Core" [ref=e72] [cursor=pointer]:
+              - /url: /documents/91665027-42ab-4804-aee1-e7b713ff3399
+              - generic [ref=e73]: Ship Core Redesign
+              - generic [ref=e74]: Ship Core
+          - generic [ref=e76]:
+            - generic [ref=e77]:
+              - paragraph [ref=e78]: Last week's retro is not complete
+              - paragraph [ref=e79]: Week 12 retro needs your input
+            - button "Create retro" [ref=e80] [cursor=pointer]
+          - generic [ref=e81]:
+            - generic [ref=e82]:
+              - heading "Weekly Plan" [level=2] [ref=e83]
+              - link "Due today 1. Prepare API instrumentation rollout 2. Deliver onboarding support for new teammate" [ref=e84] [cursor=pointer]:
+                - /url: /documents/aa34496f-adad-4d64-afc8-556e61f377f7
+                - generic [ref=e85]: Due today
+                - generic [ref=e86]:
+                  - generic [ref=e87]:
+                    - generic [ref=e88]: "1."
+                    - generic [ref=e89]: Prepare API instrumentation rollout
+                  - generic [ref=e90]:
+                    - generic [ref=e91]: "2."
+                    - generic [ref=e92]: Deliver onboarding support for new teammate
+            - generic [ref=e93]:
+              - heading "Weekly Retro" [level=2] [ref=e94]
+              - link "Due today + Create retro for this week" [ref=e95] [cursor=pointer]:
+                - /url: /documents/0e12bc5f-dd1b-4dc1-92c4-e2075518ef9a
+                - generic [ref=e96]: Due today
+                - paragraph [ref=e97]: + Create retro for this week
+          - generic [ref=e98]:
+            - heading "Daily Updates" [level=2] [ref=e99]
+            - generic [ref=e100]:
+              - button "Mon3/9 + Write update" [ref=e101] [cursor=pointer]:
+                - generic [ref=e102]: Mon3/9
+                - generic [ref=e103]: + Write update
+              - button "Tue3/10 + Write update" [ref=e105] [cursor=pointer]:
+                - generic [ref=e106]: Tue3/10
+                - generic [ref=e107]: + Write update
+              - button "Wed3/11 + Write update" [ref=e109] [cursor=pointer]:
+                - generic [ref=e110]: Wed3/11
+                - generic [ref=e111]: + Write update
+              - button "Thu3/12 + Write update" [ref=e113] [cursor=pointer]:
+                - generic [ref=e114]: Thu3/12
+                - generic [ref=e115]: + Write update
+              - button "Fri3/13 + Write update" [ref=e117] [cursor=pointer]:
+                - generic [ref=e118]: Fri3/13
+                - generic [ref=e119]: + Write update
+              - button "Sat3/14 + Write update" [ref=e121] [cursor=pointer]:
+                - generic [ref=e122]: Sat3/14
+                - generic [ref=e123]: + Write update
+              - button "Sun3/15 + Write update" [ref=e125] [cursor=pointer]:
+                - generic [ref=e126]: Sun3/15
+                - generic [ref=e127]: + Write update
+    - complementary "Document properties"
+```

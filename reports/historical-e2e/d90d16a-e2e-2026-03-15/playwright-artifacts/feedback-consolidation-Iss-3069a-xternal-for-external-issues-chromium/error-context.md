@@ -1,0 +1,181 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - link "Skip to main content" [ref=e4] [cursor=pointer]:
+    - /url: "#main-content"
+  - button "27 overdue accountability items need attention. 27 View items" [ref=e5] [cursor=pointer]:
+    - img [ref=e6]
+    - generic [ref=e8]: 27 overdue accountability items need attention.
+    - generic [ref=e9]: "27"
+    - generic [ref=e10]: View items
+  - generic [ref=e11]:
+    - navigation "Primary navigation" [ref=e12]:
+      - button "T" [ref=e14] [cursor=pointer]
+      - generic [ref=e15]:
+        - button "Dashboard" [ref=e16] [cursor=pointer]:
+          - img [ref=e17]
+        - button "Docs" [ref=e19] [cursor=pointer]:
+          - img [ref=e20]
+        - button "Programs" [ref=e22] [cursor=pointer]:
+          - img [ref=e23]
+        - button "Projects" [ref=e25] [cursor=pointer]:
+          - img [ref=e26]
+        - button "Teams (standup due)" [ref=e28] [cursor=pointer]:
+          - img [ref=e29]
+      - generic [ref=e32]:
+        - button "Settings" [ref=e33] [cursor=pointer]:
+          - img [ref=e34]
+        - button "D" [ref=e37] [cursor=pointer]
+    - complementary "Document list" [ref=e38]:
+      - generic [ref=e39]:
+        - generic [ref=e40]:
+          - heading "Issues" [level=2] [ref=e41]
+          - generic [ref=e42]:
+            - button "New issue" [ref=e43] [cursor=pointer]:
+              - img [ref=e44]
+            - button "Collapse sidebar" [ref=e46] [cursor=pointer]:
+              - img [ref=e47]
+        - generic [ref=e50]:
+          - generic [ref=e51]:
+            - img [ref=e52]
+            - text: All Issues
+          - list [ref=e54]:
+            - listitem [ref=e55]:
+              - link "Sprint Assignment Test" [ref=e56] [cursor=pointer]:
+                - /url: /documents/92e0323d-69f3-4adb-8938-f9a433654a2c
+                - generic [ref=e58]: Sprint Assignment Test
+              - button "Actions for Sprint Assignment Test" [ref=e59] [cursor=pointer]:
+                - img [ref=e60]
+            - listitem [ref=e64]:
+              - link "Program Assignment Test" [ref=e65] [cursor=pointer]:
+                - /url: /documents/a88cc2ea-12d6-4f6d-9978-73d337f6e664
+                - generic [ref=e67]: Program Assignment Test
+              - button "Actions for Program Assignment Test" [ref=e68] [cursor=pointer]:
+                - img [ref=e69]
+            - listitem [ref=e73]:
+              - link "Sequential Issue 4" [ref=e74] [cursor=pointer]:
+                - /url: /documents/29fdf8dc-4f4a-407e-a631-790669dfc0a4
+                - generic [ref=e76]: Sequential Issue 4
+              - button "Actions for Sequential Issue 4" [ref=e77] [cursor=pointer]:
+                - img [ref=e78]
+            - listitem [ref=e82]:
+              - link "Sequential Issue 3" [ref=e83] [cursor=pointer]:
+                - /url: /documents/6037386b-97cd-4a71-a21a-19f3e93477ff
+                - generic [ref=e85]: Sequential Issue 3
+              - button "Actions for Sequential Issue 3" [ref=e86] [cursor=pointer]:
+                - img [ref=e87]
+            - listitem [ref=e91]:
+              - link "Sequential Issue 2" [ref=e92] [cursor=pointer]:
+                - /url: /documents/33d4b899-0433-4c38-9906-1c7071a63859
+                - generic [ref=e94]: Sequential Issue 2
+              - button "Actions for Sequential Issue 2" [ref=e95] [cursor=pointer]:
+                - img [ref=e96]
+            - listitem [ref=e100]:
+              - link "Sequential Issue 1" [ref=e101] [cursor=pointer]:
+                - /url: /documents/e8ebfefd-88b5-4e37-bfc1-e063886a3931
+                - generic [ref=e103]: Sequential Issue 1
+              - button "Actions for Sequential Issue 1" [ref=e104] [cursor=pointer]:
+                - img [ref=e105]
+            - listitem [ref=e109]:
+              - link "Sequential Issue 0" [ref=e110] [cursor=pointer]:
+                - /url: /documents/8d69898a-b8af-4be4-b1a8-057db3ee6fbf
+                - generic [ref=e112]: Sequential Issue 0
+              - button "Actions for Sequential Issue 0" [ref=e113] [cursor=pointer]:
+                - img [ref=e114]
+            - listitem [ref=e118]:
+              - link "Concurrent Issue 3" [ref=e119] [cursor=pointer]:
+                - /url: /documents/be2f4b39-ae68-4988-9060-cbcadd1c8f28
+                - generic [ref=e121]: Concurrent Issue 3
+              - button "Actions for Concurrent Issue 3" [ref=e122] [cursor=pointer]:
+                - img [ref=e123]
+            - listitem [ref=e127]:
+              - link "Concurrent Issue 5" [ref=e128] [cursor=pointer]:
+                - /url: /documents/ee2ab311-07a8-4387-b071-606fcbfc3e94
+                - generic [ref=e130]: Concurrent Issue 5
+              - button "Actions for Concurrent Issue 5" [ref=e131] [cursor=pointer]:
+                - img [ref=e132]
+            - listitem [ref=e136]:
+              - link "Concurrent Issue 6" [ref=e137] [cursor=pointer]:
+                - /url: /documents/4644a942-af1e-4dbb-88cb-b6ce9ad4f82b
+                - generic [ref=e139]: Concurrent Issue 6
+              - button "Actions for Concurrent Issue 6" [ref=e140] [cursor=pointer]:
+                - img [ref=e141]
+            - listitem [ref=e145]:
+              - link "Concurrent Issue 8" [ref=e146] [cursor=pointer]:
+                - /url: /documents/c0d8c561-fee8-4891-a300-d8434f2ba38e
+                - generic [ref=e148]: Concurrent Issue 8
+              - button "Actions for Concurrent Issue 8" [ref=e149] [cursor=pointer]:
+                - img [ref=e150]
+            - listitem [ref=e154]:
+              - link "Concurrent Issue 7" [ref=e155] [cursor=pointer]:
+                - /url: /documents/d55be6bf-797b-4eb3-94e1-15fc0ca07add
+                - generic [ref=e157]: Concurrent Issue 7
+              - button "Actions for Concurrent Issue 7" [ref=e158] [cursor=pointer]:
+                - img [ref=e159]
+            - listitem [ref=e163]:
+              - link "Concurrent Issue 4" [ref=e164] [cursor=pointer]:
+                - /url: /documents/61bcc38a-6789-4fc7-8fd1-57d34f0c4d68
+                - generic [ref=e166]: Concurrent Issue 4
+              - button "Actions for Concurrent Issue 4" [ref=e167] [cursor=pointer]:
+                - img [ref=e168]
+            - listitem [ref=e172]:
+              - link "Concurrent Issue 9" [ref=e173] [cursor=pointer]:
+                - /url: /documents/bc39de02-4be9-493b-86b6-5da07d14c70b
+                - generic [ref=e175]: Concurrent Issue 9
+              - button "Actions for Concurrent Issue 9" [ref=e176] [cursor=pointer]:
+                - img [ref=e177]
+            - listitem [ref=e181]:
+              - link "Concurrent Issue 2" [ref=e182] [cursor=pointer]:
+                - /url: /documents/85f9a5fb-02cd-407a-9988-c3a790a59047
+                - generic [ref=e184]: Concurrent Issue 2
+              - button "Actions for Concurrent Issue 2" [ref=e185] [cursor=pointer]:
+                - img [ref=e186]
+            - listitem [ref=e190]:
+              - link "Concurrent Issue 1" [ref=e191] [cursor=pointer]:
+                - /url: /documents/1b21bbf9-b22c-44f8-99c8-2950b0e743a6
+                - generic [ref=e193]: Concurrent Issue 1
+              - button "Actions for Concurrent Issue 1" [ref=e194] [cursor=pointer]:
+                - img [ref=e195]
+            - listitem [ref=e199]:
+              - link "Concurrent Issue 0" [ref=e200] [cursor=pointer]:
+                - /url: /documents/f1ba2f4f-148f-4d5b-8d08-d6d9d69b23ca
+                - generic [ref=e202]: Concurrent Issue 0
+              - button "Actions for Concurrent Issue 0" [ref=e203] [cursor=pointer]:
+                - img [ref=e204]
+    - main [ref=e208]:
+      - generic [ref=e209]:
+        - generic [ref=e210]:
+          - heading "Issues" [level=1] [ref=e211]
+          - generic [ref=e212]:
+            - generic [ref=e214]:
+              - generic [ref=e215]:
+                - combobox "Filter issues by program" [ref=e217] [cursor=pointer]:
+                  - generic [ref=e218]: All Programs
+                  - img [ref=e219]
+                - combobox "Filter issues by week" [ref=e222] [cursor=pointer]:
+                  - generic [ref=e223]: All Weeks
+                  - img [ref=e224]
+              - combobox "Sort by" [ref=e227] [cursor=pointer]:
+                - generic [ref=e228]: Updated
+                - img [ref=e229]
+              - group "View mode" [ref=e231]:
+                - button "List view" [pressed] [ref=e232] [cursor=pointer]:
+                  - img [ref=e233]
+                - button "Kanban view" [ref=e235] [cursor=pointer]:
+                  - img [ref=e236]
+              - button "Customize columns" [ref=e238] [cursor=pointer]:
+                - img [ref=e239]
+            - button "New Issue" [ref=e241] [cursor=pointer]
+        - tablist "Issue filters" [ref=e242]:
+          - tab "All" [ref=e243] [cursor=pointer]
+          - tab "Needs Triage" [active] [selected] [ref=e244] [cursor=pointer]
+          - tab "Active" [ref=e245] [cursor=pointer]
+          - tab "Backlog" [ref=e246] [cursor=pointer]
+          - tab "Done" [ref=e247] [cursor=pointer]
+          - tab "Cancelled" [ref=e248] [cursor=pointer]
+        - generic [ref=e251]:
+          - paragraph [ref=e252]: No issues found
+          - button "Create an issue" [ref=e253] [cursor=pointer]
+    - complementary "Document properties"
+```

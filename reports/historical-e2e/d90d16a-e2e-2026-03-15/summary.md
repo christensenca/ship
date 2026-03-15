@@ -4,7 +4,7 @@
 - Run date: `2026-03-15`
 - Worktree: `/Users/cadechristensen/Source/ship/.claude/worktrees/e2e-d90d16`
 - Log: [playwright-output.txt](/Users/cadechristensen/Source/ship/reports/historical-e2e/d90d16a-e2e-2026-03-15/playwright-output.txt)
-- Playwright artifacts: [test-results](/Users/cadechristensen/Source/ship/reports/historical-e2e/d90d16a-e2e-2026-03-15/test-results)
+- Playwright artifacts: [playwright-artifacts](/Users/cadechristensen/Source/ship/reports/historical-e2e/d90d16a-e2e-2026-03-15/playwright-artifacts)
 
 ## Outcome
 
