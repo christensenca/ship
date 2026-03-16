@@ -18,7 +18,8 @@
 </p>
 
 <p align="center">
-  <a href="https://docs.google.com/document/d/1ejYaTAokblzvM-HIpMUKEx3_XrMvftYMFxvJlzcsWlE/edit?tab=t.0">Ship Audit</a>
+  <a href="https://docs.google.com/document/d/1ejYaTAokblzvM-HIpMUKEx3_XrMvftYMFxvJlzcsWlE/edit?tab=t.0">Ship Audit + Documentation + Reflections + Discovery + LLM Usage</a><br>
+  <a href="https://docs.google.com/presentation/d/17nTzPHqHiund_u9MYsCdPXCbyzlJ2yuTMvQSson1mTc/edit?usp=sharing">Presentation slides</a>
 </p>
 
 ---
@@ -289,6 +290,22 @@ We welcome contributions. See [CONTRIBUTING.md](./CONTRIBUTING.md) for guideline
 - [Accountability Manager Guide](./docs/accountability-manager-guide.md) — Using approval workflows
 - [Contributing Guidelines](./CONTRIBUTING.md) — How to contribute
 - [Security Policy](./SECURITY.md) — Vulnerability reporting
+
+---
+
+## Reports
+
+Quality and audit reports live in **[reports/](./reports/)**. Each report type has a `latest.md` (or `latest.json`) for the current run; use the headers below to jump to the section you need.
+
+| Report | Summary file | Main sections (headers) |
+|--------|--------------|--------------------------|
+| **Accessibility** | [reports/accessibility/latest.md](./reports/accessibility/latest.md) | Audit Deliverable, Trend, Lighthouse Scores by Page, Per-Page Violations |
+| **API latency** | [reports/api-latency/latest.md](./reports/api-latency/latest.md) | Audit Deliverable Table (P95/P99), Trend, Root Cause Scope, Detailed Results, Slowest Endpoints, Route Timing Breakdown |
+| **DB query efficiency** | [reports/db-query-efficiency/latest.md](./reports/db-query-efficiency/latest.md) | How To Read This Report, Methodology, Workflow Summary, Workflow Breakdown, Individual SQL Query Plans, Predicate / Index Review, Trend |
+| **Test coverage** | [reports/test-coverage/latest.md](./reports/test-coverage/latest.md) | Audit Deliverable, Executed Suites, Failed Tests, Flaky Tests, Code Coverage, Critical Flow Coverage |
+| **Type safety** | [reports/type-safety/latest.md](./reports/type-safety/latest.md) | Summary, Trend Status, Package Breakdown, Top 5 Violation-Dense Files |
+
+- **Bundle size** and **historical E2E** results use `latest.json` or dated run folders (e.g. `reports/historical-e2e/<commit>-e2e-<date>/summary.md`).
 
 ---
 
