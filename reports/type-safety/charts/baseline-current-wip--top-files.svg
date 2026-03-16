@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="536" viewBox="0 0 1400 536">
+  <rect width="100%" height="100%" fill="white" />
+  <text x="420" y="34" font-family="ui-sans-serif, system-ui, sans-serif" font-size="28" font-weight="700" fill="#111827">Top 10 Files</text>
+  <g transform="translate(420, 76)">
+    
+    <g font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#111827">
+      <rect x="0" y="0" width="12" height="12" rx="2" fill="#9ca3af" />
+      <text x="18" y="10">Baseline</text>
+      <rect x="96" y="0" width="12" height="12" rx="2" fill="#2563eb" />
+      <text x="114" y="10">Current</text>
+    </g>
+  
+  </g>
+  
+      <line x1="420" y1="114" x2="420" y2="502" stroke="#e5e7eb" />
+      <text x="420" y="108" text-anchor="middle" font-size="12" fill="#6b7280">0</text>
+    
+      <line x1="601.6" y1="114" x2="601.6" y2="502" stroke="#e5e7eb" />
+      <text x="601.6" y="108" text-anchor="middle" font-size="12" fill="#6b7280">38</text>
+    
+      <line x1="783.2" y1="114" x2="783.2" y2="502" stroke="#e5e7eb" />
+      <text x="783.2" y="108" text-anchor="middle" font-size="12" fill="#6b7280">76</text>
+    
+      <line x1="964.8" y1="114" x2="964.8" y2="502" stroke="#e5e7eb" />
+      <text x="964.8" y="108" text-anchor="middle" font-size="12" fill="#6b7280">113</text>
+    
+      <line x1="1146.4" y1="114" x2="1146.4" y2="502" stroke="#e5e7eb" />
+      <text x="1146.4" y="108" text-anchor="middle" font-size="12" fill="#6b7280">151</text>
+    
+      <line x1="1328" y1="114" x2="1328" y2="502" stroke="#e5e7eb" />
+      <text x="1328" y="108" text-anchor="middle" font-size="12" fill="#6b7280">189</text>
+    
+  
+      <g font-family="ui-sans-serif, system-ui, sans-serif">
+        <text x="408" y="135" text-anchor="end" font-size="12" fill="#111827">Web/Src/Components/IssuesList.Tsx</text>
+        <rect x="420" y="122" width="908" height="12" rx="3" fill="#9ca3af" />
+        <rect x="420" y="136" width="326.6878306878307" height="12" rx="3" fill="#2563eb" />
+        <text x="1336" y="132" font-size="11" fill="#6b7280">189</text>
+        <text x="754.6878306878307" y="146" font-size="11" fill="#6b7280">68</text>
+      </g>
+    
+      <g font-family="ui-sans-serif, system-ui, sans-serif">
+        <text x="408" y="173" text-anchor="end" font-size="12" fill="#111827">Web/Src/Pages/App.Tsx</text>
+        <rect x="420" y="160" width="864.7619047619047" height="12" rx="3" fill="#9ca3af" />
+        <rect x="420" y="174" width="259.4285714285714" height="12" rx="3" fill="#2563eb" />
+        <text x="1292.7619047619046" y="170" font-size="11" fill="#6b7280">180</text>
+        <text x="687.4285714285713" y="184" font-size="11" fill="#6b7280">54</text>
+      </g>
+    
+      <g font-family="ui-sans-serif, system-ui, sans-serif">
+        <text x="408" y="211" text-anchor="end" font-size="12" fill="#111827">Api/Src/Routes/Weeks.Ts</text>
+        <rect x="420" y="198" width="763.8730158730159" height="12" rx="3" fill="#9ca3af" />
+        <rect x="420" y="212" width="273.8412698412698" height="12" rx="3" fill="#2563eb" />
+        <text x="1191.873015873016" y="208" font-size="11" fill="#6b7280">159</text>
+        <text x="701.8412698412699" y="222" font-size="11" fill="#6b7280">57</text>
+      </g>
+    
+      <g font-family="ui-sans-serif, system-ui, sans-serif">
+        <text x="408" y="249" text-anchor="end" font-size="12" fill="#111827">Web/Src/Pages/ReviewsPage.Tsx</text>
+        <rect x="420" y="236" width="720.6349206349206" height="12" rx="3" fill="#9ca3af" />
+        <rect x="420" y="250" width="38.43386243386243" height="12" rx="3" fill="#2563eb" />
+        <text x="1148.6349206349205" y="246" font-size="11" fill="#6b7280">150</text>
+        <text x="466.43386243386243" y="260" font-size="11" fill="#6b7280">8</text>
+      </g>
+    
+      <g font-family="ui-sans-serif, system-ui, sans-serif">
+        <text x="408" y="287" text-anchor="end" font-size="12" fill="#111827">Api/Src/Routes/Issues.Ts</text>
+        <rect x="420" y="274" width="586.1164021164021" height="12" rx="3" fill="#9ca3af" />
+        <rect x="420" y="288" width="341.10052910052906" height="12" rx="3" fill="#2563eb" />
+        <text x="1014.1164021164021" y="284" font-size="11" fill="#6b7280">122</text>
+        <text x="769.100529100529" y="298" font-size="11" fill="#6b7280">71</text>
+      </g>
+    
+      <g font-family="ui-sans-serif, system-ui, sans-serif">
+        <text x="408" y="325" text-anchor="end" font-size="12" fill="#111827">Web/Src/Components/Editor.Tsx</text>
+        <rect x="420" y="312" width="547.6825396825396" height="12" rx="3" fill="#9ca3af" />
+        <rect x="420" y="326" width="105.69312169312168" height="12" rx="3" fill="#2563eb" />
+        <text x="975.6825396825396" y="322" font-size="11" fill="#6b7280">114</text>
+        <text x="533.6931216931217" y="336" font-size="11" fill="#6b7280">22</text>
+      </g>
+    
+      <g font-family="ui-sans-serif, system-ui, sans-serif">
+        <text x="408" y="363" text-anchor="end" font-size="12" fill="#111827">Web/Src/Pages/TeamMode.Tsx</text>
+        <rect x="420" y="350" width="518.8571428571428" height="12" rx="3" fill="#9ca3af" />
+        <rect x="420" y="364" width="4.804232804232804" height="12" rx="3" fill="#2563eb" />
+        <text x="946.8571428571428" y="360" font-size="11" fill="#6b7280">108</text>
+        <text x="432.8042328042328" y="374" font-size="11" fill="#6b7280">1</text>
+      </g>
+    
+      <g font-family="ui-sans-serif, system-ui, sans-serif">
+        <text x="408" y="401" text-anchor="end" font-size="12" fill="#111827">Web/Src/Hooks/UseWeeksQuery.Ts</text>
+        <rect x="420" y="388" width="485.22751322751327" height="12" rx="3" fill="#9ca3af" />
+        <rect x="420" y="402" width="0" height="12" rx="3" fill="#2563eb" />
+        <text x="913.2275132275133" y="398" font-size="11" fill="#6b7280">101</text>
+        <text x="428" y="412" font-size="11" fill="#6b7280">0</text>
+      </g>
+    
+      <g font-family="ui-sans-serif, system-ui, sans-serif">
+        <text x="408" y="439" text-anchor="end" font-size="12" fill="#111827">Api/Src/Routes/Projects.Ts</text>
+        <rect x="420" y="426" width="441.989417989418" height="12" rx="3" fill="#9ca3af" />
+        <rect x="420" y="440" width="220.994708994709" height="12" rx="3" fill="#2563eb" />
+        <text x="869.9894179894179" y="436" font-size="11" fill="#6b7280">92</text>
+        <text x="648.994708994709" y="450" font-size="11" fill="#6b7280">46</text>
+      </g>
+    
+      <g font-family="ui-sans-serif, system-ui, sans-serif">
+        <text x="408" y="477" text-anchor="end" font-size="12" fill="#111827">Web/Src/Pages/UnifiedDocumentPage.Tsx</text>
+        <rect x="420" y="464" width="441.989417989418" height="12" rx="3" fill="#9ca3af" />
+        <rect x="420" y="478" width="163.34391534391534" height="12" rx="3" fill="#2563eb" />
+        <text x="869.9894179894179" y="474" font-size="11" fill="#6b7280">92</text>
+        <text x="591.3439153439153" y="488" font-size="11" fill="#6b7280">34</text>
+      </g>
+    
+</svg>

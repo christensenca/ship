@@ -4,7 +4,7 @@ import crypto from 'crypto'
 import { createApp } from '../app.js'
 import { pool } from '../db/client.js'
 
-describe('Documents API - PATCH with Issue Fields', () => {
+describe('Documents API - PATCH with Issue Fields', (): void => {
   const app = createApp()
   const testRunId = Date.now().toString(36) + Math.random().toString(36).slice(2, 6)
   const testEmail = `docs-patch-${testRunId}@ship.local`
@@ -17,7 +17,7 @@ describe('Documents API - PATCH with Issue Fields', () => {
   let testUserId: string
   let testSprintId: string
 
-  beforeAll(async () => {
+  beforeAll(async (): Promise<void> => {
     // Create test workspace
     const workspaceResult = await pool.query(
       `INSERT INTO workspaces (name) VALUES ($1) RETURNING id`,
@@ -70,7 +70,7 @@ describe('Documents API - PATCH with Issue Fields', () => {
     }
   })
 
-  afterAll(async () => {
+  afterAll(async (): Promise<void> => {
     await pool.query('DELETE FROM document_associations WHERE document_id IN (SELECT id FROM documents WHERE workspace_id = $1)', [testWorkspaceId])
     await pool.query('DELETE FROM sessions WHERE user_id = $1', [testUserId])
     await pool.query('DELETE FROM documents WHERE workspace_id = $1', [testWorkspaceId])
@@ -79,7 +79,7 @@ describe('Documents API - PATCH with Issue Fields', () => {
     await pool.query('DELETE FROM workspaces WHERE id = $1', [testWorkspaceId])
   })
 
-  beforeEach(async () => {
+  beforeEach(async (): Promise<void> => {
     // Clean up issues from previous tests (keep the sprint)
     await pool.query(`DELETE FROM documents WHERE workspace_id = $1 AND document_type = 'issue'`, [testWorkspaceId])
 
@@ -93,8 +93,8 @@ describe('Documents API - PATCH with Issue Fields', () => {
     testIssueId = issueResult.rows[0].id
   })
 
-  describe('PATCH /api/documents/:id with top-level issue fields', () => {
-    it('should accept state at top level and store in properties', async () => {
+  describe('PATCH /api/documents/:id with top-level issue fields', (): void => {
+    it('should accept state at top level and store in properties', async (): Promise<void> => {
       const response = await request(app)
         .patch(`/api/documents/${testIssueId}`)
         .set('Cookie', sessionCookie)
@@ -105,7 +105,7 @@ describe('Documents API - PATCH with Issue Fields', () => {
       expect(response.body.properties.state).toBe('in_progress')
     })
 
-    it('should accept priority at top level and store in properties', async () => {
+    it('should accept priority at top level and store in properties', async (): Promise<void> => {
       const response = await request(app)
         .patch(`/api/documents/${testIssueId}`)
         .set('Cookie', sessionCookie)
@@ -116,7 +116,7 @@ describe('Documents API - PATCH with Issue Fields', () => {
       expect(response.body.properties.priority).toBe('high')
     })
 
-    it('should accept estimate at top level and store in properties', async () => {
+    it('should accept estimate at top level and store in properties', async (): Promise<void> => {
       const response = await request(app)
         .patch(`/api/documents/${testIssueId}`)
         .set('Cookie', sessionCookie)
@@ -127,7 +127,7 @@ describe('Documents API - PATCH with Issue Fields', () => {
       expect(response.body.properties.estimate).toBe(3)
     })
 
-    it('should accept assignee_id at top level and store in properties', async () => {
+    it('should accept assignee_id at top level and store in properties', async (): Promise<void> => {
       const response = await request(app)
         .patch(`/api/documents/${testIssueId}`)
         .set('Cookie', sessionCookie)
@@ -138,7 +138,7 @@ describe('Documents API - PATCH with Issue Fields', () => {
       expect(response.body.properties.assignee_id).toBe(testUserId)
     })
 
-    it('should accept null estimate to clear hours', async () => {
+    it('should accept null estimate to clear hours', async (): Promise<void> => {
       // First set an estimate
       await request(app)
         .patch(`/api/documents/${testIssueId}`)
@@ -157,7 +157,7 @@ describe('Documents API - PATCH with Issue Fields', () => {
       expect(response.body.properties.estimate).toBeNull()
     })
 
-    it('should accept belongs_to for sprint association', async () => {
+    it('should accept belongs_to for sprint association', async (): Promise<void> => {
       const response = await request(app)
         .patch(`/api/documents/${testIssueId}`)
         .set('Cookie', sessionCookie)
@@ -176,7 +176,7 @@ describe('Documents API - PATCH with Issue Fields', () => {
       expect(assocResult.rows.length).toBe(1)
     })
 
-    it('should accept multiple top-level fields in one request', async () => {
+    it('should accept multiple top-level fields in one request', async (): Promise<void> => {
       const response = await request(app)
         .patch(`/api/documents/${testIssueId}`)
         .set('Cookie', sessionCookie)
@@ -197,7 +197,7 @@ describe('Documents API - PATCH with Issue Fields', () => {
   })
 })
 
-describe('Documents API - Weekly Doc Resubmission', () => {
+describe('Documents API - Weekly Doc Resubmission', (): void => {
   const app = createApp()
   const testRunId = Date.now().toString(36) + Math.random().toString(36).slice(2, 6)
   const testEmail = `docs-weekly-resubmit-${testRunId}@ship.local`
@@ -210,7 +210,7 @@ describe('Documents API - Weekly Doc Resubmission', () => {
   let testPersonId: string
   let testProjectId: string
 
-  beforeAll(async () => {
+  beforeAll(async (): Promise<void> => {
     const workspaceResult = await pool.query(
       `INSERT INTO workspaces (name) VALUES ($1) RETURNING id`,
       [testWorkspaceName]
@@ -265,7 +265,7 @@ describe('Documents API - Weekly Doc Resubmission', () => {
     }
   })
 
-  afterAll(async () => {
+  afterAll(async (): Promise<void> => {
     await pool.query('DELETE FROM document_associations WHERE document_id IN (SELECT id FROM documents WHERE workspace_id = $1)', [testWorkspaceId])
     await pool.query('DELETE FROM sessions WHERE user_id = $1', [testUserId])
     await pool.query('DELETE FROM documents WHERE workspace_id = $1', [testWorkspaceId])
@@ -274,7 +274,7 @@ describe('Documents API - Weekly Doc Resubmission', () => {
     await pool.query('DELETE FROM workspaces WHERE id = $1', [testWorkspaceId])
   })
 
-  beforeEach(async () => {
+  beforeEach(async (): Promise<void> => {
     await pool.query(
       `DELETE FROM document_associations
        WHERE document_id IN (
@@ -290,7 +290,7 @@ describe('Documents API - Weekly Doc Resubmission', () => {
     )
   })
 
-  it('moves plan_approval back to changed_since_approved after weekly plan edit', async () => {
+  it('moves plan_approval back to changed_since_approved after weekly plan edit', async (): Promise<void> => {
     const weekNumber = 17
     const sprintResult = await pool.query(
       `INSERT INTO documents (workspace_id, document_type, title, created_by, properties)
@@ -349,7 +349,7 @@ describe('Documents API - Weekly Doc Resubmission', () => {
     expect(sprintAfter.rows[0].properties.plan_approval.feedback).toBe('Please make this plan more measurable.')
   })
 
-  it('moves review_approval back to changed_since_approved after weekly retro edit', async () => {
+  it('moves review_approval back to changed_since_approved after weekly retro edit', async (): Promise<void> => {
     const weekNumber = 18
     const sprintResult = await pool.query(
       `INSERT INTO documents (workspace_id, document_type, title, created_by, properties)
@@ -409,7 +409,7 @@ describe('Documents API - Weekly Doc Resubmission', () => {
   })
 })
 
-describe('Documents API - Delete', () => {
+describe('Documents API - Delete', (): void => {
   const app = createApp()
   // Use unique identifiers to avoid conflicts between concurrent test runs
   const testRunId = Date.now().toString(36) + Math.random().toString(36).slice(2, 6)
@@ -423,7 +423,7 @@ describe('Documents API - Delete', () => {
   let testUserId: string
 
   // Setup: Create a test user and session
-  beforeAll(async () => {
+  beforeAll(async (): Promise<void> => {
     // Create test workspace
     const workspaceResult = await pool.query(
       `INSERT INTO workspaces (name) VALUES ($1)
@@ -469,7 +469,7 @@ describe('Documents API - Delete', () => {
   })
 
   // Cleanup after all tests
-  afterAll(async () => {
+  afterAll(async (): Promise<void> => {
     // Clean up test data in correct order (foreign keys)
     await pool.query('DELETE FROM sessions WHERE user_id = $1', [testUserId])
     await pool.query('DELETE FROM documents WHERE workspace_id = $1', [testWorkspaceId])
@@ -479,7 +479,7 @@ describe('Documents API - Delete', () => {
   })
 
   // Create a fresh document before each test
-  beforeEach(async () => {
+  beforeEach(async (): Promise<void> => {
     // Clean up any documents from previous tests
     await pool.query('DELETE FROM documents WHERE workspace_id = $1', [testWorkspaceId])
 
@@ -492,8 +492,8 @@ describe('Documents API - Delete', () => {
     testDocumentId = docResult.rows[0].id
   })
 
-  describe('DELETE /api/documents/:id', () => {
-    it('should delete a document and return 204', async () => {
+  describe('DELETE /api/documents/:id', (): void => {
+    it('should delete a document and return 204', async (): Promise<void> => {
       const response = await request(app)
         .delete(`/api/documents/${testDocumentId}`)
         .set('Cookie', sessionCookie)
@@ -509,7 +509,7 @@ describe('Documents API - Delete', () => {
       expect(checkResult.rows.length).toBe(0)
     })
 
-    it('should return 404 when deleting non-existent document', async () => {
+    it('should return 404 when deleting non-existent document', async (): Promise<void> => {
       const fakeId = '00000000-0000-0000-0000-000000000000'
 
       const response = await request(app)
@@ -521,7 +521,7 @@ describe('Documents API - Delete', () => {
       expect(response.body.error).toBe('Document not found')
     })
 
-    it('should return 403 when not authenticated (CSRF check runs first)', async () => {
+    it('should return 403 when not authenticated (CSRF check runs first)', async (): Promise<void> => {
       const response = await request(app)
         .delete(`/api/documents/${testDocumentId}`)
 
@@ -529,7 +529,7 @@ describe('Documents API - Delete', () => {
       expect(response.status).toBe(403)
     })
 
-    it('should return 404 when trying to delete document from another workspace', async () => {
+    it('should return 404 when trying to delete document from another workspace', async (): Promise<void> => {
       // Create document in a different workspace
       const otherWorkspaceResult = await pool.query(
         `INSERT INTO workspaces (name) VALUES ('Other Workspace Delete')
@@ -560,7 +560,7 @@ describe('Documents API - Delete', () => {
       await pool.query('DELETE FROM workspaces WHERE id = $1', [otherWorkspaceId])
     })
 
-    it('should allow deleting a document with children (cascade)', async () => {
+    it('should allow deleting a document with children (cascade)', async (): Promise<void> => {
       // Create a child document
       await pool.query(
         `INSERT INTO documents (workspace_id, document_type, title, parent_id, created_by)
@@ -583,7 +583,7 @@ describe('Documents API - Delete', () => {
       expect(checkResult.rows.length).toBe(0)
     })
 
-    it('should return 403 when session is expired (CSRF check runs first)', async () => {
+    it('should return 403 when session is expired (CSRF check runs first)', async (): Promise<void> => {
       // Create expired session (sessions.id is TEXT not UUID, generated from crypto.randomBytes)
       const expiredSessionId = crypto.randomBytes(32).toString('hex')
       await pool.query(
@@ -607,7 +607,7 @@ describe('Documents API - Delete', () => {
   })
 })
 
-describe('Documents API - Conversion', () => {
+describe('Documents API - Conversion', (): void => {
   const app = createApp()
   const testRunId = Date.now().toString(36) + Math.random().toString(36).slice(2, 6)
   const testEmail = `docs-convert-${testRunId}@ship.local`
@@ -620,7 +620,7 @@ describe('Documents API - Conversion', () => {
   let testProgramId: string
 
   // Setup: Create a test user, session, and program
-  beforeAll(async () => {
+  beforeAll(async (): Promise<void> => {
     // Create test workspace
     const workspaceResult = await pool.query(
       `INSERT INTO workspaces (name) VALUES ($1)
@@ -675,7 +675,7 @@ describe('Documents API - Conversion', () => {
   })
 
   // Cleanup after all tests
-  afterAll(async () => {
+  afterAll(async (): Promise<void> => {
     await pool.query('DELETE FROM document_associations WHERE document_id IN (SELECT id FROM documents WHERE workspace_id = $1)', [testWorkspaceId])
     await pool.query('DELETE FROM sessions WHERE user_id = $1', [testUserId])
     await pool.query('DELETE FROM documents WHERE workspace_id = $1', [testWorkspaceId])
@@ -684,8 +684,8 @@ describe('Documents API - Conversion', () => {
     await pool.query('DELETE FROM workspaces WHERE id = $1', [testWorkspaceId])
   })
 
-  describe('POST /api/documents/:id/convert', () => {
-    it('should convert issue to project and copy program associations', async () => {
+  describe('POST /api/documents/:id/convert', (): void => {
+    it('should convert issue to project and copy program associations', async (): Promise<void> => {
       // Create an issue
       const issueResult = await pool.query(
         `INSERT INTO documents (workspace_id, document_type, title, ticket_number, created_by)
@@ -726,7 +726,7 @@ describe('Documents API - Conversion', () => {
       expect(response.body.converted_from_id).toBe(issueId)
     })
 
-    it('should convert project to issue and copy program associations', async () => {
+    it('should convert project to issue and copy program associations', async (): Promise<void> => {
       // Create a project
       const projectResult = await pool.query(
         `INSERT INTO documents (workspace_id, document_type, title, created_by)
@@ -768,8 +768,8 @@ describe('Documents API - Conversion', () => {
     })
   })
 
-  describe('POST /api/documents/:id/undo-conversion', () => {
-    it('should undo conversion and restore original associations', async () => {
+  describe('POST /api/documents/:id/undo-conversion', (): void => {
+    it('should undo conversion and restore original associations', async (): Promise<void> => {
       // Create an issue
       const issueResult = await pool.query(
         `INSERT INTO documents (workspace_id, document_type, title, ticket_number, created_by)
@@ -825,7 +825,7 @@ describe('Documents API - Conversion', () => {
       expect(parseInt(snapshotResult.rows[0].count)).toBeGreaterThanOrEqual(0)
     })
 
-    it('should have no orphaned associations after conversion/undo cycle', async () => {
+    it('should have no orphaned associations after conversion/undo cycle', async (): Promise<void> => {
       // Create an issue
       const issueResult = await pool.query(
         `INSERT INTO documents (workspace_id, document_type, title, ticket_number, created_by)

@@ -80,8 +80,8 @@ function buildTree(people: PersonData[]): OrgTreeNode[] {
     roots.push(node);
   }
 
-  function sortChildren(nodes: OrgTreeNode[]) {
-    nodes.sort((a, b) => a.name.localeCompare(b.name));
+  function sortChildren(nodes: OrgTreeNode[]): void {
+    nodes.sort((a: OrgTreeNode, b: OrgTreeNode): number => a.name.localeCompare(b.name));
     for (const n of nodes) sortChildren(n.children);
   }
   sortChildren(roots);
@@ -103,7 +103,12 @@ function flattenTree(nodes: OrgTreeNode[], expandedIds: Set<string>, depth = 0):
 }
 
 function getInitials(name: string): string {
-  return name.split(' ').map(p => p[0]).join('').toUpperCase().slice(0, 2);
+  return name
+    .split(' ')
+    .map((part: string): string => part[0] ?? '')
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
 }
 
 function collectAncestorIds(people: PersonData[], matchIds: Set<string>): Set<string> {
@@ -129,7 +134,7 @@ function collectAncestorIds(people: PersonData[], matchIds: Set<string>): Set<st
 /** Collect all descendant personIds from a tree node */
 function getDescendantIds(node: OrgTreeNode): Set<string> {
   const ids = new Set<string>();
-  function walk(n: OrgTreeNode) {
+  function walk(n: OrgTreeNode): void {
     for (const child of n.children) {
       ids.add(child.personId);
       walk(child);
@@ -160,7 +165,7 @@ function DroppableRow({
   disabled: boolean;
   isOver?: boolean;
   children: (props: { isOver: boolean }) => React.ReactNode;
-}) {
+}): React.JSX.Element {
   const { setNodeRef, isOver: dndIsOver } = useDroppable({
     id: `drop-${personId}`,
     disabled,
@@ -169,7 +174,7 @@ function DroppableRow({
   return <div ref={setNodeRef}>{children({ isOver: isOver ?? dndIsOver })}</div>;
 }
 
-export function OrgChartPage() {
+export function OrgChartPage(): React.JSX.Element {
   const navigate = useNavigate();
   const { isWorkspaceAdmin } = useWorkspace();
   const [people, setPeople] = useState<PersonData[]>([]);
@@ -192,12 +197,12 @@ export function OrgChartPage() {
   );
 
   // Fetch people
-  const fetchPeople = useCallback(async () => {
+  const fetchPeople = useCallback(async (): Promise<void> => {
     try {
       const res = await apiGet('/api/team/people');
       if (res.ok) {
         const data = await res.json();
-        setPeople(data.filter((p: PersonData) => !p.isPending && !p.isArchived));
+        setPeople(data.filter((p: PersonData): boolean => !p.isPending && !p.isArchived));
       }
     } catch (err) {
       console.error('Failed to fetch people:', err);
@@ -206,13 +211,15 @@ export function OrgChartPage() {
     }
   }, []);
 
-  useEffect(() => { fetchPeople(); }, [fetchPeople]);
+  useEffect((): void => {
+    fetchPeople();
+  }, [fetchPeople]);
 
   // Build tree
-  const tree = useMemo(() => buildTree(people), [people]);
+  const tree = useMemo((): OrgTreeNode[] => buildTree(people), [people]);
 
   // Compute invalid drop targets when dragging
-  const invalidDropIds = useMemo(() => {
+  const invalidDropIds = useMemo((): Set<string> => {
     if (!activeId) return new Set<string>();
     const activeNode = findNode(tree, activeId);
     if (!activeNode) return new Set<string>();
@@ -222,7 +229,7 @@ export function OrgChartPage() {
   }, [activeId, tree]);
 
   // Set default expanded (first 2 levels) once tree is built
-  useEffect(() => {
+  useEffect((): void => {
     if (tree.length > 0 && expandedIds.size === 0) {
       const defaultExpanded = new Set<string>();
       for (const root of tree) {
@@ -236,13 +243,17 @@ export function OrgChartPage() {
   }, [tree]);
 
   // Debounce search
-  useEffect(() => {
-    const timer = setTimeout(() => setDebouncedQuery(searchQuery), 200);
-    return () => clearTimeout(timer);
+  useEffect((): (() => void) => {
+    const timer = setTimeout((): void => {
+      setDebouncedQuery(searchQuery);
+    }, 200);
+    return (): void => {
+      clearTimeout(timer);
+    };
   }, [searchQuery]);
 
   // Search
-  const searchMatches = useMemo(() => {
+  const searchMatches = useMemo((): Set<string> | null => {
     if (!debouncedQuery.trim()) return null;
     const q = debouncedQuery.toLowerCase();
     const matchIds = new Set<string>();
@@ -255,7 +266,7 @@ export function OrgChartPage() {
   }, [debouncedQuery, people]);
 
   // Auto-expand ancestors when searching
-  useEffect(() => {
+  useEffect((): void => {
     if (searchMatches !== null) {
       if (!preSearchExpanded) {
         setPreSearchExpanded(new Set(expandedIds));
@@ -270,17 +281,17 @@ export function OrgChartPage() {
     }
   }, [searchMatches]);
 
-  const flatRows = useMemo(() => {
+  const flatRows = useMemo((): FlatRow[] => {
     const rows = flattenTree(tree, expandedIds);
     if (searchMatches === null) return rows;
     if (searchMatches.size === 0) return [];
     const ancestorIds = collectAncestorIds(people, searchMatches);
     const visibleIds = new Set([...searchMatches, ...ancestorIds]);
-    return rows.filter(row => visibleIds.has(row.node.personId));
+    return rows.filter((row: FlatRow): boolean => visibleIds.has(row.node.personId));
   }, [tree, expandedIds, searchMatches, people]);
 
-  const toggleExpand = useCallback((personId: string) => {
-    setExpandedIds(prev => {
+  const toggleExpand = useCallback((personId: string): void => {
+    setExpandedIds((prev: Set<string>): Set<string> => {
       const next = new Set(prev);
       if (next.has(personId)) next.delete(personId);
       else next.add(personId);
@@ -289,18 +300,18 @@ export function OrgChartPage() {
   }, []);
 
   // Keyboard navigation
-  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLUListElement>): void => {
     const rows = flatRows;
     if (rows.length === 0) return;
 
     switch (e.key) {
       case 'ArrowDown':
         e.preventDefault();
-        setFocusedIndex(i => Math.min(i + 1, rows.length - 1));
+        setFocusedIndex((i: number): number => Math.min(i + 1, rows.length - 1));
         break;
       case 'ArrowUp':
         e.preventDefault();
-        setFocusedIndex(i => Math.max(i - 1, 0));
+        setFocusedIndex((i: number): number => Math.max(i - 1, 0));
         break;
       case 'ArrowRight': {
         e.preventDefault();
@@ -328,7 +339,7 @@ export function OrgChartPage() {
   }, [flatRows, focusedIndex, toggleExpand, navigate]);
 
   // Scroll focused item into view
-  useEffect(() => {
+  useEffect((): void => {
     if (treeRef.current) {
       const items = treeRef.current.querySelectorAll('[role="treeitem"]');
       items[focusedIndex]?.scrollIntoView({ block: 'nearest' });
@@ -336,19 +347,21 @@ export function OrgChartPage() {
   }, [focusedIndex]);
 
   // Show toast with auto-dismiss
-  const showToast = useCallback((message: string, undoFn: (() => void) | null) => {
+  const showToast = useCallback((message: string, undoFn: (() => void) | null): void => {
     if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
     setToast({ message, undoFn });
-    toastTimeoutRef.current = setTimeout(() => setToast(null), 5000);
+    toastTimeoutRef.current = setTimeout((): void => {
+      setToast(null);
+    }, 5000);
   }, []);
 
   // Drag handlers
-  const handleDragStart = useCallback((event: DragStartEvent) => {
+  const handleDragStart = useCallback((event: DragStartEvent): void => {
     const id = String(event.active.id);
     setActiveId(id);
   }, []);
 
-  const handleDragEnd = useCallback(async (event: DragEndEvent) => {
+  const handleDragEnd = useCallback(async (event: DragEndEvent): Promise<void> => {
     const { active, over } = event;
     setActiveId(null);
 
@@ -362,7 +375,7 @@ export function OrgChartPage() {
     const targetPersonId = isNoSupervisor ? null : overId.replace('drop-', '');
 
     // Find the dragged person
-    const draggedPerson = people.find(p => p.id === draggedPersonId);
+    const draggedPerson = people.find((p: PersonData): boolean => p.id === draggedPersonId);
     if (!draggedPerson) return;
 
     // Find target person (for the new reports_to user_id)
@@ -383,7 +396,7 @@ export function OrgChartPage() {
 
     // Optimistically update local state
     const previousReportsTo = currentReportsTo;
-    setPeople(prev => prev.map(p =>
+    setPeople((prev: PersonData[]): PersonData[] => prev.map((p: PersonData): PersonData =>
       p.id === draggedPersonId ? { ...p, reportsTo: newReportsTo } : p,
     ));
 
@@ -394,8 +407,8 @@ export function OrgChartPage() {
       });
       if (!res.ok) throw new Error('Failed to update');
 
-      const undoFn = async () => {
-        setPeople(prev => prev.map(p =>
+      const undoFn = async (): Promise<void> => {
+        setPeople((prev: PersonData[]): PersonData[] => prev.map((p: PersonData): PersonData =>
           p.id === draggedPersonId ? { ...p, reportsTo: previousReportsTo } : p,
         ));
         try {
@@ -414,14 +427,14 @@ export function OrgChartPage() {
       showToast(message, undoFn);
     } catch {
       // Revert optimistic update
-      setPeople(prev => prev.map(p =>
+      setPeople((prev: PersonData[]): PersonData[] => prev.map((p: PersonData): PersonData =>
         p.id === draggedPersonId ? { ...p, reportsTo: previousReportsTo } : p,
       ));
       showToast('Failed to update reporting relationship', null);
     }
   }, [people, tree, invalidDropIds, fetchPeople, showToast]);
 
-  const handleDragCancel = useCallback(() => {
+  const handleDragCancel = useCallback((): void => {
     setActiveId(null);
   }, []);
 
@@ -462,7 +475,7 @@ export function OrgChartPage() {
           onKeyDown={handleKeyDown}
           className="space-y-px"
         >
-          {flatRows.map((row, index) => {
+          {flatRows.map((row: FlatRow, index: number): React.JSX.Element => {
             const { node, depth, isExpanded, hasChildren } = row;
             const isFocused = index === focusedIndex;
             const isMatch = searchMatches?.has(node.personId);
@@ -474,7 +487,7 @@ export function OrgChartPage() {
                 personId={node.personId}
                 disabled={!canDrag || isInvalidTarget}
               >
-                {({ isOver }) => (
+                {({ isOver }: { isOver: boolean }): React.JSX.Element => (
                   <OrgChartRow
                     node={node}
                     depth={depth}
@@ -488,7 +501,7 @@ export function OrgChartPage() {
                     canDrag={canDrag}
                     searchMatches={searchMatches}
                     debouncedQuery={debouncedQuery}
-                    onFocus={() => setFocusedIndex(index)}
+                    onFocus={(): void => setFocusedIndex(index)}
                     onToggleExpand={toggleExpand}
                     onNavigate={navigate}
                   />
@@ -517,7 +530,7 @@ export function OrgChartPage() {
           <input
             type="text"
             value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>): void => setSearchQuery(e.target.value)}
             placeholder="Search people..."
             className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted focus:outline-none"
           />
@@ -562,7 +575,7 @@ export function OrgChartPage() {
           <span className="text-foreground">{toast.message}</span>
           {toast.undoFn && (
             <button
-              onClick={() => {
+              onClick={(): void => {
                 toast.undoFn?.();
                 setToast(null);
                 if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
@@ -573,7 +586,7 @@ export function OrgChartPage() {
             </button>
           )}
           <button
-            onClick={() => {
+            onClick={(): void => {
               setToast(null);
               if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
             }}
@@ -590,7 +603,7 @@ export function OrgChartPage() {
 }
 
 // --- "No supervisor" drop zone ---
-function NoSupervisorDropZone() {
+function NoSupervisorDropZone(): React.JSX.Element {
   const { setNodeRef, isOver } = useDroppable({
     id: 'drop-no-supervisor',
     data: { personId: null },
@@ -643,7 +656,7 @@ function OrgChartRow({
   onFocus: () => void;
   onToggleExpand: (id: string) => void;
   onNavigate: (path: string) => void;
-}) {
+}): React.JSX.Element {
   const { attributes, listeners, setNodeRef: setDragRef, transform } = useDraggable({
     id: node.personId,
     disabled: !canDrag,
@@ -676,8 +689,11 @@ function OrgChartRow({
     >
       {/* Expand/collapse chevron */}
       <button
-        onClick={(e) => { e.stopPropagation(); onToggleExpand(node.personId); }}
-        onPointerDown={(e) => e.stopPropagation()}
+        onClick={(e: React.MouseEvent<HTMLButtonElement>): void => {
+          e.stopPropagation();
+          onToggleExpand(node.personId);
+        }}
+        onPointerDown={(e: React.PointerEvent<HTMLButtonElement>): void => e.stopPropagation()}
         className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded transition-transform ${
           hasChildren ? 'text-muted hover:text-foreground' : 'invisible'
         }`}
@@ -703,8 +719,8 @@ function OrgChartRow({
         {/* Line 1: Name + Role */}
         <div className="flex items-baseline gap-2">
           <button
-            onClick={() => onNavigate(`/team/${node.personId}`)}
-            onPointerDown={(e) => e.stopPropagation()}
+            onClick={(): void => onNavigate(`/team/${node.personId}`)}
+            onPointerDown={(e: React.PointerEvent<HTMLButtonElement>): void => e.stopPropagation()}
             className="truncate font-medium text-foreground hover:text-accent hover:underline"
             tabIndex={-1}
           >
@@ -742,7 +758,7 @@ function OrgChartRow({
   );
 }
 
-function HighlightedText({ text, query }: { text: string; query: string }) {
+function HighlightedText({ text, query }: { text: string; query: string }): React.JSX.Element {
   const lowerText = text.toLowerCase();
   const lowerQuery = query.toLowerCase();
   const idx = lowerText.indexOf(lowerQuery);

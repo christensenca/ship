@@ -4,7 +4,7 @@ import crypto from 'crypto'
 import { createApp } from '../app.js'
 import { pool } from '../db/client.js'
 
-describe('Sprints API', () => {
+describe('Sprints API', (): void => {
   const app = createApp()
   const testRunId = Date.now().toString(36) + Math.random().toString(36).slice(2, 6)
   const testEmail = `sprints-test-${testRunId}@ship.local`
@@ -17,7 +17,7 @@ describe('Sprints API', () => {
   let testProgramId: string
   let testProjectId: string
 
-  beforeAll(async () => {
+  beforeAll(async (): Promise<void> => {
     // Create test workspace
     const workspaceResult = await pool.query(
       `INSERT INTO workspaces (name) VALUES ($1) RETURNING id`,
@@ -79,7 +79,7 @@ describe('Sprints API', () => {
     testProjectId = projectResult.rows[0].id
   })
 
-  afterAll(async () => {
+  afterAll(async (): Promise<void> => {
     // Clean up in correct order (foreign key constraints)
     await pool.query('DELETE FROM sessions WHERE user_id = $1', [testUserId])
     await pool.query('DELETE FROM documents WHERE workspace_id = $1', [testWorkspaceId])
@@ -88,10 +88,10 @@ describe('Sprints API', () => {
     await pool.query('DELETE FROM workspaces WHERE id = $1', [testWorkspaceId])
   })
 
-  describe('GET /api/weeks', () => {
+  describe('GET /api/weeks', (): void => {
     let testSprintId: string
 
-    beforeAll(async () => {
+    beforeAll(async (): Promise<void> => {
       // Create a test sprint with sprint_number: 1 (matches default current sprint)
       const sprintResult = await pool.query(
         `INSERT INTO documents (workspace_id, document_type, title, visibility, created_by, properties)
@@ -108,7 +108,7 @@ describe('Sprints API', () => {
       )
     })
 
-    it('should return list of sprints', async () => {
+    it('should return list of sprints', async (): Promise<void> => {
       const res = await request(app)
         .get('/api/weeks')
         .set('Cookie', sessionCookie)
@@ -118,23 +118,23 @@ describe('Sprints API', () => {
       expect(res.body.weeks.length).toBeGreaterThan(0)
 
       // Find our test sprint
-      const testSprint = res.body.weeks.find((s: { id: string }) => s.id === testSprintId)
+      const testSprint = res.body.weeks.find((s: { id: string }): boolean => s.id === testSprintId)
       expect(testSprint).toBeDefined()
       expect(testSprint.name).toBe('Test Sprint for List')
     })
 
-    it('should filter sprints by program_id', async () => {
+    it('should filter sprints by program_id', async (): Promise<void> => {
       const res = await request(app)
         .get(`/api/weeks?program_id=${testProgramId}`)
         .set('Cookie', sessionCookie)
 
       expect(res.status).toBe(200)
       expect(res.body.weeks).toBeInstanceOf(Array)
-      const allMatchProgram = res.body.weeks.every((s: { program_id: string }) => s.program_id === testProgramId)
+      const allMatchProgram = res.body.weeks.every((s: { program_id: string }): boolean => s.program_id === testProgramId)
       expect(allMatchProgram).toBe(true)
     })
 
-    it('should reject unauthenticated request', async () => {
+    it('should reject unauthenticated request', async (): Promise<void> => {
       const res = await request(app)
         .get('/api/weeks')
 
@@ -142,10 +142,10 @@ describe('Sprints API', () => {
     })
   })
 
-  describe('GET /api/weeks/:id', () => {
+  describe('GET /api/weeks/:id', (): void => {
     let testSprintId: string
 
-    beforeAll(async () => {
+    beforeAll(async (): Promise<void> => {
       const sprintResult = await pool.query(
         `INSERT INTO documents (workspace_id, document_type, title, visibility, created_by)
          VALUES ($1, 'sprint', 'Test Sprint for Get', 'workspace', $2)
@@ -161,7 +161,7 @@ describe('Sprints API', () => {
       )
     })
 
-    it('should return sprint by id', async () => {
+    it('should return sprint by id', async (): Promise<void> => {
       const res = await request(app)
         .get(`/api/weeks/${testSprintId}`)
         .set('Cookie', sessionCookie)
@@ -171,7 +171,7 @@ describe('Sprints API', () => {
       expect(res.body.name).toBe('Test Sprint for Get')
     })
 
-    it('should return 404 for non-existent sprint', async () => {
+    it('should return 404 for non-existent sprint', async (): Promise<void> => {
       const fakeId = crypto.randomUUID()
       const res = await request(app)
         .get(`/api/weeks/${fakeId}`)
@@ -181,8 +181,8 @@ describe('Sprints API', () => {
     })
   })
 
-  describe('POST /api/weeks', () => {
-    it('should create a new sprint', async () => {
+  describe('POST /api/weeks', (): void => {
+    it('should create a new sprint', async (): Promise<void> => {
       const res = await request(app)
         .post('/api/weeks')
         .set('Cookie', sessionCookie)
@@ -199,7 +199,7 @@ describe('Sprints API', () => {
       expect(res.body.program_id).toBe(testProgramId)
     })
 
-    it('should create sprint with dates', async () => {
+    it('should create sprint with dates', async (): Promise<void> => {
       const res = await request(app)
         .post('/api/weeks')
         .set('Cookie', sessionCookie)
@@ -216,7 +216,7 @@ describe('Sprints API', () => {
       expect(res.body.workspace_sprint_start_date).toBeDefined()
     })
 
-    it('should create sprint with plan', async () => {
+    it('should create sprint with plan', async (): Promise<void> => {
       const res = await request(app)
         .post('/api/weeks')
         .set('Cookie', sessionCookie)
@@ -232,7 +232,7 @@ describe('Sprints API', () => {
       expect(res.body.plan).toBe('If we implement feature X, then metric Y will improve by Z%')
     })
 
-    it('should require sprint_number', async () => {
+    it('should require sprint_number', async (): Promise<void> => {
       const res = await request(app)
         .post('/api/weeks')
         .set('Cookie', sessionCookie)
@@ -246,10 +246,10 @@ describe('Sprints API', () => {
     })
   })
 
-  describe('PATCH /api/weeks/:id', () => {
+  describe('PATCH /api/weeks/:id', (): void => {
     let testSprintId: string
 
-    beforeAll(async () => {
+    beforeAll(async (): Promise<void> => {
       const sprintResult = await pool.query(
         `INSERT INTO documents (workspace_id, document_type, title, visibility, created_by)
          VALUES ($1, 'sprint', 'Sprint to Update', 'workspace', $2)
@@ -265,7 +265,7 @@ describe('Sprints API', () => {
       )
     })
 
-    it('should update sprint title', async () => {
+    it('should update sprint title', async (): Promise<void> => {
       const res = await request(app)
         .patch(`/api/weeks/${testSprintId}`)
         .set('Cookie', sessionCookie)
@@ -278,7 +278,7 @@ describe('Sprints API', () => {
       expect(res.body.name).toBe('Updated Sprint Title')
     })
 
-    it('should update sprint_number via PATCH', async () => {
+    it('should update sprint_number via PATCH', async (): Promise<void> => {
       // Sprint status is computed from dates, sprint_number can be updated
       const res = await request(app)
         .patch(`/api/weeks/${testSprintId}`)
@@ -292,7 +292,7 @@ describe('Sprints API', () => {
       expect(res.body.sprint_number).toBe(99)
     })
 
-    it('should return 404 for non-existent sprint', async () => {
+    it('should return 404 for non-existent sprint', async (): Promise<void> => {
       const fakeId = crypto.randomUUID()
       const res = await request(app)
         .patch(`/api/weeks/${fakeId}`)
@@ -306,8 +306,8 @@ describe('Sprints API', () => {
     })
   })
 
-  describe('DELETE /api/weeks/:id', () => {
-    it('should delete a sprint', async () => {
+  describe('DELETE /api/weeks/:id', (): void => {
+    it('should delete a sprint', async (): Promise<void> => {
       // Create sprint to delete
       const sprintResult = await pool.query(
         `INSERT INTO documents (workspace_id, document_type, title, visibility, created_by)
@@ -339,10 +339,10 @@ describe('Sprints API', () => {
     })
   })
 
-  describe('PATCH /api/weeks/:id/plan', () => {
+  describe('PATCH /api/weeks/:id/plan', (): void => {
     let testSprintId: string
 
-    beforeAll(async () => {
+    beforeAll(async (): Promise<void> => {
       const sprintResult = await pool.query(
         `INSERT INTO documents (workspace_id, document_type, title, visibility, created_by)
          VALUES ($1, 'sprint', 'Sprint for Plan', 'workspace', $2)
@@ -358,7 +358,7 @@ describe('Sprints API', () => {
       )
     })
 
-    it('should update sprint plan', async () => {
+    it('should update sprint plan', async (): Promise<void> => {
       const res = await request(app)
         .patch(`/api/weeks/${testSprintId}/plan`)
         .set('Cookie', sessionCookie)
@@ -372,11 +372,11 @@ describe('Sprints API', () => {
     })
   })
 
-  describe('GET /api/weeks/:id/issues', () => {
+  describe('GET /api/weeks/:id/issues', (): void => {
     let testSprintId: string
     let testIssueId: string
 
-    beforeAll(async () => {
+    beforeAll(async (): Promise<void> => {
       // Create sprint
       const sprintResult = await pool.query(
         `INSERT INTO documents (workspace_id, document_type, title, visibility, created_by)
@@ -408,7 +408,7 @@ describe('Sprints API', () => {
       )
     })
 
-    it('should return issues assigned to sprint', async () => {
+    it('should return issues assigned to sprint', async (): Promise<void> => {
       const res = await request(app)
         .get(`/api/weeks/${testSprintId}/issues`)
         .set('Cookie', sessionCookie)
@@ -421,10 +421,10 @@ describe('Sprints API', () => {
     })
   })
 
-  describe('Sprint Lifecycle', () => {
+  describe('Sprint Lifecycle', (): void => {
     let testSprintId: string
 
-    beforeAll(async () => {
+    beforeAll(async (): Promise<void> => {
       const sprintResult = await pool.query(
         `INSERT INTO documents (workspace_id, document_type, title, visibility, created_by, properties)
          VALUES ($1, 'sprint', 'Lifecycle Sprint', 'workspace', $2, $3)
@@ -440,7 +440,7 @@ describe('Sprints API', () => {
       )
     })
 
-    it('should update sprint_number', async () => {
+    it('should update sprint_number', async (): Promise<void> => {
       const res = await request(app)
         .patch(`/api/weeks/${testSprintId}`)
         .set('Cookie', sessionCookie)
@@ -453,7 +453,7 @@ describe('Sprints API', () => {
       expect(res.body.sprint_number).toBe(11)
     })
 
-    it('should update sprint title', async () => {
+    it('should update sprint title', async (): Promise<void> => {
       const res = await request(app)
         .patch(`/api/weeks/${testSprintId}`)
         .set('Cookie', sessionCookie)
@@ -467,8 +467,8 @@ describe('Sprints API', () => {
     })
   })
 
-  describe('GET /api/weeks/my-week', () => {
-    it('should return my-week data', async () => {
+  describe('GET /api/weeks/my-week', (): void => {
+    it('should return my-week data', async (): Promise<void> => {
       const res = await request(app)
         .get('/api/weeks/my-week')
         .set('Cookie', sessionCookie)
@@ -479,8 +479,8 @@ describe('Sprints API', () => {
     })
   })
 
-  describe('GET /api/weeks/my-action-items', () => {
-    it('should return my action items', async () => {
+  describe('GET /api/weeks/my-action-items', (): void => {
+    it('should return my action items', async (): Promise<void> => {
       const res = await request(app)
         .get('/api/weeks/my-action-items')
         .set('Cookie', sessionCookie)
@@ -490,8 +490,8 @@ describe('Sprints API', () => {
     })
   })
 
-  describe('POST /api/weeks/:id/start', () => {
-    it('should start a planning sprint and capture scope snapshot', async () => {
+  describe('POST /api/weeks/:id/start', (): void => {
+    it('should start a planning sprint and capture scope snapshot', async (): Promise<void> => {
       // Create a sprint in planning status
       const sprintResult = await pool.query(
         `INSERT INTO documents (workspace_id, document_type, title, visibility, created_by, properties)
@@ -533,7 +533,7 @@ describe('Sprints API', () => {
       expect(res.body.snapshot_issue_count).toBe(1)
     })
 
-    it('should reject starting an already active sprint', async () => {
+    it('should reject starting an already active sprint', async (): Promise<void> => {
       // Create a sprint that's already active
       const sprintResult = await pool.query(
         `INSERT INTO documents (workspace_id, document_type, title, visibility, created_by, properties)
@@ -558,7 +558,7 @@ describe('Sprints API', () => {
       expect(res.body.error).toContain('already active')
     })
 
-    it('should return 404 for non-existent sprint', async () => {
+    it('should return 404 for non-existent sprint', async (): Promise<void> => {
       const fakeId = crypto.randomUUID()
       const res = await request(app)
         .post(`/api/weeks/${fakeId}/start`)
@@ -569,13 +569,13 @@ describe('Sprints API', () => {
     })
   })
 
-  describe('POST /api/weeks/:id/carryover', () => {
+  describe('POST /api/weeks/:id/carryover', (): void => {
     let sourceSprintId: string
     let targetSprintId: string
     let issueId1: string
     let issueId2: string
 
-    beforeAll(async () => {
+    beforeAll(async (): Promise<void> => {
       // Create source sprint (completed)
       const sourceResult = await pool.query(
         `INSERT INTO documents (workspace_id, document_type, title, visibility, created_by, properties)
@@ -643,7 +643,7 @@ describe('Sprints API', () => {
       )
     })
 
-    it('should move issues from source sprint to target sprint', async () => {
+    it('should move issues from source sprint to target sprint', async (): Promise<void> => {
       const res = await request(app)
         .post(`/api/weeks/${sourceSprintId}/carryover`)
         .set('Cookie', sessionCookie)
@@ -674,7 +674,7 @@ describe('Sprints API', () => {
       expect(issueResult.rows[0].properties.carryover_from_sprint_id).toBe(sourceSprintId)
     })
 
-    it('should reject carryover to completed sprint', async () => {
+    it('should reject carryover to completed sprint', async (): Promise<void> => {
       // Create a completed sprint
       const completedResult = await pool.query(
         `INSERT INTO documents (workspace_id, document_type, title, visibility, created_by, properties)
@@ -702,7 +702,7 @@ describe('Sprints API', () => {
       expect(res.body.error).toContain('planning or active')
     })
 
-    it('should reject issues not in source sprint', async () => {
+    it('should reject issues not in source sprint', async (): Promise<void> => {
       // Create an issue NOT in the source sprint
       const unrelatedResult = await pool.query(
         `INSERT INTO documents (workspace_id, document_type, title, visibility, created_by, properties)
@@ -730,7 +730,7 @@ describe('Sprints API', () => {
       expect(res.body.error).toContain('not found in source week')
     })
 
-    it('should return 404 for non-existent source sprint', async () => {
+    it('should return 404 for non-existent source sprint', async (): Promise<void> => {
       const fakeId = crypto.randomUUID()
       const res = await request(app)
         .post(`/api/weeks/${fakeId}/carryover`)
@@ -745,13 +745,13 @@ describe('Sprints API', () => {
     })
   })
 
-  describe('POST /api/weeks/:id/approve-review and approve-plan comments', () => {
+  describe('POST /api/weeks/:id/approve-review and approve-plan comments', (): void => {
     let adminCookie: string
     let adminCsrfToken: string
     let adminUserId: string
     let approvalSprintId: string
 
-    beforeAll(async () => {
+    beforeAll(async (): Promise<void> => {
       // Create admin user for approval tests
       const adminEmail = `admin-${testRunId}@ship.local`
       const adminResult = await pool.query(
@@ -805,7 +805,7 @@ describe('Sprints API', () => {
       )
     })
 
-    it('should reject review approval without rating', async () => {
+    it('should reject review approval without rating', async (): Promise<void> => {
       const res = await request(app)
         .post(`/api/weeks/${approvalSprintId}/approve-review`)
         .set('Cookie', adminCookie)
@@ -815,7 +815,7 @@ describe('Sprints API', () => {
       expect(res.body.error).toContain('Rating is required')
     })
 
-    it('should approve review with rating', async () => {
+    it('should approve review with rating', async (): Promise<void> => {
       const res = await request(app)
         .post(`/api/weeks/${approvalSprintId}/approve-review`)
         .set('Cookie', adminCookie)
@@ -831,7 +831,7 @@ describe('Sprints API', () => {
       expect(res.body.review_rating.rated_at).toBeDefined()
     })
 
-    it('should approve plan with optional comment', async () => {
+    it('should approve plan with optional comment', async (): Promise<void> => {
       const res = await request(app)
         .post(`/api/weeks/${approvalSprintId}/approve-plan`)
         .set('Cookie', adminCookie)
@@ -844,7 +844,7 @@ describe('Sprints API', () => {
       expect(res.body.approval.comment).toBe('Onboarding week, expected slower output')
     })
 
-    it('should approve review with rating and optional comment', async () => {
+    it('should approve review with rating and optional comment', async (): Promise<void> => {
       const res = await request(app)
         .post(`/api/weeks/${approvalSprintId}/approve-review`)
         .set('Cookie', adminCookie)
@@ -857,7 +857,7 @@ describe('Sprints API', () => {
       expect(res.body.review_rating.value).toBe(4)
     })
 
-    it('should accept all valid ratings (1-5)', async () => {
+    it('should accept all valid ratings (1-5)', async (): Promise<void> => {
       for (const rating of [1, 2, 3, 4, 5]) {
         const res = await request(app)
           .post(`/api/weeks/${approvalSprintId}/approve-review`)
@@ -870,7 +870,7 @@ describe('Sprints API', () => {
       }
     })
 
-    it('should reject rating of 0', async () => {
+    it('should reject rating of 0', async (): Promise<void> => {
       const res = await request(app)
         .post(`/api/weeks/${approvalSprintId}/approve-review`)
         .set('Cookie', adminCookie)
@@ -881,7 +881,7 @@ describe('Sprints API', () => {
       expect(res.body.error).toContain('Rating must be an integer between 1 and 5')
     })
 
-    it('should reject rating of 6', async () => {
+    it('should reject rating of 6', async (): Promise<void> => {
       const res = await request(app)
         .post(`/api/weeks/${approvalSprintId}/approve-review`)
         .set('Cookie', adminCookie)
@@ -891,7 +891,7 @@ describe('Sprints API', () => {
       expect(res.status).toBe(400)
     })
 
-    it('should reject non-integer rating', async () => {
+    it('should reject non-integer rating', async (): Promise<void> => {
       const res = await request(app)
         .post(`/api/weeks/${approvalSprintId}/approve-review`)
         .set('Cookie', adminCookie)
@@ -901,7 +901,7 @@ describe('Sprints API', () => {
       expect(res.status).toBe(400)
     })
 
-    it('should persist rating in sprint properties', async () => {
+    it('should persist rating in sprint properties', async (): Promise<void> => {
       // Set a rating
       await request(app)
         .post(`/api/weeks/${approvalSprintId}/approve-review`)
@@ -917,7 +917,7 @@ describe('Sprints API', () => {
       expect(dbResult.rows[0].review_rating.value).toBe(4)
     })
 
-    it('should allow editing approval comment and log review_approval history', async () => {
+    it('should allow editing approval comment and log review_approval history', async (): Promise<void> => {
       await request(app)
         .post(`/api/weeks/${approvalSprintId}/approve-review`)
         .set('Cookie', adminCookie)
@@ -948,7 +948,7 @@ describe('Sprints API', () => {
       expect(historyResult.rows[0].new_value).toContain('Updated note after follow-up')
     })
 
-    it('should reject non-admin non-accountable user', async () => {
+    it('should reject non-admin non-accountable user', async (): Promise<void> => {
       const res = await request(app)
         .post(`/api/weeks/${approvalSprintId}/approve-review`)
         .set('Cookie', sessionCookie)
@@ -959,10 +959,10 @@ describe('Sprints API', () => {
     })
   })
 
-  describe('GET /api/team/reviews', () => {
+  describe('GET /api/team/reviews', (): void => {
     let adminCookie2: string
 
-    beforeAll(async () => {
+    beforeAll(async (): Promise<void> => {
       // Reuse admin from previous test or create one
       const adminEmail2 = `admin2-${testRunId}@ship.local`
       const adminResult = await pool.query(
@@ -996,7 +996,7 @@ describe('Sprints API', () => {
       }
     })
 
-    it('should return reviews data for admin', async () => {
+    it('should return reviews data for admin', async (): Promise<void> => {
       const res = await request(app)
         .get('/api/team/reviews')
         .set('Cookie', adminCookie2)
@@ -1008,7 +1008,7 @@ describe('Sprints API', () => {
       expect(res.body.currentSprintNumber).toBeGreaterThan(0)
     })
 
-    it('should support sprint_count parameter', async () => {
+    it('should support sprint_count parameter', async (): Promise<void> => {
       const res = await request(app)
         .get('/api/team/reviews?sprint_count=3')
         .set('Cookie', adminCookie2)
@@ -1017,7 +1017,7 @@ describe('Sprints API', () => {
       expect(res.body.weeks.length).toBeLessThanOrEqual(3)
     })
 
-    it('should reject non-admin user', async () => {
+    it('should reject non-admin user', async (): Promise<void> => {
       const res = await request(app)
         .get('/api/team/reviews')
         .set('Cookie', sessionCookie)
@@ -1025,7 +1025,7 @@ describe('Sprints API', () => {
       expect(res.status).toBe(403)
     })
 
-    it('should reject unauthenticated request', async () => {
+    it('should reject unauthenticated request', async (): Promise<void> => {
       const res = await request(app)
         .get('/api/team/reviews')
 

@@ -4,7 +4,7 @@ import crypto from 'crypto'
 import { createApp } from '../app.js'
 import { pool } from '../db/client.js'
 
-describe('Issues API', () => {
+describe('Issues API', (): void => {
   const app = createApp()
   const testRunId = Date.now().toString(36) + Math.random().toString(36).slice(2, 6)
   const testEmail = `issues-test-${testRunId}@ship.local`
@@ -18,7 +18,7 @@ describe('Issues API', () => {
   let testProjectId: string
   let testSprintId: string
 
-  beforeAll(async () => {
+  beforeAll(async (): Promise<void> => {
     // Create test workspace
     const workspaceResult = await pool.query(
       `INSERT INTO workspaces (name) VALUES ($1) RETURNING id`,
@@ -89,7 +89,7 @@ describe('Issues API', () => {
     testSprintId = sprintResult.rows[0].id
   })
 
-  afterAll(async () => {
+  afterAll(async (): Promise<void> => {
     // Clean up in correct order (foreign key constraints)
     await pool.query('DELETE FROM document_associations WHERE document_id IN (SELECT id FROM documents WHERE workspace_id = $1)', [testWorkspaceId])
     await pool.query('DELETE FROM sessions WHERE user_id = $1', [testUserId])
@@ -99,10 +99,10 @@ describe('Issues API', () => {
     await pool.query('DELETE FROM workspaces WHERE id = $1', [testWorkspaceId])
   })
 
-  describe('GET /api/issues', () => {
+  describe('GET /api/issues', (): void => {
     let testIssueId: string
 
-    beforeAll(async () => {
+    beforeAll(async (): Promise<void> => {
       // Create a test issue via direct SQL
       const issueResult = await pool.query(
         `INSERT INTO documents (workspace_id, document_type, title, visibility, created_by, properties)
@@ -120,7 +120,7 @@ describe('Issues API', () => {
       )
     })
 
-    it('should return list of issues', async () => {
+    it('should return list of issues', async (): Promise<void> => {
       const res = await request(app)
         .get('/api/issues')
         .set('Cookie', sessionCookie)
@@ -130,14 +130,14 @@ describe('Issues API', () => {
       expect(res.body.length).toBeGreaterThan(0)
 
       // Find our test issue
-      const testIssue = res.body.find((i: { id: string }) => i.id === testIssueId)
+      const testIssue = res.body.find((i: { id: string }): boolean => i.id === testIssueId)
       expect(testIssue).toBeDefined()
       expect(testIssue.title).toBe('Test Issue for List')
       expect(testIssue.content).toBeUndefined()
       expect(testIssue.properties).toBeUndefined()
     })
 
-    it('should filter issues by sprint_id', async () => {
+    it('should filter issues by sprint_id', async (): Promise<void> => {
       // Create an issue with sprint association
       const sprintIssueResult = await pool.query(
         `INSERT INTO documents (workspace_id, document_type, title, visibility, created_by, properties)
@@ -160,11 +160,11 @@ describe('Issues API', () => {
 
       expect(res.status).toBe(200)
       expect(res.body).toBeInstanceOf(Array)
-      const hasSprintIssue = res.body.some((i: { id: string }) => i.id === sprintIssueId)
+      const hasSprintIssue = res.body.some((i: { id: string }): boolean => i.id === sprintIssueId)
       expect(hasSprintIssue).toBe(true)
     })
 
-    it('should filter issues by project_id on the API', async () => {
+    it('should filter issues by project_id on the API', async (): Promise<void> => {
       const projectIssueResult = await pool.query(
         `INSERT INTO documents (workspace_id, document_type, title, visibility, created_by, properties)
          VALUES ($1, 'issue', 'Project Filter Issue', 'workspace', $2, $3)
@@ -192,11 +192,11 @@ describe('Issues API', () => {
         .set('Cookie', sessionCookie)
 
       expect(res.status).toBe(200)
-      expect(res.body.some((i: { id: string }) => i.id === projectIssueId)).toBe(true)
-      expect(res.body.some((i: { id: string }) => i.id === otherIssueId)).toBe(false)
+      expect(res.body.some((i: { id: string }): boolean => i.id === projectIssueId)).toBe(true)
+      expect(res.body.some((i: { id: string }): boolean => i.id === otherIssueId)).toBe(false)
     })
 
-    it('should emit benchmark timing phases for issues list responses', async () => {
+    it('should emit benchmark timing phases for issues list responses', async (): Promise<void> => {
       const previousBenchmark = process.env.API_BENCHMARK
       process.env.API_BENCHMARK = '1'
 
@@ -220,7 +220,7 @@ describe('Issues API', () => {
       }
     })
 
-    it('should reject unauthenticated request', async () => {
+    it('should reject unauthenticated request', async (): Promise<void> => {
       const res = await request(app)
         .get('/api/issues')
 
@@ -228,10 +228,10 @@ describe('Issues API', () => {
     })
   })
 
-  describe('GET /api/issues/:id', () => {
+  describe('GET /api/issues/:id', (): void => {
     let testIssueId: string
 
-    beforeAll(async () => {
+    beforeAll(async (): Promise<void> => {
       const issueResult = await pool.query(
         `INSERT INTO documents (workspace_id, document_type, title, visibility, created_by, properties)
          VALUES ($1, 'issue', 'Test Issue for Get', 'workspace', $2, $3)
@@ -241,7 +241,7 @@ describe('Issues API', () => {
       testIssueId = issueResult.rows[0].id
     })
 
-    it('should return issue by id', async () => {
+    it('should return issue by id', async (): Promise<void> => {
       const res = await request(app)
         .get(`/api/issues/${testIssueId}`)
         .set('Cookie', sessionCookie)
@@ -253,7 +253,7 @@ describe('Issues API', () => {
       expect(res.body.belongs_to).toBeInstanceOf(Array)
     })
 
-    it('should return 404 for non-existent issue', async () => {
+    it('should return 404 for non-existent issue', async (): Promise<void> => {
       const fakeId = crypto.randomUUID()
       const res = await request(app)
         .get(`/api/issues/${fakeId}`)
@@ -263,11 +263,11 @@ describe('Issues API', () => {
     })
   })
 
-  describe('GET /api/issues/by-ticket/:number', () => {
+  describe('GET /api/issues/by-ticket/:number', (): void => {
     let testIssueId: string
     let ticketNumber: number
 
-    beforeAll(async () => {
+    beforeAll(async (): Promise<void> => {
       // Get next available ticket number for this workspace
       const maxResult = await pool.query(
         `SELECT COALESCE(MAX(ticket_number), 0) + 1 as next_number
@@ -285,7 +285,7 @@ describe('Issues API', () => {
       testIssueId = issueResult.rows[0].id
     })
 
-    it('should find issue by ticket number', async () => {
+    it('should find issue by ticket number', async (): Promise<void> => {
       const res = await request(app)
         .get(`/api/issues/by-ticket/${ticketNumber}`)
         .set('Cookie', sessionCookie)
@@ -295,7 +295,7 @@ describe('Issues API', () => {
       expect(res.body.ticket_number).toBe(ticketNumber)
     })
 
-    it('should return 404 for non-existent ticket number', async () => {
+    it('should return 404 for non-existent ticket number', async (): Promise<void> => {
       const res = await request(app)
         .get('/api/issues/by-ticket/999999999')
         .set('Cookie', sessionCookie)
@@ -304,8 +304,8 @@ describe('Issues API', () => {
     })
   })
 
-  describe('POST /api/issues', () => {
-    it('should create a new issue', async () => {
+  describe('POST /api/issues', (): void => {
+    it('should create a new issue', async (): Promise<void> => {
       const res = await request(app)
         .post('/api/issues')
         .set('Cookie', sessionCookie)
@@ -324,7 +324,7 @@ describe('Issues API', () => {
       expect(res.body.belongs_to).toBeInstanceOf(Array)
     })
 
-    it('should create issue with optional fields', async () => {
+    it('should create issue with optional fields', async (): Promise<void> => {
       const res = await request(app)
         .post('/api/issues')
         .set('Cookie', sessionCookie)
@@ -343,7 +343,7 @@ describe('Issues API', () => {
       expect(res.body.priority).toBe('high')
     })
 
-    it('should create issue without belongs_to (valid)', async () => {
+    it('should create issue without belongs_to (valid)', async (): Promise<void> => {
       // API allows creating issues without associations
       const res = await request(app)
         .post('/api/issues')
@@ -358,10 +358,10 @@ describe('Issues API', () => {
     })
   })
 
-  describe('PATCH /api/issues/:id', () => {
+  describe('PATCH /api/issues/:id', (): void => {
     let testIssueId: string
 
-    beforeAll(async () => {
+    beforeAll(async (): Promise<void> => {
       const issueResult = await pool.query(
         `INSERT INTO documents (workspace_id, document_type, title, visibility, created_by, properties)
          VALUES ($1, 'issue', 'Issue to Update', 'workspace', $2, $3)
@@ -371,7 +371,7 @@ describe('Issues API', () => {
       testIssueId = issueResult.rows[0].id
     })
 
-    it('should update issue title', async () => {
+    it('should update issue title', async (): Promise<void> => {
       const res = await request(app)
         .patch(`/api/issues/${testIssueId}`)
         .set('Cookie', sessionCookie)
@@ -384,7 +384,7 @@ describe('Issues API', () => {
       expect(res.body.title).toBe('Updated Issue Title')
     })
 
-    it('should update issue state', async () => {
+    it('should update issue state', async (): Promise<void> => {
       const res = await request(app)
         .patch(`/api/issues/${testIssueId}`)
         .set('Cookie', sessionCookie)
@@ -397,7 +397,7 @@ describe('Issues API', () => {
       expect(res.body.state).toBe('done')
     })
 
-    it('should update issue belongs_to', async () => {
+    it('should update issue belongs_to', async (): Promise<void> => {
       const res = await request(app)
         .patch(`/api/issues/${testIssueId}`)
         .set('Cookie', sessionCookie)
@@ -408,10 +408,10 @@ describe('Issues API', () => {
 
       expect(res.status).toBe(200)
       expect(res.body.belongs_to).toBeInstanceOf(Array)
-      expect(res.body.belongs_to.some((bt: { id: string; type: string }) => bt.id === testProjectId && bt.type === 'project')).toBe(true)
+      expect(res.body.belongs_to.some((bt: { id: string; type: string }): boolean => bt.id === testProjectId && bt.type === 'project')).toBe(true)
     })
 
-    it('should return 404 for non-existent issue', async () => {
+    it('should return 404 for non-existent issue', async (): Promise<void> => {
       const fakeId = crypto.randomUUID()
       const res = await request(app)
         .patch(`/api/issues/${fakeId}`)
@@ -425,8 +425,8 @@ describe('Issues API', () => {
     })
   })
 
-  describe('DELETE /api/issues/:id', () => {
-    it('should delete an issue', async () => {
+  describe('DELETE /api/issues/:id', (): void => {
+    it('should delete an issue', async (): Promise<void> => {
       // Create issue to delete
       const issueResult = await pool.query(
         `INSERT INTO documents (workspace_id, document_type, title, visibility, created_by, properties)
@@ -452,11 +452,11 @@ describe('Issues API', () => {
     })
   })
 
-  describe('GET /api/issues/:id/children', () => {
+  describe('GET /api/issues/:id/children', (): void => {
     let parentIssueId: string
     let childIssueId: string
 
-    beforeAll(async () => {
+    beforeAll(async (): Promise<void> => {
       // Create parent issue
       const parentResult = await pool.query(
         `INSERT INTO documents (workspace_id, document_type, title, visibility, created_by, properties)
@@ -483,7 +483,7 @@ describe('Issues API', () => {
       )
     })
 
-    it('should return child issues', async () => {
+    it('should return child issues', async (): Promise<void> => {
       const res = await request(app)
         .get(`/api/issues/${parentIssueId}/children`)
         .set('Cookie', sessionCookie)
@@ -496,10 +496,10 @@ describe('Issues API', () => {
     })
   })
 
-  describe('POST /api/issues/bulk', () => {
+  describe('POST /api/issues/bulk', (): void => {
     let issueIds: string[] = []
 
-    beforeAll(async () => {
+    beforeAll(async (): Promise<void> => {
       issueIds = []
       // Create multiple issues for bulk operations
       for (let i = 0; i < 3; i++) {
@@ -513,7 +513,7 @@ describe('Issues API', () => {
       }
     })
 
-    it('should update multiple issues at once', async () => {
+    it('should update multiple issues at once', async (): Promise<void> => {
       const res = await request(app)
         .post('/api/issues/bulk')
         .set('Cookie', sessionCookie)
@@ -540,7 +540,7 @@ describe('Issues API', () => {
       }
     })
 
-    it('should bulk archive issues', async () => {
+    it('should bulk archive issues', async (): Promise<void> => {
       const res = await request(app)
         .post('/api/issues/bulk')
         .set('Cookie', sessionCookie)
@@ -555,10 +555,10 @@ describe('Issues API', () => {
     })
   })
 
-  describe('State Transitions', () => {
+  describe('State Transitions', (): void => {
     let testIssueId: string
 
-    beforeAll(async () => {
+    beforeAll(async (): Promise<void> => {
       const issueResult = await pool.query(
         `INSERT INTO documents (workspace_id, document_type, title, visibility, created_by, properties)
          VALUES ($1, 'issue', 'State Test Issue', 'workspace', $2, $3)
@@ -568,7 +568,7 @@ describe('Issues API', () => {
       testIssueId = issueResult.rows[0].id
     })
 
-    it('should transition from backlog to in_progress', async () => {
+    it('should transition from backlog to in_progress', async (): Promise<void> => {
       const res = await request(app)
         .patch(`/api/issues/${testIssueId}`)
         .set('Cookie', sessionCookie)
@@ -581,7 +581,7 @@ describe('Issues API', () => {
       expect(res.body.state).toBe('in_progress')
     })
 
-    it('should transition from in_progress to in_review', async () => {
+    it('should transition from in_progress to in_review', async (): Promise<void> => {
       const res = await request(app)
         .patch(`/api/issues/${testIssueId}`)
         .set('Cookie', sessionCookie)
@@ -594,7 +594,7 @@ describe('Issues API', () => {
       expect(res.body.state).toBe('in_review')
     })
 
-    it('should transition from in_review to done', async () => {
+    it('should transition from in_review to done', async (): Promise<void> => {
       const res = await request(app)
         .patch(`/api/issues/${testIssueId}`)
         .set('Cookie', sessionCookie)

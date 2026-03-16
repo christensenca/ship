@@ -4,7 +4,7 @@ import crypto from 'crypto'
 import { createApp } from '../app.js'
 import { pool } from '../db/client.js'
 
-describe('Workspaces API', () => {
+describe('Workspaces API', (): void => {
   const app = createApp()
   // Use unique identifiers to avoid conflicts between concurrent test runs
   const testRunId = Date.now().toString(36) + Math.random().toString(36).slice(2, 6)
@@ -21,7 +21,7 @@ describe('Workspaces API', () => {
   let superAdminUserId: string
 
   // Setup: Create test users and sessions
-  beforeAll(async () => {
+  beforeAll(async (): Promise<void> => {
     // Create test workspace
     const workspaceResult = await pool.query(
       `INSERT INTO workspaces (name) VALUES ($1)
@@ -102,7 +102,7 @@ describe('Workspaces API', () => {
   })
 
   // Cleanup after all tests
-  afterAll(async () => {
+  afterAll(async (): Promise<void> => {
     // Clean up test data in correct order (foreign keys)
     await pool.query('DELETE FROM sessions WHERE user_id IN ($1, $2)', [testUserId, superAdminUserId])
     await pool.query('DELETE FROM workspace_memberships WHERE user_id IN ($1, $2)', [testUserId, superAdminUserId])
@@ -110,8 +110,8 @@ describe('Workspaces API', () => {
     await pool.query('DELETE FROM workspaces WHERE id = $1', [testWorkspaceId])
   })
 
-  describe('GET /api/workspaces', () => {
-    it('should return user workspaces when authenticated', async () => {
+  describe('GET /api/workspaces', (): void => {
+    it('should return user workspaces when authenticated', async (): Promise<void> => {
       const response = await request(app)
         .get('/api/workspaces')
         .set('Cookie', sessionCookie)
@@ -125,7 +125,7 @@ describe('Workspaces API', () => {
       expect(response.body.data.workspaces[0]).toHaveProperty('role')
     })
 
-    it('should return 401 when not authenticated', async () => {
+    it('should return 401 when not authenticated', async (): Promise<void> => {
       const response = await request(app).get('/api/workspaces')
 
       expect(response.status).toBe(401)
@@ -134,8 +134,8 @@ describe('Workspaces API', () => {
     })
   })
 
-  describe('GET /api/workspaces/current', () => {
-    it('should return current workspace', async () => {
+  describe('GET /api/workspaces/current', (): void => {
+    it('should return current workspace', async (): Promise<void> => {
       const response = await request(app)
         .get('/api/workspaces/current')
         .set('Cookie', sessionCookie)
@@ -147,8 +147,8 @@ describe('Workspaces API', () => {
     })
   })
 
-  describe('POST /api/workspaces/:id/switch', () => {
-    it('should switch to a workspace user is member of', async () => {
+  describe('POST /api/workspaces/:id/switch', (): void => {
+    it('should switch to a workspace user is member of', async (): Promise<void> => {
       const response = await request(app)
         .post(`/api/workspaces/${testWorkspaceId}/switch`)
         .set('Cookie', sessionCookie)
@@ -159,7 +159,7 @@ describe('Workspaces API', () => {
       expect(response.body.data.workspaceId).toBe(testWorkspaceId)
     })
 
-    it('should return 403 when switching to workspace user is not member of', async () => {
+    it('should return 403 when switching to workspace user is not member of', async (): Promise<void> => {
       // Create another workspace
       const otherWorkspaceResult = await pool.query(
         `INSERT INTO workspaces (name) VALUES ('Other Workspace') RETURNING id`
@@ -178,8 +178,8 @@ describe('Workspaces API', () => {
     })
   })
 
-  describe('Workspace Members API', () => {
-    it('GET /api/workspaces/:id/members should return members', async () => {
+  describe('Workspace Members API', (): void => {
+    it('GET /api/workspaces/:id/members should return members', async (): Promise<void> => {
       const response = await request(app)
         .get(`/api/workspaces/${testWorkspaceId}/members`)
         .set('Cookie', superAdminSessionCookie)
@@ -189,7 +189,7 @@ describe('Workspaces API', () => {
       expect(Array.isArray(response.body.data.members)).toBe(true)
     })
 
-    it('should require admin role to manage members', async () => {
+    it('should require admin role to manage members', async (): Promise<void> => {
       // Regular member tries to get members
       const response = await request(app)
         .get(`/api/workspaces/${testWorkspaceId}/members`)
@@ -200,10 +200,10 @@ describe('Workspaces API', () => {
     })
   })
 
-  describe('Workspace Invites API', () => {
+  describe('Workspace Invites API', (): void => {
     let inviteId: string
 
-    it('POST /api/workspaces/:id/invites should create invite', async () => {
+    it('POST /api/workspaces/:id/invites should create invite', async (): Promise<void> => {
       const response = await request(app)
         .post(`/api/workspaces/${testWorkspaceId}/invites`)
         .set('Cookie', superAdminSessionCookie)
@@ -218,7 +218,7 @@ describe('Workspaces API', () => {
       inviteId = response.body.data.invite.id
     })
 
-    it('GET /api/workspaces/:id/invites should return invites', async () => {
+    it('GET /api/workspaces/:id/invites should return invites', async (): Promise<void> => {
       const response = await request(app)
         .get(`/api/workspaces/${testWorkspaceId}/invites`)
         .set('Cookie', superAdminSessionCookie)
@@ -228,7 +228,7 @@ describe('Workspaces API', () => {
       expect(Array.isArray(response.body.data.invites)).toBe(true)
     })
 
-    it('DELETE /api/workspaces/:id/invites/:inviteId should revoke invite', async () => {
+    it('DELETE /api/workspaces/:id/invites/:inviteId should revoke invite', async (): Promise<void> => {
       if (!inviteId) {
         // Create invite first if not created
         const createResponse = await request(app)
@@ -248,7 +248,7 @@ describe('Workspaces API', () => {
       expect(response.body.success).toBe(true)
     })
 
-    it('POST /api/workspaces/:id/invites should create pending person document', async () => {
+    it('POST /api/workspaces/:id/invites should create pending person document', async (): Promise<void> => {
       const testEmail = 'pending-person-test@test.com'
 
       const response = await request(app)
@@ -276,7 +276,7 @@ describe('Workspaces API', () => {
       expect(personResult.rows[0].properties.invite_id).toBe(newInviteId)
     })
 
-    it('DELETE /api/workspaces/:id/invites/:inviteId should archive person document', async () => {
+    it('DELETE /api/workspaces/:id/invites/:inviteId should archive person document', async (): Promise<void> => {
       const testEmail = 'archive-person-test@test.com'
 
       // Create invite (which creates pending person doc)
@@ -318,14 +318,14 @@ describe('Workspaces API', () => {
     })
 
     // Cleanup after invite tests
-    afterAll(async () => {
+    afterAll(async (): Promise<void> => {
       await pool.query('DELETE FROM workspace_invites WHERE workspace_id = $1', [testWorkspaceId])
       await pool.query(`DELETE FROM documents WHERE workspace_id = $1 AND document_type = 'person' AND properties->>'invite_id' IS NOT NULL`, [testWorkspaceId])
     })
   })
 
-  describe('Workspace Audit Logs API', () => {
-    it('GET /api/workspaces/:id/audit-logs should return audit logs', async () => {
+  describe('Workspace Audit Logs API', (): void => {
+    it('GET /api/workspaces/:id/audit-logs should return audit logs', async (): Promise<void> => {
       const response = await request(app)
         .get(`/api/workspaces/${testWorkspaceId}/audit-logs`)
         .set('Cookie', superAdminSessionCookie)
@@ -335,7 +335,7 @@ describe('Workspaces API', () => {
       expect(Array.isArray(response.body.data.logs)).toBe(true)
     })
 
-    it('should require admin role to view audit logs', async () => {
+    it('should require admin role to view audit logs', async (): Promise<void> => {
       const response = await request(app)
         .get(`/api/workspaces/${testWorkspaceId}/audit-logs`)
         .set('Cookie', sessionCookie)
@@ -346,7 +346,7 @@ describe('Workspaces API', () => {
   })
 })
 
-describe('Admin API', () => {
+describe('Admin API', (): void => {
   const app = createApp()
   // Use unique identifiers to avoid conflicts between concurrent test runs
   const testRunId = Date.now().toString(36) + Math.random().toString(36).slice(2, 6)
@@ -362,7 +362,7 @@ describe('Admin API', () => {
   let regularUserId: string
   let testWorkspaceId: string
 
-  beforeAll(async () => {
+  beforeAll(async (): Promise<void> => {
     // Create test workspace
     const workspaceResult = await pool.query(
       `INSERT INTO workspaces (name) VALUES ($1) RETURNING id`,
@@ -439,7 +439,7 @@ describe('Admin API', () => {
     }
   })
 
-  afterAll(async () => {
+  afterAll(async (): Promise<void> => {
     await pool.query('DELETE FROM sessions WHERE user_id IN ($1, $2)', [superAdminUserId, regularUserId])
     await pool.query('DELETE FROM workspace_memberships WHERE user_id IN ($1, $2)', [superAdminUserId, regularUserId])
     await pool.query('DELETE FROM audit_logs WHERE workspace_id = $1', [testWorkspaceId])
@@ -448,8 +448,8 @@ describe('Admin API', () => {
     await pool.query('DELETE FROM workspaces WHERE id = $1', [testWorkspaceId])
   })
 
-  describe('GET /api/admin/workspaces', () => {
-    it('should return all workspaces for super admin', async () => {
+  describe('GET /api/admin/workspaces', (): void => {
+    it('should return all workspaces for super admin', async (): Promise<void> => {
       const response = await request(app)
         .get('/api/admin/workspaces')
         .set('Cookie', superAdminSessionCookie)
@@ -459,7 +459,7 @@ describe('Admin API', () => {
       expect(Array.isArray(response.body.data.workspaces)).toBe(true)
     })
 
-    it('should return 403 for non-super-admin', async () => {
+    it('should return 403 for non-super-admin', async (): Promise<void> => {
       const response = await request(app)
         .get('/api/admin/workspaces')
         .set('Cookie', regularSessionCookie)
@@ -468,8 +468,8 @@ describe('Admin API', () => {
     })
   })
 
-  describe('POST /api/admin/workspaces', () => {
-    it('should create workspace for super admin', async () => {
+  describe('POST /api/admin/workspaces', (): void => {
+    it('should create workspace for super admin', async (): Promise<void> => {
       const response = await request(app)
         .post('/api/admin/workspaces')
         .set('Cookie', superAdminSessionCookie)
@@ -482,7 +482,7 @@ describe('Admin API', () => {
       expect(response.body.data.workspace).toHaveProperty('name', 'Admin Created Workspace')
     })
 
-    it('should return 403 for non-super-admin', async () => {
+    it('should return 403 for non-super-admin', async (): Promise<void> => {
       const response = await request(app)
         .post('/api/admin/workspaces')
         .set('Cookie', regularSessionCookie)
@@ -493,8 +493,8 @@ describe('Admin API', () => {
     })
   })
 
-  describe('GET /api/admin/users', () => {
-    it('should return all users for super admin', async () => {
+  describe('GET /api/admin/users', (): void => {
+    it('should return all users for super admin', async (): Promise<void> => {
       const response = await request(app)
         .get('/api/admin/users')
         .set('Cookie', superAdminSessionCookie)
@@ -504,7 +504,7 @@ describe('Admin API', () => {
       expect(Array.isArray(response.body.data.users)).toBe(true)
     })
 
-    it('should return 403 for non-super-admin', async () => {
+    it('should return 403 for non-super-admin', async (): Promise<void> => {
       const response = await request(app)
         .get('/api/admin/users')
         .set('Cookie', regularSessionCookie)
@@ -513,8 +513,8 @@ describe('Admin API', () => {
     })
   })
 
-  describe('GET /api/admin/audit-logs', () => {
-    it('should return global audit logs for super admin', async () => {
+  describe('GET /api/admin/audit-logs', (): void => {
+    it('should return global audit logs for super admin', async (): Promise<void> => {
       const response = await request(app)
         .get('/api/admin/audit-logs')
         .set('Cookie', superAdminSessionCookie)
@@ -524,7 +524,7 @@ describe('Admin API', () => {
       expect(Array.isArray(response.body.data.logs)).toBe(true)
     })
 
-    it('should return 403 for non-super-admin', async () => {
+    it('should return 403 for non-super-admin', async (): Promise<void> => {
       const response = await request(app)
         .get('/api/admin/audit-logs')
         .set('Cookie', regularSessionCookie)
@@ -534,7 +534,7 @@ describe('Admin API', () => {
   })
 })
 
-describe('Invite Validation API', () => {
+describe('Invite Validation API', (): void => {
   const app = createApp()
   // Use unique identifiers to avoid conflicts between concurrent test runs
   const testRunId = Date.now().toString(36) + Math.random().toString(36).slice(2, 6)
@@ -548,7 +548,7 @@ describe('Invite Validation API', () => {
   let sessionCookie: string
   let validInviteToken: string
 
-  beforeAll(async () => {
+  beforeAll(async (): Promise<void> => {
     // Create test workspace
     const workspaceResult = await pool.query(
       `INSERT INTO workspaces (name) VALUES ($1) RETURNING id`,
@@ -590,7 +590,7 @@ describe('Invite Validation API', () => {
     validInviteToken = inviteResult.rows[0].token
   })
 
-  afterAll(async () => {
+  afterAll(async (): Promise<void> => {
     await pool.query('DELETE FROM sessions WHERE user_id = $1', [testUserId])
     await pool.query('DELETE FROM workspace_invites WHERE workspace_id = $1', [testWorkspaceId])
     await pool.query('DELETE FROM workspace_memberships WHERE user_id = $1', [testUserId])
@@ -598,8 +598,8 @@ describe('Invite Validation API', () => {
     await pool.query('DELETE FROM workspaces WHERE id = $1', [testWorkspaceId])
   })
 
-  describe('GET /api/invites/:token', () => {
-    it('should return invite info for valid token', async () => {
+  describe('GET /api/invites/:token', (): void => {
+    it('should return invite info for valid token', async (): Promise<void> => {
       const response = await request(app).get(`/api/invites/${validInviteToken}`)
 
       expect(response.status).toBe(200)
@@ -609,13 +609,13 @@ describe('Invite Validation API', () => {
       expect(response.body.data).toHaveProperty('role', 'member')
     })
 
-    it('should return 404 for invalid token', async () => {
+    it('should return 404 for invalid token', async (): Promise<void> => {
       const response = await request(app).get('/api/invites/invalid-token-12345')
 
       expect(response.status).toBe(404)
     })
 
-    it('should return 400 for expired token', async () => {
+    it('should return 400 for expired token', async (): Promise<void> => {
       // Create expired invite with unique token
       await pool.query(
         `INSERT INTO workspace_invites (workspace_id, email, role, invited_by_user_id, token, expires_at)
