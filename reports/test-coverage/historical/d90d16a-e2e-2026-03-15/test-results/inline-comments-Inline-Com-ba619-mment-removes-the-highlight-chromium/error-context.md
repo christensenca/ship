@@ -1,0 +1,191 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - link "Skip to main content" [ref=e4] [cursor=pointer]:
+    - /url: "#main-content"
+  - button "28 overdue accountability items need attention. 28 View items" [ref=e5] [cursor=pointer]:
+    - img [ref=e6]
+    - generic [ref=e8]: 28 overdue accountability items need attention.
+    - generic [ref=e9]: "28"
+    - generic [ref=e10]: View items
+  - generic [ref=e11]:
+    - navigation "Primary navigation" [ref=e12]:
+      - button "T" [ref=e14] [cursor=pointer]
+      - generic [ref=e15]:
+        - button "Dashboard" [ref=e16] [cursor=pointer]:
+          - img [ref=e17]
+        - button "Docs" [ref=e19] [cursor=pointer]:
+          - img [ref=e20]
+        - button "Programs" [ref=e22] [cursor=pointer]:
+          - img [ref=e23]
+        - button "Projects" [ref=e25] [cursor=pointer]:
+          - img [ref=e26]
+        - button "Teams (standup due)" [ref=e28] [cursor=pointer]:
+          - img [ref=e29]
+      - generic [ref=e32]:
+        - button "Settings" [ref=e33] [cursor=pointer]:
+          - img [ref=e34]
+        - button "D" [ref=e37] [cursor=pointer]
+    - complementary "Document list" [ref=e38]:
+      - generic [ref=e39]:
+        - generic [ref=e40]:
+          - heading "Docs" [level=2] [ref=e41]
+          - generic [ref=e42]:
+            - button "New document" [ref=e43] [cursor=pointer]:
+              - img [ref=e44]
+            - button "Collapse sidebar" [ref=e46] [cursor=pointer]:
+              - img [ref=e47]
+        - generic [ref=e51]:
+          - generic [ref=e52]:
+            - img [ref=e53]
+            - text: Workspace
+          - tree "Workspace documents" [ref=e55]:
+            - treeitem "Untitled Document actions" [selected] [ref=e56]:
+              - generic [ref=e57]:
+                - img [ref=e59]
+                - link "Untitled" [ref=e61] [cursor=pointer]:
+                  - /url: /documents/fd870c57-88d7-472e-a749-ecdb18c4ca5b
+                  - generic [ref=e62]: Untitled
+                - button "Document actions" [ref=e63] [cursor=pointer]:
+                  - img [ref=e64]
+            - treeitem "Untitled Document actions" [ref=e68]:
+              - generic [ref=e69]:
+                - img [ref=e71]
+                - link "Untitled" [ref=e73] [cursor=pointer]:
+                  - /url: /documents/d6b021be-c5ba-47c1-aa39-2a54894e4ea7
+                  - generic [ref=e74]: Untitled
+                - button "Document actions" [ref=e75] [cursor=pointer]:
+                  - img [ref=e76]
+            - treeitem "Untitled Document actions" [ref=e80]:
+              - generic [ref=e81]:
+                - img [ref=e83]
+                - link "Untitled" [ref=e85] [cursor=pointer]:
+                  - /url: /documents/5a3b201d-cf3d-4235-b076-319b7561882c
+                  - generic [ref=e86]: Untitled
+                - button "Document actions" [ref=e87] [cursor=pointer]:
+                  - img [ref=e88]
+            - treeitem "Untitled Document actions" [ref=e92]:
+              - generic [ref=e93]:
+                - img [ref=e95]
+                - link "Untitled" [ref=e97] [cursor=pointer]:
+                  - /url: /documents/6c7da1ab-d2a6-46ac-b5b6-40dea057c147
+                  - generic [ref=e98]: Untitled
+                - button "Document actions" [ref=e99] [cursor=pointer]:
+                  - img [ref=e100]
+            - treeitem "Untitled Document actions" [ref=e104]:
+              - generic [ref=e105]:
+                - img [ref=e107]
+                - link "Untitled" [ref=e109] [cursor=pointer]:
+                  - /url: /documents/b0d5080c-54a4-4464-a58a-8f9b8c0423f2
+                  - generic [ref=e110]: Untitled
+                - button "Document actions" [ref=e111] [cursor=pointer]:
+                  - img [ref=e112]
+            - treeitem "Untitled Document actions" [ref=e116]:
+              - generic [ref=e117]:
+                - img [ref=e119]
+                - link "Untitled" [ref=e121] [cursor=pointer]:
+                  - /url: /documents/cada37e0-9401-42fd-bd60-5ed7667ac89e
+                  - generic [ref=e122]: Untitled
+                - button "Document actions" [ref=e123] [cursor=pointer]:
+                  - img [ref=e124]
+            - treeitem "Untitled Document actions" [ref=e128]:
+              - generic [ref=e129]:
+                - img [ref=e131]
+                - link "Untitled" [ref=e133] [cursor=pointer]:
+                  - /url: /documents/691c815f-378f-4695-9e32-1ca38c20c2db
+                  - generic [ref=e134]: Untitled
+                - button "Document actions" [ref=e135] [cursor=pointer]:
+                  - img [ref=e136]
+            - treeitem "Untitled Document actions" [ref=e140]:
+              - generic [ref=e141]:
+                - img [ref=e143]
+                - link "Untitled" [ref=e145] [cursor=pointer]:
+                  - /url: /documents/e14a3106-6a27-49f0-9345-e84b38aff030
+                  - generic [ref=e146]: Untitled
+                - button "Document actions" [ref=e147] [cursor=pointer]:
+                  - img [ref=e148]
+            - treeitem "Untitled Document actions" [ref=e152]:
+              - generic [ref=e153]:
+                - img [ref=e155]
+                - link "Untitled" [ref=e157] [cursor=pointer]:
+                  - /url: /documents/53360bbc-7293-4cd2-be6a-d826170aa7d6
+                  - generic [ref=e158]: Untitled
+                - button "Document actions" [ref=e159] [cursor=pointer]:
+                  - img [ref=e160]
+            - treeitem "Untitled Document actions" [ref=e164]:
+              - generic [ref=e165]:
+                - img [ref=e167]
+                - link "Untitled" [ref=e169] [cursor=pointer]:
+                  - /url: /documents/96d3f299-b9d3-46b8-9e71-2d8d6b8ddbab
+                  - generic [ref=e170]: Untitled
+                - button "Document actions" [ref=e171] [cursor=pointer]:
+                  - img [ref=e172]
+            - listitem [ref=e176]:
+              - link "24 more..." [ref=e177] [cursor=pointer]:
+                - /url: /docs?filter=workspace
+    - main [ref=e178]:
+      - generic [ref=e179]:
+        - generic [ref=e180]:
+          - button "Back to docs" [ref=e181] [cursor=pointer]:
+            - img [ref=e182]
+            - generic [ref=e184]: docs
+          - heading "Untitled" [level=1] [ref=e185]
+          - status [ref=e186]:
+            - generic [ref=e188]: Cached
+          - button "Delete document" [ref=e189] [cursor=pointer]:
+            - img [ref=e190]
+          - generic "Dev User" [ref=e193]: D
+        - generic [ref=e196]:
+          - textbox "Untitled" [ref=e197]
+          - generic [ref=e198]:
+            - generic [ref=e199]:
+              - paragraph [ref=e201]:
+                - text: This text will have a comment that gets canceled.
+                - generic [ref=e202]:
+                  - generic [ref=e203]: "Add your comment:"
+                  - textbox "Write a comment..." [active] [ref=e204]
+                  - generic [ref=e205]: Press Enter to submit, Escape to cancel
+              - button "Drag to reorder block":
+                - img
+            - tooltip "Comment" [ref=e207]:
+              - button "Comment" [ref=e210] [cursor=pointer]:
+                - img [ref=e211]
+                - text: Comment
+    - complementary "Document properties" [ref=e215]:
+      - generic [ref=e217]:
+        - generic [ref=e218]:
+          - generic [ref=e219]: Properties
+          - button "Collapse sidebar" [ref=e220] [cursor=pointer]:
+            - img [ref=e221]
+        - generic [ref=e226]:
+          - generic [ref=e228]:
+            - generic [ref=e229]: Type
+            - combobox "Document type" [ref=e230]:
+              - option "Wiki" [selected]
+              - option "Issue"
+              - option "Project"
+              - option "Week"
+          - generic [ref=e232]:
+            - generic [ref=e233]:
+              - generic [ref=e234]: Maintainer
+              - button "DU Dev User" [ref=e235] [cursor=pointer]:
+                - generic [ref=e236]: DU
+                - generic [ref=e237]: Dev User
+                - img [ref=e238]
+            - generic [ref=e240]:
+              - generic [ref=e241]: Visibility
+              - button "Workspace" [ref=e242] [cursor=pointer]:
+                - img [ref=e243]
+                - generic [ref=e245]: Workspace
+                - img [ref=e246]
+            - generic [ref=e248]:
+              - generic [ref=e249]: Created
+              - paragraph [ref=e250]: Mar 15, 2026
+            - generic [ref=e251]:
+              - generic [ref=e252]: Updated
+              - paragraph [ref=e253]: Mar 15, 2026, 11:54 AM
+            - generic [ref=e254]:
+              - heading "Backlinks" [level=3] [ref=e255]
+              - generic [ref=e256]: No backlinks
+```

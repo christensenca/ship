@@ -1,0 +1,1156 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - link "Skip to main content" [ref=e4] [cursor=pointer]:
+      - /url: "#main-content"
+    - button "34 overdue accountability items need attention. 34 View items" [ref=e5] [cursor=pointer]:
+      - img [ref=e6]
+      - generic [ref=e8]: 34 overdue accountability items need attention.
+      - generic [ref=e9]: "34"
+      - generic [ref=e10]: View items
+    - generic [ref=e11]:
+      - navigation "Primary navigation" [ref=e12]:
+        - button "T" [ref=e14] [cursor=pointer]
+        - generic [ref=e15]:
+          - button "Dashboard" [ref=e16] [cursor=pointer]:
+            - img [ref=e17]
+          - button "Docs" [ref=e19] [cursor=pointer]:
+            - img [ref=e20]
+          - button "Programs" [ref=e22] [cursor=pointer]:
+            - img [ref=e23]
+          - button "Projects" [ref=e25] [cursor=pointer]:
+            - img [ref=e26]
+          - button "Teams (standup due)" [ref=e28] [cursor=pointer]:
+            - img [ref=e29]
+        - generic [ref=e32]:
+          - button "Settings" [ref=e33] [cursor=pointer]:
+            - img [ref=e34]
+          - button "D" [ref=e37] [cursor=pointer]
+      - complementary "Document list" [ref=e38]:
+        - generic [ref=e39]:
+          - generic [ref=e40]:
+            - heading "Issues" [level=2] [ref=e41]
+            - generic [ref=e42]:
+              - button "New issue" [ref=e43] [cursor=pointer]:
+                - img [ref=e44]
+              - button "Collapse sidebar" [ref=e46] [cursor=pointer]:
+                - img [ref=e47]
+          - generic [ref=e50]:
+            - generic [ref=e51]:
+              - img [ref=e52]
+              - text: All Issues
+            - list [ref=e54]:
+              - listitem [ref=e55]:
+                - link "Implement sprint management" [ref=e56] [cursor=pointer]:
+                  - /url: /documents/2acf97fe-f966-4e6b-a87f-da7f3d2e313f
+                  - generic [ref=e58]: Implement sprint management
+                - button "Actions for Implement sprint management" [ref=e59] [cursor=pointer]:
+                  - img [ref=e60]
+              - listitem [ref=e64]:
+                - link "User authentication setup" [ref=e65] [cursor=pointer]:
+                  - /url: /documents/a03aaeda-90ca-4639-bab6-dc777fe3f73d
+                  - generic [ref=e67]: User authentication setup
+                - button "Actions for User authentication setup" [ref=e68] [cursor=pointer]:
+                  - img [ref=e69]
+              - listitem [ref=e73]:
+                - link "Database schema design" [ref=e74] [cursor=pointer]:
+                  - /url: /documents/ec6f9581-7092-4f56-9e26-ed73fcd53043
+                  - generic [ref=e76]: Database schema design
+                - button "Actions for Database schema design" [ref=e77] [cursor=pointer]:
+                  - img [ref=e78]
+              - listitem [ref=e82]:
+                - link "Initial project setup" [ref=e83] [cursor=pointer]:
+                  - /url: /documents/c56677d9-612b-4b1c-8efa-1406afd6e640
+                  - generic [ref=e85]: Initial project setup
+                - button "Actions for Initial project setup" [ref=e86] [cursor=pointer]:
+                  - img [ref=e87]
+              - listitem [ref=e91]:
+                - 'link "Bug: login fails" [ref=e92] [cursor=pointer]':
+                  - /url: /documents/a5924faf-5da1-432c-9a73-f1f3f60309c5
+                  - generic [ref=e94]: "Bug: login fails"
+                - 'button "Actions for Bug: login fails" [ref=e95] [cursor=pointer]':
+                  - img [ref=e96]
+              - listitem [ref=e100]:
+                - link "Test Issue for Sprint" [ref=e101] [cursor=pointer]:
+                  - /url: /documents/36eca07d-f838-4716-9b33-488e7ce1ae84
+                  - generic [ref=e103]: Test Issue for Sprint
+                - button "Actions for Test Issue for Sprint" [ref=e104] [cursor=pointer]:
+                  - img [ref=e105]
+              - listitem [ref=e109]:
+                - link "Test Issue for Standup" [ref=e110] [cursor=pointer]:
+                  - /url: /documents/d2bd354a-9f19-4969-b605-054a7352164c
+                  - generic [ref=e112]: Test Issue for Standup
+                - button "Actions for Test Issue for Standup" [ref=e113] [cursor=pointer]:
+                  - img [ref=e114]
+              - listitem [ref=e118]:
+                - link "Test Issue Assigned to User" [ref=e119] [cursor=pointer]:
+                  - /url: /documents/5464a98e-3471-48c6-aa19-698e5d459d89
+                  - generic [ref=e121]: Test Issue Assigned to User
+                - button "Actions for Test Issue Assigned to User" [ref=e122] [cursor=pointer]:
+                  - img [ref=e123]
+              - listitem [ref=e127]:
+                - link "API work for current week" [ref=e128] [cursor=pointer]:
+                  - /url: /documents/f1c40a83-823b-44a2-8095-8ddb3c005695
+                  - generic [ref=e130]: API work for current week
+                - button "Actions for API work for current week" [ref=e131] [cursor=pointer]:
+                  - img [ref=e132]
+              - listitem [ref=e136]:
+                - link "Status Overview test issue 2" [ref=e137] [cursor=pointer]:
+                  - /url: /documents/b3abe28e-5dec-4641-917b-7dcb4a3786c7
+                  - generic [ref=e139]: Status Overview test issue 2
+                - button "Actions for Status Overview test issue 2" [ref=e140] [cursor=pointer]:
+                  - img [ref=e141]
+              - listitem [ref=e145]:
+                - link "Status Overview test issue 1" [ref=e146] [cursor=pointer]:
+                  - /url: /documents/82636af4-8db6-44d9-b3d2-36173d42a162
+                  - generic [ref=e148]: Status Overview test issue 1
+                - button "Actions for Status Overview test issue 1" [ref=e149] [cursor=pointer]:
+                  - img [ref=e150]
+              - listitem [ref=e154]:
+                - link "Rejected spam submission" [ref=e155] [cursor=pointer]:
+                  - /url: /documents/144241b8-8a9e-420c-8666-85f0a82d97c9
+                  - generic [ref=e157]: Rejected spam submission
+                - button "Actions for Rejected spam submission" [ref=e158] [cursor=pointer]:
+                  - img [ref=e159]
+              - listitem [ref=e163]:
+                - link "Accepted user suggestion" [ref=e164] [cursor=pointer]:
+                  - /url: /documents/ac4cee5c-2e10-4da7-97f7-ae8ee6b69684
+                  - generic [ref=e166]: Accepted user suggestion
+                - button "Actions for Accepted user suggestion" [ref=e167] [cursor=pointer]:
+                  - img [ref=e168]
+              - listitem [ref=e172]:
+                - link "Bug report from customer" [ref=e173] [cursor=pointer]:
+                  - /url: /documents/a7c17293-aed6-477a-b659-cee471badf48
+                  - generic [ref=e175]: Bug report from customer
+                - button "Actions for Bug report from customer" [ref=e176] [cursor=pointer]:
+                  - img [ref=e177]
+              - listitem [ref=e181]:
+                - link "External feature request from user" [ref=e182] [cursor=pointer]:
+                  - /url: /documents/3b340511-41fb-4865-97a0-859bbdf6be9e
+                  - generic [ref=e184]: External feature request from user
+                - button "Actions for External feature request from user" [ref=e185] [cursor=pointer]:
+                  - img [ref=e186]
+              - listitem [ref=e190]:
+                - link "Infrastructure configuration" [ref=e191] [cursor=pointer]:
+                  - /url: /documents/86566cca-f144-4f45-8eef-36971cca1fa0
+                  - generic [ref=e193]: Infrastructure configuration
+                - button "Actions for Infrastructure configuration" [ref=e194] [cursor=pointer]:
+                  - img [ref=e195]
+              - listitem [ref=e199]:
+                - link "Infrastructure initial setup" [ref=e200] [cursor=pointer]:
+                  - /url: /documents/e1914d71-bb54-4032-9ad9-7d61ae80067f
+                  - generic [ref=e202]: Infrastructure initial setup
+                - button "Actions for Infrastructure initial setup" [ref=e203] [cursor=pointer]:
+                  - img [ref=e204]
+              - listitem [ref=e208]:
+                - link "Design System configuration" [ref=e209] [cursor=pointer]:
+                  - /url: /documents/c148709d-db10-4073-8af3-72762a353625
+                  - generic [ref=e211]: Design System configuration
+                - button "Actions for Design System configuration" [ref=e212] [cursor=pointer]:
+                  - img [ref=e213]
+              - listitem [ref=e217]:
+                - link "Design System initial setup" [ref=e218] [cursor=pointer]:
+                  - /url: /documents/4485155e-36f9-4798-9a55-b2a7b0516a97
+                  - generic [ref=e220]: Design System initial setup
+                - button "Actions for Design System initial setup" [ref=e221] [cursor=pointer]:
+                  - img [ref=e222]
+              - listitem [ref=e226]:
+                - link "API Platform configuration" [ref=e227] [cursor=pointer]:
+                  - /url: /documents/be50f5d7-341d-45aa-ad4d-d6c52fe19cd9
+                  - generic [ref=e229]: API Platform configuration
+                - button "Actions for API Platform configuration" [ref=e230] [cursor=pointer]:
+                  - img [ref=e231]
+              - listitem [ref=e235]:
+                - link "API Platform initial setup" [ref=e236] [cursor=pointer]:
+                  - /url: /documents/08b0081a-6c55-4a4e-9665-e2705278d4b0
+                  - generic [ref=e238]: API Platform initial setup
+                - button "Actions for API Platform initial setup" [ref=e239] [cursor=pointer]:
+                  - img [ref=e240]
+              - listitem [ref=e244]:
+                - link "Authentication configuration" [ref=e245] [cursor=pointer]:
+                  - /url: /documents/7672a4a3-69bc-45ce-a34c-05374643c9e3
+                  - generic [ref=e247]: Authentication configuration
+                - button "Actions for Authentication configuration" [ref=e248] [cursor=pointer]:
+                  - img [ref=e249]
+              - listitem [ref=e253]:
+                - link "Authentication initial setup" [ref=e254] [cursor=pointer]:
+                  - /url: /documents/8572e06f-1bfa-4cbc-960e-bbd2b818c032
+                  - generic [ref=e256]: Authentication initial setup
+                - button "Actions for Authentication initial setup" [ref=e257] [cursor=pointer]:
+                  - img [ref=e258]
+              - listitem [ref=e262]:
+                - link "Create Slack integration" [ref=e263] [cursor=pointer]:
+                  - /url: /documents/f87b1919-37e2-4170-ba49-80c64723122a
+                  - generic [ref=e265]: Create Slack integration
+                - button "Actions for Create Slack integration" [ref=e266] [cursor=pointer]:
+                  - img [ref=e267]
+              - listitem [ref=e271]:
+                - link "Implement webhooks" [ref=e272] [cursor=pointer]:
+                  - /url: /documents/b5e296e8-d100-4c1c-a254-ae94b0450dcd
+                  - generic [ref=e274]: Implement webhooks
+                - button "Actions for Implement webhooks" [ref=e275] [cursor=pointer]:
+                  - img [ref=e276]
+              - listitem [ref=e280]:
+                - link "Build analytics dashboard" [ref=e281] [cursor=pointer]:
+                  - /url: /documents/e4912cae-e48c-4f7a-9726-4d4effbde151
+                  - generic [ref=e283]: Build analytics dashboard
+                - button "Actions for Build analytics dashboard" [ref=e284] [cursor=pointer]:
+                  - img [ref=e285]
+              - listitem [ref=e289]:
+                - link "Build settings page" [ref=e290] [cursor=pointer]:
+                  - /url: /documents/151b658c-1300-473f-853a-57a0fb6003f4
+                  - generic [ref=e292]: Build settings page
+                - button "Actions for Build settings page" [ref=e293] [cursor=pointer]:
+                  - img [ref=e294]
+              - listitem [ref=e298]:
+                - link "Refactor notification system" [ref=e299] [cursor=pointer]:
+                  - /url: /documents/a5c2b6b8-e198-4495-aee2-7faa8fb214db
+                  - generic [ref=e301]: Refactor notification system
+                - button "Actions for Refactor notification system" [ref=e302] [cursor=pointer]:
+                  - img [ref=e303]
+              - listitem [ref=e307]:
+                - link "Review dashboard design" [ref=e308] [cursor=pointer]:
+                  - /url: /documents/15e7a036-2936-485b-bce1-155f60071034
+                  - generic [ref=e310]: Review dashboard design
+                - button "Actions for Review dashboard design" [ref=e311] [cursor=pointer]:
+                  - img [ref=e312]
+              - listitem [ref=e316]:
+                - link "Implement burndown chart" [ref=e317] [cursor=pointer]:
+                  - /url: /documents/7af10aa1-7506-4868-94b4-4dc7874cbcf8
+                  - generic [ref=e319]: Implement burndown chart
+                - button "Actions for Implement burndown chart" [ref=e320] [cursor=pointer]:
+                  - img [ref=e321]
+              - listitem [ref=e325]:
+                - link "Add sprint velocity metrics" [ref=e326] [cursor=pointer]:
+                  - /url: /documents/e6c6c0b7-03cc-4b75-b3b4-b7a89a5dd081
+                  - generic [ref=e328]: Add sprint velocity metrics
+                - button "Actions for Add sprint velocity metrics" [ref=e329] [cursor=pointer]:
+                  - img [ref=e330]
+              - listitem [ref=e334]:
+                - link "CI/CD pipeline configuration" [ref=e335] [cursor=pointer]:
+                  - /url: /documents/c4cf27cb-269f-44fe-9dba-a90bd5325bcf
+                  - generic [ref=e337]: CI/CD pipeline configuration
+                - button "Actions for CI/CD pipeline configuration" [ref=e338] [cursor=pointer]:
+                  - img [ref=e339]
+              - listitem [ref=e343]:
+                - link "Infrastructure improvements" [ref=e344] [cursor=pointer]:
+                  - /url: /documents/09b41482-6ec3-484e-a159-bcba505dddd6
+                  - generic [ref=e346]: Infrastructure improvements
+                - button "Actions for Infrastructure improvements" [ref=e347] [cursor=pointer]:
+                  - img [ref=e348]
+              - listitem [ref=e352]:
+                - link "Design System improvements" [ref=e353] [cursor=pointer]:
+                  - /url: /documents/06388c67-25b6-4554-922d-cb97d8eecc5f
+                  - generic [ref=e355]: Design System improvements
+                - button "Actions for Design System improvements" [ref=e356] [cursor=pointer]:
+                  - img [ref=e357]
+              - listitem [ref=e361]:
+                - link "API Platform improvements" [ref=e362] [cursor=pointer]:
+                  - /url: /documents/4b80d376-224f-47fa-9f82-ed5321ab7ec6
+                  - generic [ref=e364]: API Platform improvements
+                - button "Actions for API Platform improvements" [ref=e365] [cursor=pointer]:
+                  - img [ref=e366]
+              - listitem [ref=e370]:
+                - link "Authentication improvements" [ref=e371] [cursor=pointer]:
+                  - /url: /documents/5bacc57e-1dc1-43fe-8c07-d8b71b4f63ac
+                  - generic [ref=e373]: Authentication improvements
+                - button "Actions for Authentication improvements" [ref=e374] [cursor=pointer]:
+                  - img [ref=e375]
+              - listitem [ref=e379]:
+                - link "Implement file versioning" [ref=e380] [cursor=pointer]:
+                  - /url: /documents/2c0b14c1-df9e-4ef9-baec-184a2bf013c3
+                  - generic [ref=e382]: Implement file versioning
+                - button "Actions for Implement file versioning" [ref=e383] [cursor=pointer]:
+                  - img [ref=e384]
+              - listitem [ref=e388]:
+                - link "Add calendar view" [ref=e389] [cursor=pointer]:
+                  - /url: /documents/d335564d-4fdb-41a2-be48-0f7859f521fa
+                  - generic [ref=e391]: Add calendar view
+                - button "Actions for Add calendar view" [ref=e392] [cursor=pointer]:
+                  - img [ref=e393]
+              - listitem [ref=e397]:
+                - link "Build export to PDF" [ref=e398] [cursor=pointer]:
+                  - /url: /documents/6dc6678e-1ee2-4e4a-b36e-f56cab3a6a26
+                  - generic [ref=e400]: Build export to PDF
+                - button "Actions for Build export to PDF" [ref=e401] [cursor=pointer]:
+                  - img [ref=e402]
+              - listitem [ref=e406]:
+                - link "Add keyboard shortcuts" [ref=e407] [cursor=pointer]:
+                  - /url: /documents/b4a6fe81-cf58-4594-9e1b-851f14fb1404
+                  - generic [ref=e409]: Add keyboard shortcuts
+                - button "Actions for Add keyboard shortcuts" [ref=e410] [cursor=pointer]:
+                  - img [ref=e411]
+              - listitem [ref=e415]:
+                - link "Create mobile app" [ref=e416] [cursor=pointer]:
+                  - /url: /documents/6c529da0-a58c-46ac-92f8-a560402b13ac
+                  - generic [ref=e418]: Create mobile app
+                - button "Actions for Create mobile app" [ref=e419] [cursor=pointer]:
+                  - img [ref=e420]
+              - listitem [ref=e424]:
+                - link "Add dark mode support" [ref=e425] [cursor=pointer]:
+                  - /url: /documents/f5ca7b31-884a-4459-8064-d77476812017
+                  - generic [ref=e427]: Add dark mode support
+                - button "Actions for Add dark mode support" [ref=e428] [cursor=pointer]:
+                  - img [ref=e429]
+              - listitem [ref=e433]:
+                - link "Add email notifications" [ref=e434] [cursor=pointer]:
+                  - /url: /documents/417404d5-2d48-40f1-b58f-582b600bb8e5
+                  - generic [ref=e436]: Add email notifications
+                - button "Actions for Add email notifications" [ref=e437] [cursor=pointer]:
+                  - img [ref=e438]
+              - listitem [ref=e442]:
+                - link "Update API documentation" [ref=e443] [cursor=pointer]:
+                  - /url: /documents/8fc6fdb2-3444-4671-9c8f-a71770de075f
+                  - generic [ref=e445]: Update API documentation
+                - button "Actions for Update API documentation" [ref=e446] [cursor=pointer]:
+                  - img [ref=e447]
+      - main [ref=e451]:
+        - generic [ref=e452]:
+          - generic [ref=e453]:
+            - heading "Issues" [level=1] [ref=e454]
+            - generic [ref=e455]:
+              - generic [ref=e457]:
+                - generic [ref=e458]:
+                  - combobox "Filter issues by program" [ref=e460] [cursor=pointer]:
+                    - generic [ref=e461]: All Programs
+                    - img [ref=e462]
+                  - combobox "Filter issues by project" [ref=e465] [cursor=pointer]:
+                    - generic [ref=e466]: All Projects
+                    - img [ref=e467]
+                  - combobox "Filter issues by week" [ref=e470] [cursor=pointer]:
+                    - generic [ref=e471]: All Weeks
+                    - img [ref=e472]
+                - combobox "Sort by" [ref=e475] [cursor=pointer]:
+                  - generic [ref=e476]: Updated
+                  - img [ref=e477]
+                - group "View mode" [ref=e479]:
+                  - button "List view" [pressed] [ref=e480] [cursor=pointer]:
+                    - img [ref=e481]
+                  - button "Kanban view" [ref=e483] [cursor=pointer]:
+                    - img [ref=e484]
+                - button "Customize columns" [ref=e486] [cursor=pointer]:
+                  - img [ref=e487]
+              - button "New Issue" [ref=e489] [cursor=pointer]
+          - tablist "Issue filters" [ref=e490]:
+            - tab "All" [selected] [ref=e491] [cursor=pointer]
+            - tab "Needs Triage" [ref=e492] [cursor=pointer]
+            - tab "Active" [ref=e493] [cursor=pointer]
+            - tab "Backlog" [ref=e494] [cursor=pointer]
+            - tab "Done" [ref=e495] [cursor=pointer]
+            - tab "Cancelled" [ref=e496] [cursor=pointer]
+          - generic [ref=e497]:
+            - grid "Issues list" [ref=e498]:
+              - rowgroup [ref=e499]:
+                - row "Selection ID Title Status Source Program Week Priority Assignee Updated" [ref=e500]:
+                  - columnheader "Selection" [ref=e501]
+                  - columnheader "ID" [ref=e502]
+                  - columnheader "Title" [ref=e503]
+                  - columnheader "Status" [ref=e504]
+                  - columnheader "Source" [ref=e505]
+                  - columnheader "Program" [ref=e506]
+                  - columnheader "Week" [ref=e507]
+                  - columnheader "Priority" [ref=e508]
+                  - columnheader "Assignee" [ref=e509]
+                  - columnheader "Updated" [ref=e510]
+              - rowgroup [ref=e511]:
+                - 'row "Select item 2acf97fe-f966-4e6b-a87f-da7f3d2e313f #5 Implement sprint management Status: Done Internal Ship Core Week 13 High Dev User Just now" [ref=e512] [cursor=pointer]':
+                  - gridcell "Select item 2acf97fe-f966-4e6b-a87f-da7f3d2e313f" [ref=e513]:
+                    - checkbox "Select item 2acf97fe-f966-4e6b-a87f-da7f3d2e313f" [ref=e515]
+                  - gridcell "#5" [ref=e516]
+                  - gridcell "Implement sprint management" [ref=e517]:
+                    - generic [ref=e519]: Implement sprint management
+                  - 'gridcell "Status: Done" [ref=e520]':
+                    - 'generic "Status: Done" [ref=e521]':
+                      - img [ref=e522]
+                      - text: Done
+                      - generic [ref=e525]: "Status: Done"
+                  - gridcell "Internal" [ref=e526]:
+                    - generic [ref=e527]: Internal
+                  - gridcell "Ship Core" [ref=e528]
+                  - gridcell "Week 13" [ref=e529]
+                  - gridcell "High" [ref=e530]
+                  - gridcell "Dev User" [ref=e531]
+                  - gridcell "Just now" [ref=e532]
+                - 'row "Select item a03aaeda-90ca-4639-bab6-dc777fe3f73d #3 User authentication setup Status: Done Internal Ship Core Week 12 High Dev User 4m ago" [ref=e533] [cursor=pointer]':
+                  - gridcell "Select item a03aaeda-90ca-4639-bab6-dc777fe3f73d" [ref=e534]:
+                    - checkbox "Select item a03aaeda-90ca-4639-bab6-dc777fe3f73d" [ref=e536]
+                  - gridcell "#3" [ref=e537]
+                  - gridcell "User authentication setup" [ref=e538]:
+                    - generic [ref=e540]: User authentication setup
+                  - 'gridcell "Status: Done" [ref=e541]':
+                    - 'generic "Status: Done" [ref=e542]':
+                      - img [ref=e543]
+                      - text: Done
+                      - generic [ref=e546]: "Status: Done"
+                  - gridcell "Internal" [ref=e547]:
+                    - generic [ref=e548]: Internal
+                  - gridcell "Ship Core" [ref=e549]
+                  - gridcell "Week 12" [ref=e550]
+                  - gridcell "High" [ref=e551]
+                  - gridcell "Dev User" [ref=e552]
+                  - gridcell "4m ago" [ref=e553]
+                - 'row "Select item ec6f9581-7092-4f56-9e26-ed73fcd53043 #2 Database schema design Status: Done Internal Ship Core Week 12 High Dev User 4m ago" [ref=e554] [cursor=pointer]':
+                  - gridcell "Select item ec6f9581-7092-4f56-9e26-ed73fcd53043" [ref=e555]:
+                    - checkbox "Select item ec6f9581-7092-4f56-9e26-ed73fcd53043" [ref=e557]
+                  - gridcell "#2" [ref=e558]
+                  - gridcell "Database schema design" [ref=e559]:
+                    - generic [ref=e561]: Database schema design
+                  - 'gridcell "Status: Done" [ref=e562]':
+                    - 'generic "Status: Done" [ref=e563]':
+                      - img [ref=e564]
+                      - text: Done
+                      - generic [ref=e567]: "Status: Done"
+                  - gridcell "Internal" [ref=e568]:
+                    - generic [ref=e569]: Internal
+                  - gridcell "Ship Core" [ref=e570]
+                  - gridcell "Week 12" [ref=e571]
+                  - gridcell "High" [ref=e572]
+                  - gridcell "Dev User" [ref=e573]
+                  - gridcell "4m ago" [ref=e574]
+                - 'row "Select item c56677d9-612b-4b1c-8efa-1406afd6e640 #1 Initial project setup Status: Done Internal Ship Core Week 12 High Dev User 4m ago" [ref=e575] [cursor=pointer]':
+                  - gridcell "Select item c56677d9-612b-4b1c-8efa-1406afd6e640" [ref=e576]:
+                    - checkbox "Select item c56677d9-612b-4b1c-8efa-1406afd6e640" [ref=e578]
+                  - gridcell "#1" [ref=e579]
+                  - gridcell "Initial project setup" [ref=e580]:
+                    - generic [ref=e582]: Initial project setup
+                  - 'gridcell "Status: Done" [ref=e583]':
+                    - 'generic "Status: Done" [ref=e584]':
+                      - img [ref=e585]
+                      - text: Done
+                      - generic [ref=e588]: "Status: Done"
+                  - gridcell "Internal" [ref=e589]:
+                    - generic [ref=e590]: Internal
+                  - gridcell "Ship Core" [ref=e591]
+                  - gridcell "Week 12" [ref=e592]
+                  - gridcell "High" [ref=e593]
+                  - gridcell "Dev User" [ref=e594]
+                  - gridcell "4m ago" [ref=e595]
+                - 'row "Select item a5924faf-5da1-432c-9a73-f1f3f60309c5 #51 Bug: login fails Status: Backlog Internal — — Medium Unassigned 1m ago" [ref=e596] [cursor=pointer]':
+                  - gridcell "Select item a5924faf-5da1-432c-9a73-f1f3f60309c5" [ref=e597]:
+                    - checkbox "Select item a5924faf-5da1-432c-9a73-f1f3f60309c5" [ref=e599]
+                  - gridcell "#51" [ref=e600]
+                  - 'gridcell "Bug: login fails" [ref=e601]':
+                    - generic [ref=e603]: "Bug: login fails"
+                  - 'gridcell "Status: Backlog" [ref=e604]':
+                    - 'generic "Status: Backlog" [ref=e605]':
+                      - img [ref=e606]
+                      - text: Backlog
+                      - generic [ref=e608]: "Status: Backlog"
+                  - gridcell "Internal" [ref=e609]:
+                    - generic [ref=e610]: Internal
+                  - gridcell "—" [ref=e611]
+                  - gridcell "—" [ref=e612]
+                  - gridcell "Medium" [ref=e613]
+                  - gridcell "Unassigned" [ref=e614]
+                  - gridcell "1m ago" [ref=e615]
+                - 'row "Select item 36eca07d-f838-4716-9b33-488e7ce1ae84 #50 Test Issue for Sprint Status: Backlog Internal — Test Sprint Without Issues Medium Unassigned 2m ago" [ref=e616] [cursor=pointer]':
+                  - gridcell "Select item 36eca07d-f838-4716-9b33-488e7ce1ae84" [ref=e617]:
+                    - checkbox "Select item 36eca07d-f838-4716-9b33-488e7ce1ae84" [ref=e619]
+                  - gridcell "#50" [ref=e620]
+                  - gridcell "Test Issue for Sprint" [ref=e621]:
+                    - generic [ref=e623]: Test Issue for Sprint
+                  - 'gridcell "Status: Backlog" [ref=e624]':
+                    - 'generic "Status: Backlog" [ref=e625]':
+                      - img [ref=e626]
+                      - text: Backlog
+                      - generic [ref=e628]: "Status: Backlog"
+                  - gridcell "Internal" [ref=e629]:
+                    - generic [ref=e630]: Internal
+                  - gridcell "—" [ref=e631]
+                  - gridcell "Test Sprint Without Issues" [ref=e632]
+                  - gridcell "Medium" [ref=e633]
+                  - gridcell "Unassigned" [ref=e634]
+                  - gridcell "2m ago" [ref=e635]
+                - 'row "Select item d2bd354a-9f19-4969-b605-054a7352164c #49 Test Issue for Standup Status: Backlog Internal — Current Sprint for Standup Creation Medium Dev User 2m ago" [ref=e636] [cursor=pointer]':
+                  - gridcell "Select item d2bd354a-9f19-4969-b605-054a7352164c" [ref=e637]:
+                    - checkbox "Select item d2bd354a-9f19-4969-b605-054a7352164c" [ref=e639]
+                  - gridcell "#49" [ref=e640]
+                  - gridcell "Test Issue for Standup" [ref=e641]:
+                    - generic [ref=e643]: Test Issue for Standup
+                  - 'gridcell "Status: Backlog" [ref=e644]':
+                    - 'generic "Status: Backlog" [ref=e645]':
+                      - img [ref=e646]
+                      - text: Backlog
+                      - generic [ref=e648]: "Status: Backlog"
+                  - gridcell "Internal" [ref=e649]:
+                    - generic [ref=e650]: Internal
+                  - gridcell "—" [ref=e651]
+                  - gridcell "Current Sprint for Standup Creation" [ref=e652]
+                  - gridcell "Medium" [ref=e653]
+                  - gridcell "Dev User" [ref=e654]
+                  - gridcell "2m ago" [ref=e655]
+                - 'row "Select item 5464a98e-3471-48c6-aa19-698e5d459d89 #48 Test Issue Assigned to User Status: Backlog Internal — Current Sprint for Standup Medium Dev User 2m ago" [ref=e656] [cursor=pointer]':
+                  - gridcell "Select item 5464a98e-3471-48c6-aa19-698e5d459d89" [ref=e657]:
+                    - checkbox "Select item 5464a98e-3471-48c6-aa19-698e5d459d89" [ref=e659]
+                  - gridcell "#48" [ref=e660]
+                  - gridcell "Test Issue Assigned to User" [ref=e661]:
+                    - generic [ref=e663]: Test Issue Assigned to User
+                  - 'gridcell "Status: Backlog" [ref=e664]':
+                    - 'generic "Status: Backlog" [ref=e665]':
+                      - img [ref=e666]
+                      - text: Backlog
+                      - generic [ref=e668]: "Status: Backlog"
+                  - gridcell "Internal" [ref=e669]:
+                    - generic [ref=e670]: Internal
+                  - gridcell "—" [ref=e671]
+                  - gridcell "Current Sprint for Standup" [ref=e672]
+                  - gridcell "Medium" [ref=e673]
+                  - gridcell "Dev User" [ref=e674]
+                  - gridcell "2m ago" [ref=e675]
+                - 'row "Select item f1c40a83-823b-44a2-8095-8ddb3c005695 #47 API work for current week Status: Todo Internal API Platform Week 13 Medium Unassigned 4m ago" [ref=e676] [cursor=pointer]':
+                  - gridcell "Select item f1c40a83-823b-44a2-8095-8ddb3c005695" [ref=e677]:
+                    - checkbox "Select item f1c40a83-823b-44a2-8095-8ddb3c005695" [ref=e679]
+                  - gridcell "#47" [ref=e680]
+                  - gridcell "API work for current week" [ref=e681]:
+                    - generic [ref=e683]: API work for current week
+                  - 'gridcell "Status: Todo" [ref=e684]':
+                    - 'generic "Status: Todo" [ref=e685]':
+                      - img [ref=e686]
+                      - text: Todo
+                      - generic [ref=e689]: "Status: Todo"
+                  - gridcell "Internal" [ref=e690]:
+                    - generic [ref=e691]: Internal
+                  - gridcell "API Platform" [ref=e692]
+                  - gridcell "Week 13" [ref=e693]
+                  - gridcell "Medium" [ref=e694]
+                  - gridcell "Unassigned" [ref=e695]
+                  - gridcell "4m ago" [ref=e696]
+                - 'row "Select item b3abe28e-5dec-4641-917b-7dcb4a3786c7 #46 Status Overview test issue 2 Status: Todo Internal Ship Core Week 13 Medium Unassigned 4m ago" [ref=e697] [cursor=pointer]':
+                  - gridcell "Select item b3abe28e-5dec-4641-917b-7dcb4a3786c7" [ref=e698]:
+                    - checkbox "Select item b3abe28e-5dec-4641-917b-7dcb4a3786c7" [ref=e700]
+                  - gridcell "#46" [ref=e701]
+                  - gridcell "Status Overview test issue 2" [ref=e702]:
+                    - generic [ref=e704]: Status Overview test issue 2
+                  - 'gridcell "Status: Todo" [ref=e705]':
+                    - 'generic "Status: Todo" [ref=e706]':
+                      - img [ref=e707]
+                      - text: Todo
+                      - generic [ref=e710]: "Status: Todo"
+                  - gridcell "Internal" [ref=e711]:
+                    - generic [ref=e712]: Internal
+                  - gridcell "Ship Core" [ref=e713]
+                  - gridcell "Week 13" [ref=e714]
+                  - gridcell "Medium" [ref=e715]
+                  - gridcell "Unassigned" [ref=e716]
+                  - gridcell "4m ago" [ref=e717]
+                - 'row "Select item 82636af4-8db6-44d9-b3d2-36173d42a162 #45 Status Overview test issue 1 Status: Todo Internal Ship Core Week 13 Medium Unassigned 4m ago" [ref=e718] [cursor=pointer]':
+                  - gridcell "Select item 82636af4-8db6-44d9-b3d2-36173d42a162" [ref=e719]:
+                    - checkbox "Select item 82636af4-8db6-44d9-b3d2-36173d42a162" [ref=e721]
+                  - gridcell "#45" [ref=e722]
+                  - gridcell "Status Overview test issue 1" [ref=e723]:
+                    - generic [ref=e725]: Status Overview test issue 1
+                  - 'gridcell "Status: Todo" [ref=e726]':
+                    - 'generic "Status: Todo" [ref=e727]':
+                      - img [ref=e728]
+                      - text: Todo
+                      - generic [ref=e731]: "Status: Todo"
+                  - gridcell "Internal" [ref=e732]:
+                    - generic [ref=e733]: Internal
+                  - gridcell "Ship Core" [ref=e734]
+                  - gridcell "Week 13" [ref=e735]
+                  - gridcell "Medium" [ref=e736]
+                  - gridcell "Unassigned" [ref=e737]
+                  - gridcell "4m ago" [ref=e738]
+                - 'row "Select item 144241b8-8a9e-420c-8666-85f0a82d97c9 #44 Rejected spam submission Status: Cancelled External Ship Core — Medium Unassigned 4m ago" [ref=e739] [cursor=pointer]':
+                  - gridcell "Select item 144241b8-8a9e-420c-8666-85f0a82d97c9" [ref=e740]:
+                    - checkbox "Select item 144241b8-8a9e-420c-8666-85f0a82d97c9" [ref=e742]
+                  - gridcell "#44" [ref=e743]
+                  - gridcell "Rejected spam submission" [ref=e744]:
+                    - generic [ref=e746]: Rejected spam submission
+                  - 'gridcell "Status: Cancelled" [ref=e747]':
+                    - 'generic "Status: Cancelled" [ref=e748]':
+                      - img [ref=e749]
+                      - text: Cancelled
+                      - generic [ref=e752]: "Status: Cancelled"
+                  - gridcell "External" [ref=e753]:
+                    - generic [ref=e754]: External
+                  - gridcell "Ship Core" [ref=e755]
+                  - gridcell "—" [ref=e756]
+                  - gridcell "Medium" [ref=e757]
+                  - gridcell "Unassigned" [ref=e758]
+                  - gridcell "4m ago" [ref=e759]
+                - 'row "Select item ac4cee5c-2e10-4da7-97f7-ae8ee6b69684 #43 Accepted user suggestion Status: Backlog External Ship Core — Medium Unassigned 4m ago" [ref=e760] [cursor=pointer]':
+                  - gridcell "Select item ac4cee5c-2e10-4da7-97f7-ae8ee6b69684" [ref=e761]:
+                    - checkbox "Select item ac4cee5c-2e10-4da7-97f7-ae8ee6b69684" [ref=e763]
+                  - gridcell "#43" [ref=e764]
+                  - gridcell "Accepted user suggestion" [ref=e765]:
+                    - generic [ref=e767]: Accepted user suggestion
+                  - 'gridcell "Status: Backlog" [ref=e768]':
+                    - 'generic "Status: Backlog" [ref=e769]':
+                      - img [ref=e770]
+                      - text: Backlog
+                      - generic [ref=e772]: "Status: Backlog"
+                  - gridcell "External" [ref=e773]:
+                    - generic [ref=e774]: External
+                  - gridcell "Ship Core" [ref=e775]
+                  - gridcell "—" [ref=e776]
+                  - gridcell "Medium" [ref=e777]
+                  - gridcell "Unassigned" [ref=e778]
+                  - gridcell "4m ago" [ref=e779]
+                - 'row "Select item a7c17293-aed6-477a-b659-cee471badf48 #42 Bug report from customer Status: Needs Triage External Ship Core — Medium Unassigned 4m ago" [ref=e780] [cursor=pointer]':
+                  - gridcell "Select item a7c17293-aed6-477a-b659-cee471badf48" [ref=e781]:
+                    - checkbox "Select item a7c17293-aed6-477a-b659-cee471badf48" [ref=e783]
+                  - gridcell "#42" [ref=e784]
+                  - gridcell "Bug report from customer" [ref=e785]:
+                    - generic [ref=e787]: Bug report from customer
+                  - 'gridcell "Status: Needs Triage" [ref=e788]':
+                    - 'generic "Status: Needs Triage" [ref=e789]':
+                      - img [ref=e790]
+                      - text: Needs Triage
+                      - generic [ref=e792]: "Status: Needs Triage"
+                  - gridcell "External" [ref=e793]:
+                    - generic [ref=e794]: External
+                  - gridcell "Ship Core" [ref=e795]
+                  - gridcell "—" [ref=e796]
+                  - gridcell "Medium" [ref=e797]
+                  - gridcell "Unassigned" [ref=e798]
+                  - gridcell "4m ago" [ref=e799]
+                - 'row "Select item 3b340511-41fb-4865-97a0-859bbdf6be9e #41 External feature request from user Status: Needs Triage External Ship Core — Medium Unassigned 4m ago" [ref=e800] [cursor=pointer]':
+                  - gridcell "Select item 3b340511-41fb-4865-97a0-859bbdf6be9e" [ref=e801]:
+                    - checkbox "Select item 3b340511-41fb-4865-97a0-859bbdf6be9e" [ref=e803]
+                  - gridcell "#41" [ref=e804]
+                  - gridcell "External feature request from user" [ref=e805]:
+                    - generic [ref=e807]: External feature request from user
+                  - 'gridcell "Status: Needs Triage" [ref=e808]':
+                    - 'generic "Status: Needs Triage" [ref=e809]':
+                      - img [ref=e810]
+                      - text: Needs Triage
+                      - generic [ref=e812]: "Status: Needs Triage"
+                  - gridcell "External" [ref=e813]:
+                    - generic [ref=e814]: External
+                  - gridcell "Ship Core" [ref=e815]
+                  - gridcell "—" [ref=e816]
+                  - gridcell "Medium" [ref=e817]
+                  - gridcell "Unassigned" [ref=e818]
+                  - gridcell "4m ago" [ref=e819]
+                - 'row "Select item 86566cca-f144-4f45-8eef-36971cca1fa0 #40 Infrastructure configuration Status: Done Internal Infrastructure Week 13 Medium Dev User 4m ago" [ref=e820] [cursor=pointer]':
+                  - gridcell "Select item 86566cca-f144-4f45-8eef-36971cca1fa0" [ref=e821]:
+                    - checkbox "Select item 86566cca-f144-4f45-8eef-36971cca1fa0" [ref=e823]
+                  - gridcell "#40" [ref=e824]
+                  - gridcell "Infrastructure configuration" [ref=e825]:
+                    - generic [ref=e827]: Infrastructure configuration
+                  - 'gridcell "Status: Done" [ref=e828]':
+                    - 'generic "Status: Done" [ref=e829]':
+                      - img [ref=e830]
+                      - text: Done
+                      - generic [ref=e833]: "Status: Done"
+                  - gridcell "Internal" [ref=e834]:
+                    - generic [ref=e835]: Internal
+                  - gridcell "Infrastructure" [ref=e836]
+                  - gridcell "Week 13" [ref=e837]
+                  - gridcell "Medium" [ref=e838]
+                  - gridcell "Dev User" [ref=e839]
+                  - gridcell "4m ago" [ref=e840]
+                - 'row "Select item e1914d71-bb54-4032-9ad9-7d61ae80067f #37 Infrastructure initial setup Status: In Progress Internal Infrastructure Week 13 Medium Dev User 4m ago" [ref=e841] [cursor=pointer]':
+                  - gridcell "Select item e1914d71-bb54-4032-9ad9-7d61ae80067f" [ref=e842]:
+                    - checkbox "Select item e1914d71-bb54-4032-9ad9-7d61ae80067f" [ref=e844]
+                  - gridcell "#37" [ref=e845]
+                  - gridcell "Infrastructure initial setup" [ref=e846]:
+                    - generic [ref=e848]: Infrastructure initial setup
+                  - 'gridcell "Status: In Progress" [ref=e849]':
+                    - 'generic "Status: In Progress" [ref=e850]':
+                      - img [ref=e851]
+                      - text: In Progress
+                      - generic [ref=e854]: "Status: In Progress"
+                  - gridcell "Internal" [ref=e855]:
+                    - generic [ref=e856]: Internal
+                  - gridcell "Infrastructure" [ref=e857]
+                  - gridcell "Week 13" [ref=e858]
+                  - gridcell "Medium" [ref=e859]
+                  - gridcell "Dev User" [ref=e860]
+                  - gridcell "4m ago" [ref=e861]
+                - 'row "Select item c148709d-db10-4073-8af3-72762a353625 #36 Design System configuration Status: Done Internal Design System Week 13 Medium Dev User 4m ago" [ref=e862] [cursor=pointer]':
+                  - gridcell "Select item c148709d-db10-4073-8af3-72762a353625" [ref=e863]:
+                    - checkbox "Select item c148709d-db10-4073-8af3-72762a353625" [ref=e865]
+                  - gridcell "#36" [ref=e866]
+                  - gridcell "Design System configuration" [ref=e867]:
+                    - generic [ref=e869]: Design System configuration
+                  - 'gridcell "Status: Done" [ref=e870]':
+                    - 'generic "Status: Done" [ref=e871]':
+                      - img [ref=e872]
+                      - text: Done
+                      - generic [ref=e875]: "Status: Done"
+                  - gridcell "Internal" [ref=e876]:
+                    - generic [ref=e877]: Internal
+                  - gridcell "Design System" [ref=e878]
+                  - gridcell "Week 13" [ref=e879]
+                  - gridcell "Medium" [ref=e880]
+                  - gridcell "Dev User" [ref=e881]
+                  - gridcell "4m ago" [ref=e882]
+                - 'row "Select item 4485155e-36f9-4798-9a55-b2a7b0516a97 #33 Design System initial setup Status: In Progress Internal Design System Week 13 Medium Dev User 4m ago" [ref=e883] [cursor=pointer]':
+                  - gridcell "Select item 4485155e-36f9-4798-9a55-b2a7b0516a97" [ref=e884]:
+                    - checkbox "Select item 4485155e-36f9-4798-9a55-b2a7b0516a97" [ref=e886]
+                  - gridcell "#33" [ref=e887]
+                  - gridcell "Design System initial setup" [ref=e888]:
+                    - generic [ref=e890]: Design System initial setup
+                  - 'gridcell "Status: In Progress" [ref=e891]':
+                    - 'generic "Status: In Progress" [ref=e892]':
+                      - img [ref=e893]
+                      - text: In Progress
+                      - generic [ref=e896]: "Status: In Progress"
+                  - gridcell "Internal" [ref=e897]:
+                    - generic [ref=e898]: Internal
+                  - gridcell "Design System" [ref=e899]
+                  - gridcell "Week 13" [ref=e900]
+                  - gridcell "Medium" [ref=e901]
+                  - gridcell "Dev User" [ref=e902]
+                  - gridcell "4m ago" [ref=e903]
+                - 'row "Select item be50f5d7-341d-45aa-ad4d-d6c52fe19cd9 #32 API Platform configuration Status: Done Internal API Platform Week 13 Medium Dev User 4m ago" [ref=e904] [cursor=pointer]':
+                  - gridcell "Select item be50f5d7-341d-45aa-ad4d-d6c52fe19cd9" [ref=e905]:
+                    - checkbox "Select item be50f5d7-341d-45aa-ad4d-d6c52fe19cd9" [ref=e907]
+                  - gridcell "#32" [ref=e908]
+                  - gridcell "API Platform configuration" [ref=e909]:
+                    - generic [ref=e911]: API Platform configuration
+                  - 'gridcell "Status: Done" [ref=e912]':
+                    - 'generic "Status: Done" [ref=e913]':
+                      - img [ref=e914]
+                      - text: Done
+                      - generic [ref=e917]: "Status: Done"
+                  - gridcell "Internal" [ref=e918]:
+                    - generic [ref=e919]: Internal
+                  - gridcell "API Platform" [ref=e920]
+                  - gridcell "Week 13" [ref=e921]
+                  - gridcell "Medium" [ref=e922]
+                  - gridcell "Dev User" [ref=e923]
+                  - gridcell "4m ago" [ref=e924]
+                - 'row "Select item 08b0081a-6c55-4a4e-9665-e2705278d4b0 #29 API Platform initial setup Status: In Progress Internal API Platform Week 13 Medium Dev User 4m ago" [ref=e925] [cursor=pointer]':
+                  - gridcell "Select item 08b0081a-6c55-4a4e-9665-e2705278d4b0" [ref=e926]:
+                    - checkbox "Select item 08b0081a-6c55-4a4e-9665-e2705278d4b0" [ref=e928]
+                  - gridcell "#29" [ref=e929]
+                  - gridcell "API Platform initial setup" [ref=e930]:
+                    - generic [ref=e932]: API Platform initial setup
+                  - 'gridcell "Status: In Progress" [ref=e933]':
+                    - 'generic "Status: In Progress" [ref=e934]':
+                      - img [ref=e935]
+                      - text: In Progress
+                      - generic [ref=e938]: "Status: In Progress"
+                  - gridcell "Internal" [ref=e939]:
+                    - generic [ref=e940]: Internal
+                  - gridcell "API Platform" [ref=e941]
+                  - gridcell "Week 13" [ref=e942]
+                  - gridcell "Medium" [ref=e943]
+                  - gridcell "Dev User" [ref=e944]
+                  - gridcell "4m ago" [ref=e945]
+                - 'row "Select item 7672a4a3-69bc-45ce-a34c-05374643c9e3 #28 Authentication configuration Status: Done Internal Authentication Week 13 Medium Dev User 4m ago" [ref=e946] [cursor=pointer]':
+                  - gridcell "Select item 7672a4a3-69bc-45ce-a34c-05374643c9e3" [ref=e947]:
+                    - checkbox "Select item 7672a4a3-69bc-45ce-a34c-05374643c9e3" [ref=e949]
+                  - gridcell "#28" [ref=e950]
+                  - gridcell "Authentication configuration" [ref=e951]:
+                    - generic [ref=e953]: Authentication configuration
+                  - 'gridcell "Status: Done" [ref=e954]':
+                    - 'generic "Status: Done" [ref=e955]':
+                      - img [ref=e956]
+                      - text: Done
+                      - generic [ref=e959]: "Status: Done"
+                  - gridcell "Internal" [ref=e960]:
+                    - generic [ref=e961]: Internal
+                  - gridcell "Authentication" [ref=e962]
+                  - gridcell "Week 13" [ref=e963]
+                  - gridcell "Medium" [ref=e964]
+                  - gridcell "Dev User" [ref=e965]
+                  - gridcell "4m ago" [ref=e966]
+                - 'row "Select item 8572e06f-1bfa-4cbc-960e-bbd2b818c032 #25 Authentication initial setup Status: In Progress Internal Authentication Week 13 Medium Dev User 4m ago" [ref=e967] [cursor=pointer]':
+                  - gridcell "Select item 8572e06f-1bfa-4cbc-960e-bbd2b818c032" [ref=e968]:
+                    - checkbox "Select item 8572e06f-1bfa-4cbc-960e-bbd2b818c032" [ref=e970]
+                  - gridcell "#25" [ref=e971]
+                  - gridcell "Authentication initial setup" [ref=e972]:
+                    - generic [ref=e974]: Authentication initial setup
+                  - 'gridcell "Status: In Progress" [ref=e975]':
+                    - 'generic "Status: In Progress" [ref=e976]':
+                      - img [ref=e977]
+                      - text: In Progress
+                      - generic [ref=e980]: "Status: In Progress"
+                  - gridcell "Internal" [ref=e981]:
+                    - generic [ref=e982]: Internal
+                  - gridcell "Authentication" [ref=e983]
+                  - gridcell "Week 13" [ref=e984]
+                  - gridcell "Medium" [ref=e985]
+                  - gridcell "Dev User" [ref=e986]
+                  - gridcell "4m ago" [ref=e987]
+                - 'row "Select item f87b1919-37e2-4170-ba49-80c64723122a #22 Create Slack integration Status: Backlog Internal Ship Core — Medium Dev User 4m ago" [ref=e988] [cursor=pointer]':
+                  - gridcell "Select item f87b1919-37e2-4170-ba49-80c64723122a" [ref=e989]:
+                    - checkbox "Select item f87b1919-37e2-4170-ba49-80c64723122a" [ref=e991]
+                  - gridcell "#22" [ref=e992]
+                  - gridcell "Create Slack integration" [ref=e993]:
+                    - generic [ref=e995]: Create Slack integration
+                  - 'gridcell "Status: Backlog" [ref=e996]':
+                    - 'generic "Status: Backlog" [ref=e997]':
+                      - img [ref=e998]
+                      - text: Backlog
+                      - generic [ref=e1000]: "Status: Backlog"
+                  - gridcell "Internal" [ref=e1001]:
+                    - generic [ref=e1002]: Internal
+                  - gridcell "Ship Core" [ref=e1003]
+                  - gridcell "—" [ref=e1004]
+                  - gridcell "Medium" [ref=e1005]
+                  - gridcell "Dev User" [ref=e1006]
+                  - gridcell "4m ago" [ref=e1007]
+                - 'row "Select item b5e296e8-d100-4c1c-a254-ae94b0450dcd #19 Implement webhooks Status: Backlog Internal Ship Core — Medium Dev User 4m ago" [ref=e1008] [cursor=pointer]':
+                  - gridcell "Select item b5e296e8-d100-4c1c-a254-ae94b0450dcd" [ref=e1009]:
+                    - checkbox "Select item b5e296e8-d100-4c1c-a254-ae94b0450dcd" [ref=e1011]
+                  - gridcell "#19" [ref=e1012]
+                  - gridcell "Implement webhooks" [ref=e1013]:
+                    - generic [ref=e1015]: Implement webhooks
+                  - 'gridcell "Status: Backlog" [ref=e1016]':
+                    - 'generic "Status: Backlog" [ref=e1017]':
+                      - img [ref=e1018]
+                      - text: Backlog
+                      - generic [ref=e1020]: "Status: Backlog"
+                  - gridcell "Internal" [ref=e1021]:
+                    - generic [ref=e1022]: Internal
+                  - gridcell "Ship Core" [ref=e1023]
+                  - gridcell "—" [ref=e1024]
+                  - gridcell "Medium" [ref=e1025]
+                  - gridcell "Dev User" [ref=e1026]
+                  - gridcell "4m ago" [ref=e1027]
+                - 'row "Select item e4912cae-e48c-4f7a-9726-4d4effbde151 #16 Build analytics dashboard Status: Todo Internal Ship Core Week 14 Medium Dev User 4m ago" [ref=e1028] [cursor=pointer]':
+                  - gridcell "Select item e4912cae-e48c-4f7a-9726-4d4effbde151" [ref=e1029]:
+                    - checkbox "Select item e4912cae-e48c-4f7a-9726-4d4effbde151" [ref=e1031]
+                  - gridcell "#16" [ref=e1032]
+                  - gridcell "Build analytics dashboard" [ref=e1033]:
+                    - generic [ref=e1035]: Build analytics dashboard
+                  - 'gridcell "Status: Todo" [ref=e1036]':
+                    - 'generic "Status: Todo" [ref=e1037]':
+                      - img [ref=e1038]
+                      - text: Todo
+                      - generic [ref=e1041]: "Status: Todo"
+                  - gridcell "Internal" [ref=e1042]:
+                    - generic [ref=e1043]: Internal
+                  - gridcell "Ship Core" [ref=e1044]
+                  - gridcell "Week 14" [ref=e1045]
+                  - gridcell "Medium" [ref=e1046]
+                  - gridcell "Dev User" [ref=e1047]
+                  - gridcell "4m ago" [ref=e1048]
+                - 'row "Select item 151b658c-1300-473f-853a-57a0fb6003f4 #13 Build settings page Status: In Progress Internal Ship Core Week 13 Medium Dev User 4m ago" [ref=e1049] [cursor=pointer]':
+                  - gridcell "Select item 151b658c-1300-473f-853a-57a0fb6003f4" [ref=e1050]:
+                    - checkbox "Select item 151b658c-1300-473f-853a-57a0fb6003f4" [ref=e1052]
+                  - gridcell "#13" [ref=e1053]
+                  - gridcell "Build settings page" [ref=e1054]:
+                    - generic [ref=e1056]: Build settings page
+                  - 'gridcell "Status: In Progress" [ref=e1057]':
+                    - 'generic "Status: In Progress" [ref=e1058]':
+                      - img [ref=e1059]
+                      - text: In Progress
+                      - generic [ref=e1062]: "Status: In Progress"
+                  - gridcell "Internal" [ref=e1063]:
+                    - generic [ref=e1064]: Internal
+                  - gridcell "Ship Core" [ref=e1065]
+                  - gridcell "Week 13" [ref=e1066]
+                  - gridcell "Medium" [ref=e1067]
+                  - gridcell "Dev User" [ref=e1068]
+                  - gridcell "4m ago" [ref=e1069]
+                - 'row "Select item a5c2b6b8-e198-4495-aee2-7faa8fb214db #11 Refactor notification system Status: Todo Internal Ship Core Week 13 Medium Dev User 4m ago" [ref=e1070] [cursor=pointer]':
+                  - gridcell "Select item a5c2b6b8-e198-4495-aee2-7faa8fb214db" [ref=e1071]:
+                    - checkbox "Select item a5c2b6b8-e198-4495-aee2-7faa8fb214db" [ref=e1073]
+                  - gridcell "#11" [ref=e1074]
+                  - gridcell "Refactor notification system" [ref=e1075]:
+                    - generic [ref=e1077]: Refactor notification system
+                  - 'gridcell "Status: Todo" [ref=e1078]':
+                    - 'generic "Status: Todo" [ref=e1079]':
+                      - img [ref=e1080]
+                      - text: Todo
+                      - generic [ref=e1083]: "Status: Todo"
+                  - gridcell "Internal" [ref=e1084]:
+                    - generic [ref=e1085]: Internal
+                  - gridcell "Ship Core" [ref=e1086]
+                  - gridcell "Week 13" [ref=e1087]
+                  - gridcell "Medium" [ref=e1088]
+                  - gridcell "Dev User" [ref=e1089]
+                  - gridcell "4m ago" [ref=e1090]
+                - 'row "Select item 15e7a036-2936-485b-bce1-155f60071034 #9 Review dashboard design Status: In Review Internal Ship Core Week 13 Medium Dev User 4m ago" [ref=e1091] [cursor=pointer]':
+                  - gridcell "Select item 15e7a036-2936-485b-bce1-155f60071034" [ref=e1092]:
+                    - checkbox "Select item 15e7a036-2936-485b-bce1-155f60071034" [ref=e1094]
+                  - gridcell "#9" [ref=e1095]
+                  - gridcell "Review dashboard design" [ref=e1096]:
+                    - generic [ref=e1098]: Review dashboard design
+                  - 'gridcell "Status: In Review" [ref=e1099]':
+                    - 'generic "Status: In Review" [ref=e1100]':
+                      - img [ref=e1101]
+                      - text: In Review
+                      - generic [ref=e1104]: "Status: In Review"
+                  - gridcell "Internal" [ref=e1105]:
+                    - generic [ref=e1106]: Internal
+                  - gridcell "Ship Core" [ref=e1107]
+                  - gridcell "Week 13" [ref=e1108]
+                  - gridcell "Medium" [ref=e1109]
+                  - gridcell "Dev User" [ref=e1110]
+                  - gridcell "4m ago" [ref=e1111]
+                - 'row "Select item 7af10aa1-7506-4868-94b4-4dc7874cbcf8 #8 Implement burndown chart Status: Todo Internal Ship Core Week 13 Medium Dev User 4m ago" [ref=e1112] [cursor=pointer]':
+                  - gridcell "Select item 7af10aa1-7506-4868-94b4-4dc7874cbcf8" [ref=e1113]:
+                    - checkbox "Select item 7af10aa1-7506-4868-94b4-4dc7874cbcf8" [ref=e1115]
+                  - gridcell "#8" [ref=e1116]
+                  - gridcell "Implement burndown chart" [ref=e1117]:
+                    - generic [ref=e1119]: Implement burndown chart
+                  - 'gridcell "Status: Todo" [ref=e1120]':
+                    - 'generic "Status: Todo" [ref=e1121]':
+                      - img [ref=e1122]
+                      - text: Todo
+                      - generic [ref=e1125]: "Status: Todo"
+                  - gridcell "Internal" [ref=e1126]:
+                    - generic [ref=e1127]: Internal
+                  - gridcell "Ship Core" [ref=e1128]
+                  - gridcell "Week 13" [ref=e1129]
+                  - gridcell "Medium" [ref=e1130]
+                  - gridcell "Dev User" [ref=e1131]
+                  - gridcell "4m ago" [ref=e1132]
+                - 'row "Select item e6c6c0b7-03cc-4b75-b3b4-b7a89a5dd081 #7 Add sprint velocity metrics Status: Todo Internal Ship Core Week 13 Medium Dev User 4m ago" [ref=e1133] [cursor=pointer]':
+                  - gridcell "Select item e6c6c0b7-03cc-4b75-b3b4-b7a89a5dd081" [ref=e1134]:
+                    - checkbox "Select item e6c6c0b7-03cc-4b75-b3b4-b7a89a5dd081" [ref=e1136]
+                  - gridcell "#7" [ref=e1137]
+                  - gridcell "Add sprint velocity metrics" [ref=e1138]:
+                    - generic [ref=e1140]: Add sprint velocity metrics
+                  - 'gridcell "Status: Todo" [ref=e1141]':
+                    - 'generic "Status: Todo" [ref=e1142]':
+                      - img [ref=e1143]
+                      - text: Todo
+                      - generic [ref=e1146]: "Status: Todo"
+                  - gridcell "Internal" [ref=e1147]:
+                    - generic [ref=e1148]: Internal
+                  - gridcell "Ship Core" [ref=e1149]
+                  - gridcell "Week 13" [ref=e1150]
+                  - gridcell "Medium" [ref=e1151]
+                  - gridcell "Dev User" [ref=e1152]
+                  - gridcell "4m ago" [ref=e1153]
+                - 'row "Select item c4cf27cb-269f-44fe-9dba-a90bd5325bcf #4 CI/CD pipeline configuration Status: Done Internal Ship Core Week 12 Medium Dev User 4m ago" [ref=e1154] [cursor=pointer]':
+                  - gridcell "Select item c4cf27cb-269f-44fe-9dba-a90bd5325bcf" [ref=e1155]:
+                    - checkbox "Select item c4cf27cb-269f-44fe-9dba-a90bd5325bcf" [ref=e1157]
+                  - gridcell "#4" [ref=e1158]
+                  - gridcell "CI/CD pipeline configuration" [ref=e1159]:
+                    - generic [ref=e1161]: CI/CD pipeline configuration
+                  - 'gridcell "Status: Done" [ref=e1162]':
+                    - 'generic "Status: Done" [ref=e1163]':
+                      - img [ref=e1164]
+                      - text: Done
+                      - generic [ref=e1167]: "Status: Done"
+                  - gridcell "Internal" [ref=e1168]:
+                    - generic [ref=e1169]: Internal
+                  - gridcell "Ship Core" [ref=e1170]
+                  - gridcell "Week 12" [ref=e1171]
+                  - gridcell "Medium" [ref=e1172]
+                  - gridcell "Dev User" [ref=e1173]
+                  - gridcell "4m ago" [ref=e1174]
+                - 'row "Select item 09b41482-6ec3-484e-a159-bcba505dddd6 #39 Infrastructure improvements Status: Backlog Internal Infrastructure — Low Dev User 4m ago" [ref=e1175] [cursor=pointer]':
+                  - gridcell "Select item 09b41482-6ec3-484e-a159-bcba505dddd6" [ref=e1176]:
+                    - checkbox "Select item 09b41482-6ec3-484e-a159-bcba505dddd6" [ref=e1178]
+                  - gridcell "#39" [ref=e1179]
+                  - gridcell "Infrastructure improvements" [ref=e1180]:
+                    - generic [ref=e1182]: Infrastructure improvements
+                  - 'gridcell "Status: Backlog" [ref=e1183]':
+                    - 'generic "Status: Backlog" [ref=e1184]':
+                      - img [ref=e1185]
+                      - text: Backlog
+                      - generic [ref=e1187]: "Status: Backlog"
+                  - gridcell "Internal" [ref=e1188]:
+                    - generic [ref=e1189]: Internal
+                  - gridcell "Infrastructure" [ref=e1190]
+                  - gridcell "—" [ref=e1191]
+                  - gridcell "Low" [ref=e1192]
+                  - gridcell "Dev User" [ref=e1193]
+                  - gridcell "4m ago" [ref=e1194]
+                - 'row "Select item 06388c67-25b6-4554-922d-cb97d8eecc5f #35 Design System improvements Status: Backlog Internal Design System — Low Dev User 4m ago" [ref=e1195] [cursor=pointer]':
+                  - gridcell "Select item 06388c67-25b6-4554-922d-cb97d8eecc5f" [ref=e1196]:
+                    - checkbox "Select item 06388c67-25b6-4554-922d-cb97d8eecc5f" [ref=e1198]
+                  - gridcell "#35" [ref=e1199]
+                  - gridcell "Design System improvements" [ref=e1200]:
+                    - generic [ref=e1202]: Design System improvements
+                  - 'gridcell "Status: Backlog" [ref=e1203]':
+                    - 'generic "Status: Backlog" [ref=e1204]':
+                      - img [ref=e1205]
+                      - text: Backlog
+                      - generic [ref=e1207]: "Status: Backlog"
+                  - gridcell "Internal" [ref=e1208]:
+                    - generic [ref=e1209]: Internal
+                  - gridcell "Design System" [ref=e1210]
+                  - gridcell "—" [ref=e1211]
+                  - gridcell "Low" [ref=e1212]
+                  - gridcell "Dev User" [ref=e1213]
+                  - gridcell "4m ago" [ref=e1214]
+                - 'row "Select item 4b80d376-224f-47fa-9f82-ed5321ab7ec6 #31 API Platform improvements Status: Backlog Internal API Platform — Low Dev User 4m ago" [ref=e1215] [cursor=pointer]':
+                  - gridcell "Select item 4b80d376-224f-47fa-9f82-ed5321ab7ec6" [ref=e1216]:
+                    - checkbox "Select item 4b80d376-224f-47fa-9f82-ed5321ab7ec6" [ref=e1218]
+                  - gridcell "#31" [ref=e1219]
+                  - gridcell "API Platform improvements" [ref=e1220]:
+                    - generic [ref=e1222]: API Platform improvements
+                  - 'gridcell "Status: Backlog" [ref=e1223]':
+                    - 'generic "Status: Backlog" [ref=e1224]':
+                      - img [ref=e1225]
+                      - text: Backlog
+                      - generic [ref=e1227]: "Status: Backlog"
+                  - gridcell "Internal" [ref=e1228]:
+                    - generic [ref=e1229]: Internal
+                  - gridcell "API Platform" [ref=e1230]
+                  - gridcell "—" [ref=e1231]
+                  - gridcell "Low" [ref=e1232]
+                  - gridcell "Dev User" [ref=e1233]
+                  - gridcell "4m ago" [ref=e1234]
+                - 'row "Select item 5bacc57e-1dc1-43fe-8c07-d8b71b4f63ac #27 Authentication improvements Status: Backlog Internal Authentication — Low Dev User 4m ago" [ref=e1235] [cursor=pointer]':
+                  - gridcell "Select item 5bacc57e-1dc1-43fe-8c07-d8b71b4f63ac" [ref=e1236]:
+                    - checkbox "Select item 5bacc57e-1dc1-43fe-8c07-d8b71b4f63ac" [ref=e1238]
+                  - gridcell "#27" [ref=e1239]
+                  - gridcell "Authentication improvements" [ref=e1240]:
+                    - generic [ref=e1242]: Authentication improvements
+                  - 'gridcell "Status: Backlog" [ref=e1243]':
+                    - 'generic "Status: Backlog" [ref=e1244]':
+                      - img [ref=e1245]
+                      - text: Backlog
+                      - generic [ref=e1247]: "Status: Backlog"
+                  - gridcell "Internal" [ref=e1248]:
+                    - generic [ref=e1249]: Internal
+                  - gridcell "Authentication" [ref=e1250]
+                  - gridcell "—" [ref=e1251]
+                  - gridcell "Low" [ref=e1252]
+                  - gridcell "Dev User" [ref=e1253]
+                  - gridcell "4m ago" [ref=e1254]
+                - 'row "Select item 2c0b14c1-df9e-4ef9-baec-184a2bf013c3 #24 Implement file versioning Status: Backlog Internal Ship Core — Low Dev User 4m ago" [ref=e1255] [cursor=pointer]':
+                  - gridcell "Select item 2c0b14c1-df9e-4ef9-baec-184a2bf013c3" [ref=e1256]:
+                    - checkbox "Select item 2c0b14c1-df9e-4ef9-baec-184a2bf013c3" [ref=e1258]
+                  - gridcell "#24" [ref=e1259]
+                  - gridcell "Implement file versioning" [ref=e1260]:
+                    - generic [ref=e1262]: Implement file versioning
+                  - 'gridcell "Status: Backlog" [ref=e1263]':
+                    - 'generic "Status: Backlog" [ref=e1264]':
+                      - img [ref=e1265]
+                      - text: Backlog
+                      - generic [ref=e1267]: "Status: Backlog"
+                  - gridcell "Internal" [ref=e1268]:
+                    - generic [ref=e1269]: Internal
+                  - gridcell "Ship Core" [ref=e1270]
+                  - gridcell "—" [ref=e1271]
+                  - gridcell "Low" [ref=e1272]
+                  - gridcell "Dev User" [ref=e1273]
+                  - gridcell "4m ago" [ref=e1274]
+                - 'row "Select item d335564d-4fdb-41a2-be48-0f7859f521fa #23 Add calendar view Status: Backlog Internal Ship Core — Low Dev User 4m ago" [ref=e1275] [cursor=pointer]':
+                  - gridcell "Select item d335564d-4fdb-41a2-be48-0f7859f521fa" [ref=e1276]:
+                    - checkbox "Select item d335564d-4fdb-41a2-be48-0f7859f521fa" [ref=e1278]
+                  - gridcell "#23" [ref=e1279]
+                  - gridcell "Add calendar view" [ref=e1280]:
+                    - generic [ref=e1282]: Add calendar view
+                  - 'gridcell "Status: Backlog" [ref=e1283]':
+                    - 'generic "Status: Backlog" [ref=e1284]':
+                      - img [ref=e1285]
+                      - text: Backlog
+                      - generic [ref=e1287]: "Status: Backlog"
+                  - gridcell "Internal" [ref=e1288]:
+                    - generic [ref=e1289]: Internal
+                  - gridcell "Ship Core" [ref=e1290]
+                  - gridcell "—" [ref=e1291]
+                  - gridcell "Low" [ref=e1292]
+                  - gridcell "Dev User" [ref=e1293]
+                  - gridcell "4m ago" [ref=e1294]
+                - 'row "Select item 6dc6678e-1ee2-4e4a-b36e-f56cab3a6a26 #21 Build export to PDF Status: Backlog Internal Ship Core — Low Dev User 4m ago" [ref=e1295] [cursor=pointer]':
+                  - gridcell "Select item 6dc6678e-1ee2-4e4a-b36e-f56cab3a6a26" [ref=e1296]:
+                    - checkbox "Select item 6dc6678e-1ee2-4e4a-b36e-f56cab3a6a26" [ref=e1298]
+                  - gridcell "#21" [ref=e1299]
+                  - gridcell "Build export to PDF" [ref=e1300]:
+                    - generic [ref=e1302]: Build export to PDF
+                  - 'gridcell "Status: Backlog" [ref=e1303]':
+                    - 'generic "Status: Backlog" [ref=e1304]':
+                      - img [ref=e1305]
+                      - text: Backlog
+                      - generic [ref=e1307]: "Status: Backlog"
+                  - gridcell "Internal" [ref=e1308]:
+                    - generic [ref=e1309]: Internal
+                  - gridcell "Ship Core" [ref=e1310]
+                  - gridcell "—" [ref=e1311]
+                  - gridcell "Low" [ref=e1312]
+                  - gridcell "Dev User" [ref=e1313]
+                  - gridcell "4m ago" [ref=e1314]
+                - 'row "Select item b4a6fe81-cf58-4594-9e1b-851f14fb1404 #20 Add keyboard shortcuts Status: Backlog Internal Ship Core — Low Dev User 4m ago" [ref=e1315] [cursor=pointer]':
+                  - gridcell "Select item b4a6fe81-cf58-4594-9e1b-851f14fb1404" [ref=e1316]:
+                    - checkbox "Select item b4a6fe81-cf58-4594-9e1b-851f14fb1404" [ref=e1318]
+                  - gridcell "#20" [ref=e1319]
+                  - gridcell "Add keyboard shortcuts" [ref=e1320]:
+                    - generic [ref=e1322]: Add keyboard shortcuts
+                  - 'gridcell "Status: Backlog" [ref=e1323]':
+                    - 'generic "Status: Backlog" [ref=e1324]':
+                      - img [ref=e1325]
+                      - text: Backlog
+                      - generic [ref=e1327]: "Status: Backlog"
+                  - gridcell "Internal" [ref=e1328]:
+                    - generic [ref=e1329]: Internal
+                  - gridcell "Ship Core" [ref=e1330]
+                  - gridcell "—" [ref=e1331]
+                  - gridcell "Low" [ref=e1332]
+                  - gridcell "Dev User" [ref=e1333]
+                  - gridcell "4m ago" [ref=e1334]
+                - 'row "Select item 6c529da0-a58c-46ac-92f8-a560402b13ac #18 Create mobile app Status: Backlog Internal Ship Core — Low Dev User 4m ago" [ref=e1335] [cursor=pointer]':
+                  - gridcell "Select item 6c529da0-a58c-46ac-92f8-a560402b13ac" [ref=e1336]:
+                    - checkbox "Select item 6c529da0-a58c-46ac-92f8-a560402b13ac" [ref=e1338]
+                  - gridcell "#18" [ref=e1339]
+                  - gridcell "Create mobile app" [ref=e1340]:
+                    - generic [ref=e1342]: Create mobile app
+                  - 'gridcell "Status: Backlog" [ref=e1343]':
+                    - 'generic "Status: Backlog" [ref=e1344]':
+                      - img [ref=e1345]
+                      - text: Backlog
+                      - generic [ref=e1347]: "Status: Backlog"
+                  - gridcell "Internal" [ref=e1348]:
+                    - generic [ref=e1349]: Internal
+                  - gridcell "Ship Core" [ref=e1350]
+                  - gridcell "—" [ref=e1351]
+                  - gridcell "Low" [ref=e1352]
+                  - gridcell "Dev User" [ref=e1353]
+                  - gridcell "4m ago" [ref=e1354]
+                - 'row "Select item f5ca7b31-884a-4459-8064-d77476812017 #17 Add dark mode support Status: Backlog Internal Ship Core — Low Dev User 4m ago" [ref=e1355] [cursor=pointer]':
+                  - gridcell "Select item f5ca7b31-884a-4459-8064-d77476812017" [ref=e1356]:
+                    - checkbox "Select item f5ca7b31-884a-4459-8064-d77476812017" [ref=e1358]
+                  - gridcell "#17" [ref=e1359]
+                  - gridcell "Add dark mode support" [ref=e1360]:
+                    - generic [ref=e1362]: Add dark mode support
+                  - 'gridcell "Status: Backlog" [ref=e1363]':
+                    - 'generic "Status: Backlog" [ref=e1364]':
+                      - img [ref=e1365]
+                      - text: Backlog
+                      - generic [ref=e1367]: "Status: Backlog"
+                  - gridcell "Internal" [ref=e1368]:
+                    - generic [ref=e1369]: Internal
+                  - gridcell "Ship Core" [ref=e1370]
+                  - gridcell "—" [ref=e1371]
+                  - gridcell "Low" [ref=e1372]
+                  - gridcell "Dev User" [ref=e1373]
+                  - gridcell "4m ago" [ref=e1374]
+                - 'row "Select item 417404d5-2d48-40f1-b58f-582b600bb8e5 #12 Add email notifications Status: Todo Internal Ship Core Week 13 Low Dev User 4m ago" [ref=e1375] [cursor=pointer]':
+                  - gridcell "Select item 417404d5-2d48-40f1-b58f-582b600bb8e5" [ref=e1376]:
+                    - checkbox "Select item 417404d5-2d48-40f1-b58f-582b600bb8e5" [ref=e1378]
+                  - gridcell "#12" [ref=e1379]
+                  - gridcell "Add email notifications" [ref=e1380]:
+                    - generic [ref=e1382]: Add email notifications
+                  - 'gridcell "Status: Todo" [ref=e1383]':
+                    - 'generic "Status: Todo" [ref=e1384]':
+                      - img [ref=e1385]
+                      - text: Todo
+                      - generic [ref=e1388]: "Status: Todo"
+                  - gridcell "Internal" [ref=e1389]:
+                    - generic [ref=e1390]: Internal
+                  - gridcell "Ship Core" [ref=e1391]
+                  - gridcell "Week 13" [ref=e1392]
+                  - gridcell "Low" [ref=e1393]
+                  - gridcell "Dev User" [ref=e1394]
+                  - gridcell "4m ago" [ref=e1395]
+                - 'row "Select item 8fc6fdb2-3444-4671-9c8f-a71770de075f #10 Update API documentation Status: In Review Internal Ship Core Week 13 Low Dev User 4m ago" [ref=e1396] [cursor=pointer]':
+                  - gridcell "Select item 8fc6fdb2-3444-4671-9c8f-a71770de075f" [ref=e1397]:
+                    - checkbox "Select item 8fc6fdb2-3444-4671-9c8f-a71770de075f" [ref=e1399]
+                  - gridcell "#10" [ref=e1400]
+                  - gridcell "Update API documentation" [ref=e1401]:
+                    - generic [ref=e1403]: Update API documentation
+                  - 'gridcell "Status: In Review" [ref=e1404]':
+                    - 'generic "Status: In Review" [ref=e1405]':
+                      - img [ref=e1406]
+                      - text: In Review
+                      - generic [ref=e1409]: "Status: In Review"
+                  - gridcell "Internal" [ref=e1410]:
+                    - generic [ref=e1411]: Internal
+                  - gridcell "Ship Core" [ref=e1412]
+                  - gridcell "Week 13" [ref=e1413]
+                  - gridcell "Low" [ref=e1414]
+                  - gridcell "Dev User" [ref=e1415]
+                  - gridcell "4m ago" [ref=e1416]
+            - status [ref=e1417]
+      - complementary "Document properties"
+  - alert [ref=e1419]:
+    - generic [ref=e1420]: Delete undone
+    - button "Dismiss" [ref=e1421] [cursor=pointer]:
+      - img [ref=e1422]
+```

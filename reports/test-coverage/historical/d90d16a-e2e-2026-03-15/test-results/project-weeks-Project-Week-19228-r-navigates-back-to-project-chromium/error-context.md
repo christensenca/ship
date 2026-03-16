@@ -1,0 +1,164 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - link "Skip to main content" [ref=e4] [cursor=pointer]:
+    - /url: "#main-content"
+  - button "27 overdue accountability items need attention. 27 View items" [ref=e5] [cursor=pointer]:
+    - img [ref=e6]
+    - generic [ref=e8]: 27 overdue accountability items need attention.
+    - generic [ref=e9]: "27"
+    - generic [ref=e10]: View items
+  - generic [ref=e11]:
+    - navigation "Primary navigation" [ref=e12]:
+      - button "T" [ref=e14] [cursor=pointer]
+      - generic [ref=e15]:
+        - button "Dashboard" [ref=e16] [cursor=pointer]:
+          - img [ref=e17]
+        - button "Docs" [ref=e19] [cursor=pointer]:
+          - img [ref=e20]
+        - button "Programs" [ref=e22] [cursor=pointer]:
+          - img [ref=e23]
+        - button "Projects" [ref=e25] [cursor=pointer]:
+          - img [ref=e26]
+        - button "Teams (standup due)" [ref=e28] [cursor=pointer]:
+          - img [ref=e29]
+      - generic [ref=e32]:
+        - button "Settings" [ref=e33] [cursor=pointer]:
+          - img [ref=e34]
+        - button "D" [ref=e37] [cursor=pointer]
+    - complementary "Document list":
+      - generic [ref=e38]:
+        - generic [ref=e39]:
+          - heading "Projects" [level=2] [ref=e40]
+          - generic [ref=e41]:
+            - button "New project" [ref=e42] [cursor=pointer]:
+              - img [ref=e43]
+            - button "Collapse sidebar" [ref=e45] [cursor=pointer]:
+              - img [ref=e46]
+        - tree [ref=e49]:
+          - treeitem "Expand Ship Core Redesign Actions for Ship Core Redesign" [ref=e50]:
+            - generic [ref=e51]:
+              - generic [ref=e52]:
+                - button "Expand" [ref=e53] [cursor=pointer]:
+                  - img [ref=e54]
+                - link "Ship Core Redesign" [ref=e57] [cursor=pointer]:
+                  - /url: /documents/15face22-67c1-4d1f-acfa-54270698e4b4
+              - button "Actions for Ship Core Redesign" [ref=e58] [cursor=pointer]:
+                - img [ref=e59]
+          - treeitem "Expand Auth System v2 Actions for Auth System v2" [ref=e63]:
+            - generic [ref=e64]:
+              - generic [ref=e65]:
+                - button "Expand" [ref=e66] [cursor=pointer]:
+                  - img [ref=e67]
+                - link "Auth System v2" [ref=e70] [cursor=pointer]:
+                  - /url: /documents/d6929976-1c28-46ad-8036-130dd11a68da
+              - button "Actions for Auth System v2" [ref=e71] [cursor=pointer]:
+                - img [ref=e72]
+          - treeitem "Expand API Gateway Actions for API Gateway" [ref=e76]:
+            - generic [ref=e77]:
+              - generic [ref=e78]:
+                - button "Expand" [ref=e79] [cursor=pointer]:
+                  - img [ref=e80]
+                - link "API Gateway" [ref=e83] [cursor=pointer]:
+                  - /url: /documents/a80b5b83-a1c6-4522-bc18-b482312882b9
+              - button "Actions for API Gateway" [ref=e84] [cursor=pointer]:
+                - img [ref=e85]
+          - treeitem "Expand Component Library Actions for Component Library" [ref=e89]:
+            - generic [ref=e90]:
+              - generic [ref=e91]:
+                - button "Expand" [ref=e92] [cursor=pointer]:
+                  - img [ref=e93]
+                - link "Component Library" [ref=e96] [cursor=pointer]:
+                  - /url: /documents/8fb1069b-bc66-469a-970b-eac1e121958a
+              - button "Actions for Component Library" [ref=e97] [cursor=pointer]:
+                - img [ref=e98]
+          - treeitem "Expand Untitled Actions for Untitled" [ref=e102]:
+            - generic [ref=e103]:
+              - generic [ref=e104]:
+                - button "Expand" [ref=e105] [cursor=pointer]:
+                  - img [ref=e106]
+                - link "Untitled" [ref=e109] [cursor=pointer]:
+                  - /url: /documents/0cde4fe0-060c-44ac-9d14-bf132126f6b7
+              - button "Actions for Untitled" [ref=e110] [cursor=pointer]:
+                - img [ref=e111]
+          - treeitem "Expand E2E Test Project Actions for E2E Test Project" [ref=e115]:
+            - generic [ref=e116]:
+              - generic [ref=e117]:
+                - button "Expand" [ref=e118] [cursor=pointer]:
+                  - img [ref=e119]
+                - link "E2E Test Project" [ref=e122] [cursor=pointer]:
+                  - /url: /documents/7e0ad1e8-3e38-404e-86b2-1944effd595c
+              - button "Actions for E2E Test Project" [ref=e123] [cursor=pointer]:
+                - img [ref=e124]
+          - treeitem "Collapse Click Test Project Actions for Click Test Project" [expanded] [ref=e128]:
+            - generic [ref=e129]:
+              - generic [ref=e130]:
+                - button "Collapse" [ref=e131] [cursor=pointer]:
+                  - img [ref=e132]
+                - link "Click Test Project" [ref=e135] [cursor=pointer]:
+                  - /url: /documents/923db1b5-68c9-49b9-86eb-2f25c88372f7
+              - button "Actions for Click Test Project" [ref=e136] [cursor=pointer]:
+                - img [ref=e137]
+            - group [ref=e141]:
+              - treeitem "Details" [ref=e142]:
+                - link "Details" [ref=e143] [cursor=pointer]:
+                  - /url: /documents/923db1b5-68c9-49b9-86eb-2f25c88372f7
+                  - img [ref=e144]
+                  - generic [ref=e146]: Details
+              - treeitem "Weeks" [ref=e147]:
+                - link "Weeks" [ref=e148] [cursor=pointer]:
+                  - /url: /documents/923db1b5-68c9-49b9-86eb-2f25c88372f7/weeks
+                  - img [ref=e149]
+                  - generic [ref=e151]: Weeks
+              - treeitem "Issues" [ref=e152]:
+                - link "Issues" [ref=e153] [cursor=pointer]:
+                  - /url: /documents/923db1b5-68c9-49b9-86eb-2f25c88372f7/issues
+                  - img [ref=e154]
+                  - generic [ref=e156]: Issues
+              - treeitem "Retro" [ref=e157]:
+                - link "Retro" [ref=e158] [cursor=pointer]:
+                  - /url: /documents/923db1b5-68c9-49b9-86eb-2f25c88372f7/retro
+                  - img [ref=e159]
+                  - generic [ref=e161]: Retro
+    - main [active] [ref=e162]:
+      - generic [ref=e163]:
+        - generic [ref=e164]:
+          - heading "Week 10 Plan - Dev User" [level=1] [ref=e165]
+          - status [ref=e166]:
+            - generic [ref=e168]: Cached
+          - button "Delete document" [ref=e169] [cursor=pointer]:
+            - img [ref=e170]
+          - generic "Dev User" [ref=e173]: D
+        - generic [ref=e176]:
+          - textbox "Untitled" [ref=e177]: Week 10 Plan - Dev User
+          - generic [ref=e180]:
+            - generic [ref=e181]: 0%
+            - generic [ref=e183]: Approval Likelihood
+            - generic [ref=e184]: Light
+          - generic [ref=e186]:
+            - paragraph [ref=e188]: Start writing...
+            - button "Drag to reorder block":
+              - img
+    - complementary "Document properties" [ref=e190]:
+      - generic [ref=e192]:
+        - generic [ref=e193]:
+          - generic [ref=e194]: Properties
+          - button "Collapse sidebar" [ref=e195] [cursor=pointer]:
+            - img [ref=e196]
+        - generic [ref=e201]:
+          - generic [ref=e202]:
+            - heading "Weekly Plan" [level=3] [ref=e203]
+            - paragraph [ref=e204]: Week 10
+          - generic [ref=e205]:
+            - generic [ref=e206]: Person
+            - paragraph [ref=e207]: Dev User
+          - generic [ref=e208]:
+            - generic [ref=e209]: Project
+            - link "Click Test Project" [ref=e210] [cursor=pointer]:
+              - /url: /documents/923db1b5-68c9-49b9-86eb-2f25c88372f7/weeks
+          - button "Version History" [ref=e212] [cursor=pointer]:
+            - img [ref=e213]
+            - img [ref=e215]
+            - generic [ref=e217]: Version History
+```

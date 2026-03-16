@@ -1,0 +1,746 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - link "Skip to main content" [ref=e4] [cursor=pointer]:
+    - /url: "#main-content"
+  - generic [ref=e5]:
+    - img "celebration" [ref=e6]: 🎉
+    - generic [ref=e7]: Accountability item completed. Nice work.
+    - img [ref=e8]
+  - generic [ref=e10]:
+    - navigation "Primary navigation" [ref=e11]:
+      - button "T" [ref=e13] [cursor=pointer]
+      - generic [ref=e14]:
+        - button "Dashboard" [ref=e15] [cursor=pointer]:
+          - img [ref=e16]
+        - button "Docs" [ref=e18] [cursor=pointer]:
+          - img [ref=e19]
+        - button "Programs" [ref=e21] [cursor=pointer]:
+          - img [ref=e22]
+        - button "Projects" [ref=e24] [cursor=pointer]:
+          - img [ref=e25]
+        - button "Teams (standup due)" [ref=e27] [cursor=pointer]:
+          - img [ref=e28]
+      - generic [ref=e31]:
+        - button "Settings" [ref=e32] [cursor=pointer]:
+          - img [ref=e33]
+        - button "D" [ref=e36] [cursor=pointer]
+    - complementary "Document list" [ref=e37]:
+      - generic [ref=e38]:
+        - generic [ref=e39]:
+          - heading "Docs" [level=2] [ref=e40]
+          - generic [ref=e41]:
+            - button "New document" [ref=e42] [cursor=pointer]:
+              - img [ref=e43]
+            - button "Collapse sidebar" [ref=e45] [cursor=pointer]:
+              - img [ref=e46]
+        - generic [ref=e50]:
+          - generic [ref=e51]:
+            - img [ref=e52]
+            - text: Workspace
+          - tree "Workspace documents" [ref=e54]:
+            - treeitem "Untitled Document actions" [ref=e55]:
+              - generic [ref=e56]:
+                - img [ref=e58]
+                - link "Untitled" [ref=e60] [cursor=pointer]:
+                  - /url: /documents/4aab3912-d444-485d-b633-76bee9d19b58
+                  - generic [ref=e61]: Untitled
+                - button "Document actions" [ref=e62] [cursor=pointer]:
+                  - img [ref=e63]
+            - treeitem "Untitled Document actions" [ref=e67]:
+              - generic [ref=e68]:
+                - img [ref=e70]
+                - link "Untitled" [ref=e72] [cursor=pointer]:
+                  - /url: /documents/4acac51f-3283-4e7e-bd7d-2e0e15b0dd38
+                  - generic [ref=e73]: Untitled
+                - button "Document actions" [ref=e74] [cursor=pointer]:
+                  - img [ref=e75]
+            - treeitem "Untitled Document actions" [ref=e79]:
+              - generic [ref=e80]:
+                - img [ref=e82]
+                - link "Untitled" [ref=e84] [cursor=pointer]:
+                  - /url: /documents/e3b69511-d37d-47f9-bac3-e9db05c61bc0
+                  - generic [ref=e85]: Untitled
+                - button "Document actions" [ref=e86] [cursor=pointer]:
+                  - img [ref=e87]
+            - treeitem "Untitled Document actions" [ref=e91]:
+              - generic [ref=e92]:
+                - img [ref=e94]
+                - link "Untitled" [ref=e96] [cursor=pointer]:
+                  - /url: /documents/ba558cc5-459d-4b33-b05e-a60e4ebe51de
+                  - generic [ref=e97]: Untitled
+                - button "Document actions" [ref=e98] [cursor=pointer]:
+                  - img [ref=e99]
+            - treeitem "Untitled Document actions" [ref=e103]:
+              - generic [ref=e104]:
+                - img [ref=e106]
+                - link "Untitled" [ref=e108] [cursor=pointer]:
+                  - /url: /documents/16dea0ab-fe25-48c5-9e9a-11742b17734f
+                  - generic [ref=e109]: Untitled
+                - button "Document actions" [ref=e110] [cursor=pointer]:
+                  - img [ref=e111]
+            - treeitem "Untitled Document actions" [ref=e115]:
+              - generic [ref=e116]:
+                - img [ref=e118]
+                - link "Untitled" [ref=e120] [cursor=pointer]:
+                  - /url: /documents/536b1659-edcb-4a3f-90d4-c6e88a8a1bf2
+                  - generic [ref=e121]: Untitled
+                - button "Document actions" [ref=e122] [cursor=pointer]:
+                  - img [ref=e123]
+            - treeitem "Untitled Document actions" [ref=e127]:
+              - generic [ref=e128]:
+                - img [ref=e130]
+                - link "Untitled" [ref=e132] [cursor=pointer]:
+                  - /url: /documents/c0b1fb58-669b-4eaa-8a30-3722740d45d5
+                  - generic [ref=e133]: Untitled
+                - button "Document actions" [ref=e134] [cursor=pointer]:
+                  - img [ref=e135]
+            - treeitem "Untitled Document actions" [ref=e139]:
+              - generic [ref=e140]:
+                - img [ref=e142]
+                - link "Untitled" [ref=e144] [cursor=pointer]:
+                  - /url: /documents/9c28a37a-5716-4116-99e7-4d7ffd4c9d58
+                  - generic [ref=e145]: Untitled
+                - button "Document actions" [ref=e146] [cursor=pointer]:
+                  - img [ref=e147]
+            - treeitem "Untitled Document actions" [ref=e151]:
+              - generic [ref=e152]:
+                - img [ref=e154]
+                - link "Untitled" [ref=e156] [cursor=pointer]:
+                  - /url: /documents/c944b092-c4e3-4eec-8d9b-255c84de1814
+                  - generic [ref=e157]: Untitled
+                - button "Document actions" [ref=e158] [cursor=pointer]:
+                  - img [ref=e159]
+            - treeitem "Untitled Document actions" [ref=e163]:
+              - generic [ref=e164]:
+                - img [ref=e166]
+                - link "Untitled" [ref=e168] [cursor=pointer]:
+                  - /url: /documents/add1ccd8-6312-4300-9b95-f00495d2e08d
+                  - generic [ref=e169]: Untitled
+                - button "Document actions" [ref=e170] [cursor=pointer]:
+                  - img [ref=e171]
+            - listitem [ref=e175]:
+              - link "56 more..." [ref=e176] [cursor=pointer]:
+                - /url: /docs?filter=workspace
+    - main [active] [ref=e177]:
+      - generic [ref=e178]:
+        - generic [ref=e179]:
+          - heading "Documents" [level=1] [ref=e180]
+          - generic [ref=e181]:
+            - textbox "Search..." [ref=e183]
+            - combobox "Sort by" [ref=e185] [cursor=pointer]:
+              - generic [ref=e186]: Title
+              - img [ref=e187]
+            - group "View mode" [ref=e189]:
+              - button "List view" [ref=e190] [cursor=pointer]:
+                - img [ref=e191]
+              - button "Tree view" [pressed] [ref=e193] [cursor=pointer]:
+                - img [ref=e194]
+            - button "New Document" [ref=e196] [cursor=pointer]
+        - tablist "Document visibility filters" [ref=e197]:
+          - tab "All" [selected] [ref=e198] [cursor=pointer]
+          - tab "Workspace" [ref=e199] [cursor=pointer]:
+            - img [ref=e200]
+            - text: Workspace
+          - tab "Private" [ref=e202] [cursor=pointer]:
+            - img [ref=e203]
+            - text: Private
+        - tree "Documents" [ref=e206]:
+          - treeitem "Untitled Delete document Add sub-document" [ref=e207]:
+            - generic [ref=e208]:
+              - img [ref=e210]
+              - link "Untitled" [ref=e212] [cursor=pointer]:
+                - /url: /documents/4aab3912-d444-485d-b633-76bee9d19b58
+              - button "Delete document" [ref=e213] [cursor=pointer]:
+                - img [ref=e214]
+              - button "Add sub-document" [ref=e216] [cursor=pointer]:
+                - img [ref=e217]
+          - treeitem "Untitled Delete document Add sub-document" [ref=e219]:
+            - generic [ref=e220]:
+              - img [ref=e222]
+              - link "Untitled" [ref=e224] [cursor=pointer]:
+                - /url: /documents/4acac51f-3283-4e7e-bd7d-2e0e15b0dd38
+              - button "Delete document" [ref=e225] [cursor=pointer]:
+                - img [ref=e226]
+              - button "Add sub-document" [ref=e228] [cursor=pointer]:
+                - img [ref=e229]
+          - treeitem "Untitled Delete document Add sub-document" [ref=e231]:
+            - generic [ref=e232]:
+              - img [ref=e234]
+              - link "Untitled" [ref=e236] [cursor=pointer]:
+                - /url: /documents/e3b69511-d37d-47f9-bac3-e9db05c61bc0
+              - button "Delete document" [ref=e237] [cursor=pointer]:
+                - img [ref=e238]
+              - button "Add sub-document" [ref=e240] [cursor=pointer]:
+                - img [ref=e241]
+          - treeitem "Untitled Delete document Add sub-document" [ref=e243]:
+            - generic [ref=e244]:
+              - img [ref=e246]
+              - link "Untitled" [ref=e248] [cursor=pointer]:
+                - /url: /documents/ba558cc5-459d-4b33-b05e-a60e4ebe51de
+              - button "Delete document" [ref=e249] [cursor=pointer]:
+                - img [ref=e250]
+              - button "Add sub-document" [ref=e252] [cursor=pointer]:
+                - img [ref=e253]
+          - treeitem "Untitled Delete document Add sub-document" [ref=e255]:
+            - generic [ref=e256]:
+              - img [ref=e258]
+              - link "Untitled" [ref=e260] [cursor=pointer]:
+                - /url: /documents/16dea0ab-fe25-48c5-9e9a-11742b17734f
+              - button "Delete document" [ref=e261] [cursor=pointer]:
+                - img [ref=e262]
+              - button "Add sub-document" [ref=e264] [cursor=pointer]:
+                - img [ref=e265]
+          - treeitem "Untitled Delete document Add sub-document" [ref=e267]:
+            - generic [ref=e268]:
+              - img [ref=e270]
+              - link "Untitled" [ref=e272] [cursor=pointer]:
+                - /url: /documents/536b1659-edcb-4a3f-90d4-c6e88a8a1bf2
+              - button "Delete document" [ref=e273] [cursor=pointer]:
+                - img [ref=e274]
+              - button "Add sub-document" [ref=e276] [cursor=pointer]:
+                - img [ref=e277]
+          - treeitem "Untitled Delete document Add sub-document" [ref=e279]:
+            - generic [ref=e280]:
+              - img [ref=e282]
+              - link "Untitled" [ref=e284] [cursor=pointer]:
+                - /url: /documents/c0b1fb58-669b-4eaa-8a30-3722740d45d5
+              - button "Delete document" [ref=e285] [cursor=pointer]:
+                - img [ref=e286]
+              - button "Add sub-document" [ref=e288] [cursor=pointer]:
+                - img [ref=e289]
+          - treeitem "Untitled Delete document Add sub-document" [ref=e291]:
+            - generic [ref=e292]:
+              - img [ref=e294]
+              - link "Untitled" [ref=e296] [cursor=pointer]:
+                - /url: /documents/9c28a37a-5716-4116-99e7-4d7ffd4c9d58
+              - button "Delete document" [ref=e297] [cursor=pointer]:
+                - img [ref=e298]
+              - button "Add sub-document" [ref=e300] [cursor=pointer]:
+                - img [ref=e301]
+          - treeitem "Untitled Delete document Add sub-document" [ref=e303]:
+            - generic [ref=e304]:
+              - img [ref=e306]
+              - link "Untitled" [ref=e308] [cursor=pointer]:
+                - /url: /documents/c944b092-c4e3-4eec-8d9b-255c84de1814
+              - button "Delete document" [ref=e309] [cursor=pointer]:
+                - img [ref=e310]
+              - button "Add sub-document" [ref=e312] [cursor=pointer]:
+                - img [ref=e313]
+          - treeitem "Untitled Delete document Add sub-document" [ref=e315]:
+            - generic [ref=e316]:
+              - img [ref=e318]
+              - link "Untitled" [ref=e320] [cursor=pointer]:
+                - /url: /documents/add1ccd8-6312-4300-9b95-f00495d2e08d
+              - button "Delete document" [ref=e321] [cursor=pointer]:
+                - img [ref=e322]
+              - button "Add sub-document" [ref=e324] [cursor=pointer]:
+                - img [ref=e325]
+          - treeitem "Untitled Delete document Add sub-document" [ref=e327]:
+            - generic [ref=e328]:
+              - img [ref=e330]
+              - link "Untitled" [ref=e332] [cursor=pointer]:
+                - /url: /documents/5d20aae3-c047-4d5a-8fb1-bc86d9530733
+              - button "Delete document" [ref=e333] [cursor=pointer]:
+                - img [ref=e334]
+              - button "Add sub-document" [ref=e336] [cursor=pointer]:
+                - img [ref=e337]
+          - treeitem "Untitled Delete document Add sub-document" [ref=e339]:
+            - generic [ref=e340]:
+              - img [ref=e342]
+              - link "Untitled" [ref=e344] [cursor=pointer]:
+                - /url: /documents/dbde85d6-ed5d-47be-b007-8d49cf30097e
+              - button "Delete document" [ref=e345] [cursor=pointer]:
+                - img [ref=e346]
+              - button "Add sub-document" [ref=e348] [cursor=pointer]:
+                - img [ref=e349]
+          - treeitem "Untitled Delete document Add sub-document" [ref=e351]:
+            - generic [ref=e352]:
+              - img [ref=e354]
+              - link "Untitled" [ref=e356] [cursor=pointer]:
+                - /url: /documents/7aef18a0-82b7-433b-80f3-1ae09abb7b1c
+              - button "Delete document" [ref=e357] [cursor=pointer]:
+                - img [ref=e358]
+              - button "Add sub-document" [ref=e360] [cursor=pointer]:
+                - img [ref=e361]
+          - treeitem "Untitled Delete document Add sub-document" [ref=e363]:
+            - generic [ref=e364]:
+              - img [ref=e366]
+              - link "Untitled" [ref=e368] [cursor=pointer]:
+                - /url: /documents/dd7a70a5-1a8e-480c-860c-cd50f3025e5d
+              - button "Delete document" [ref=e369] [cursor=pointer]:
+                - img [ref=e370]
+              - button "Add sub-document" [ref=e372] [cursor=pointer]:
+                - img [ref=e373]
+          - treeitem "Untitled Delete document Add sub-document" [ref=e375]:
+            - generic [ref=e376]:
+              - img [ref=e378]
+              - link "Untitled" [ref=e380] [cursor=pointer]:
+                - /url: /documents/7ecd976d-8a50-43af-af9a-c854a0766b36
+              - button "Delete document" [ref=e381] [cursor=pointer]:
+                - img [ref=e382]
+              - button "Add sub-document" [ref=e384] [cursor=pointer]:
+                - img [ref=e385]
+          - treeitem "Untitled Delete document Add sub-document" [ref=e387]:
+            - generic [ref=e388]:
+              - img [ref=e390]
+              - link "Untitled" [ref=e392] [cursor=pointer]:
+                - /url: /documents/f33557e4-c086-446b-a59f-1e07fc6de035
+              - button "Delete document" [ref=e393] [cursor=pointer]:
+                - img [ref=e394]
+              - button "Add sub-document" [ref=e396] [cursor=pointer]:
+                - img [ref=e397]
+          - treeitem "Untitled Delete document Add sub-document" [ref=e399]:
+            - generic [ref=e400]:
+              - img [ref=e402]
+              - link "Untitled" [ref=e404] [cursor=pointer]:
+                - /url: /documents/7483cfd4-a506-4a47-873e-0c64dfec7957
+              - button "Delete document" [ref=e405] [cursor=pointer]:
+                - img [ref=e406]
+              - button "Add sub-document" [ref=e408] [cursor=pointer]:
+                - img [ref=e409]
+          - treeitem "Untitled Delete document Add sub-document" [ref=e411]:
+            - generic [ref=e412]:
+              - img [ref=e414]
+              - link "Untitled" [ref=e416] [cursor=pointer]:
+                - /url: /documents/8f154c72-eea4-488f-b282-25f846fae727
+              - button "Delete document" [ref=e417] [cursor=pointer]:
+                - img [ref=e418]
+              - button "Add sub-document" [ref=e420] [cursor=pointer]:
+                - img [ref=e421]
+          - treeitem "Untitled Delete document Add sub-document" [ref=e423]:
+            - generic [ref=e424]:
+              - img [ref=e426]
+              - link "Untitled" [ref=e428] [cursor=pointer]:
+                - /url: /documents/092468b4-63a3-40ea-8d4b-aaf6f5af9d17
+              - button "Delete document" [ref=e429] [cursor=pointer]:
+                - img [ref=e430]
+              - button "Add sub-document" [ref=e432] [cursor=pointer]:
+                - img [ref=e433]
+          - treeitem "Untitled Delete document Add sub-document" [ref=e435]:
+            - generic [ref=e436]:
+              - img [ref=e438]
+              - link "Untitled" [ref=e440] [cursor=pointer]:
+                - /url: /documents/508837af-d9d5-42ae-a208-6054eea67782
+              - button "Delete document" [ref=e441] [cursor=pointer]:
+                - img [ref=e442]
+              - button "Add sub-document" [ref=e444] [cursor=pointer]:
+                - img [ref=e445]
+          - treeitem "Untitled Delete document Add sub-document" [ref=e447]:
+            - generic [ref=e448]:
+              - img [ref=e450]
+              - link "Untitled" [ref=e452] [cursor=pointer]:
+                - /url: /documents/18bc6d75-c640-4187-abb5-74f8c1547e03
+              - button "Delete document" [ref=e453] [cursor=pointer]:
+                - img [ref=e454]
+              - button "Add sub-document" [ref=e456] [cursor=pointer]:
+                - img [ref=e457]
+          - treeitem "Untitled Delete document Add sub-document" [ref=e459]:
+            - generic [ref=e460]:
+              - img [ref=e462]
+              - link "Untitled" [ref=e464] [cursor=pointer]:
+                - /url: /documents/455f3be7-802a-44f0-bf61-9f311652ab73
+              - button "Delete document" [ref=e465] [cursor=pointer]:
+                - img [ref=e466]
+              - button "Add sub-document" [ref=e468] [cursor=pointer]:
+                - img [ref=e469]
+          - treeitem "Untitled Delete document Add sub-document" [ref=e471]:
+            - generic [ref=e472]:
+              - img [ref=e474]
+              - link "Untitled" [ref=e476] [cursor=pointer]:
+                - /url: /documents/200cdb16-5783-41f5-804f-1a6cd1b62a9e
+              - button "Delete document" [ref=e477] [cursor=pointer]:
+                - img [ref=e478]
+              - button "Add sub-document" [ref=e480] [cursor=pointer]:
+                - img [ref=e481]
+          - treeitem "Untitled Delete document Add sub-document" [ref=e483]:
+            - generic [ref=e484]:
+              - img [ref=e486]
+              - link "Untitled" [ref=e488] [cursor=pointer]:
+                - /url: /documents/ccc1e04d-dccb-494b-9c4b-454141f1a478
+              - button "Delete document" [ref=e489] [cursor=pointer]:
+                - img [ref=e490]
+              - button "Add sub-document" [ref=e492] [cursor=pointer]:
+                - img [ref=e493]
+          - treeitem "Untitled Delete document Add sub-document" [ref=e495]:
+            - generic [ref=e496]:
+              - img [ref=e498]
+              - link "Untitled" [ref=e500] [cursor=pointer]:
+                - /url: /documents/c22f9e5e-b869-40f2-946b-f623b1aed145
+              - button "Delete document" [ref=e501] [cursor=pointer]:
+                - img [ref=e502]
+              - button "Add sub-document" [ref=e504] [cursor=pointer]:
+                - img [ref=e505]
+          - treeitem "Untitled Delete document Add sub-document" [ref=e507]:
+            - generic [ref=e508]:
+              - img [ref=e510]
+              - link "Untitled" [ref=e512] [cursor=pointer]:
+                - /url: /documents/d1169157-17fc-4aa1-add2-e60046b522b1
+              - button "Delete document" [ref=e513] [cursor=pointer]:
+                - img [ref=e514]
+              - button "Add sub-document" [ref=e516] [cursor=pointer]:
+                - img [ref=e517]
+          - treeitem "Untitled Delete document Add sub-document" [ref=e519]:
+            - generic [ref=e520]:
+              - img [ref=e522]
+              - link "Untitled" [ref=e524] [cursor=pointer]:
+                - /url: /documents/0e3a1a61-866f-457b-86b9-85efd43d2321
+              - button "Delete document" [ref=e525] [cursor=pointer]:
+                - img [ref=e526]
+              - button "Add sub-document" [ref=e528] [cursor=pointer]:
+                - img [ref=e529]
+          - treeitem "Untitled Delete document Add sub-document" [ref=e531]:
+            - generic [ref=e532]:
+              - img [ref=e534]
+              - link "Untitled" [ref=e536] [cursor=pointer]:
+                - /url: /documents/3e6a50d2-764e-462c-a079-90673f1226f4
+              - button "Delete document" [ref=e537] [cursor=pointer]:
+                - img [ref=e538]
+              - button "Add sub-document" [ref=e540] [cursor=pointer]:
+                - img [ref=e541]
+          - treeitem "Untitled Delete document Add sub-document" [ref=e543]:
+            - generic [ref=e544]:
+              - img [ref=e546]
+              - link "Untitled" [ref=e548] [cursor=pointer]:
+                - /url: /documents/b0632907-7a95-407b-b1cb-2f4bd8d7a945
+              - button "Delete document" [ref=e549] [cursor=pointer]:
+                - img [ref=e550]
+              - button "Add sub-document" [ref=e552] [cursor=pointer]:
+                - img [ref=e553]
+          - treeitem "Untitled Delete document Add sub-document" [ref=e555]:
+            - generic [ref=e556]:
+              - img [ref=e558]
+              - link "Untitled" [ref=e560] [cursor=pointer]:
+                - /url: /documents/57f5cccc-59d1-4773-af4b-0ecd0d82cdda
+              - button "Delete document" [ref=e561] [cursor=pointer]:
+                - img [ref=e562]
+              - button "Add sub-document" [ref=e564] [cursor=pointer]:
+                - img [ref=e565]
+          - treeitem "Untitled Delete document Add sub-document" [ref=e567]:
+            - generic [ref=e568]:
+              - img [ref=e570]
+              - link "Untitled" [ref=e572] [cursor=pointer]:
+                - /url: /documents/6deda0b1-7ed8-4689-8a24-87f6a1324d5d
+              - button "Delete document" [ref=e573] [cursor=pointer]:
+                - img [ref=e574]
+              - button "Add sub-document" [ref=e576] [cursor=pointer]:
+                - img [ref=e577]
+          - treeitem "Untitled Delete document Add sub-document" [ref=e579]:
+            - generic [ref=e580]:
+              - img [ref=e582]
+              - link "Untitled" [ref=e584] [cursor=pointer]:
+                - /url: /documents/17ec246d-7da3-4f1d-bb77-1f9152f19c52
+              - button "Delete document" [ref=e585] [cursor=pointer]:
+                - img [ref=e586]
+              - button "Add sub-document" [ref=e588] [cursor=pointer]:
+                - img [ref=e589]
+          - treeitem "Untitled Delete document Add sub-document" [ref=e591]:
+            - generic [ref=e592]:
+              - img [ref=e594]
+              - link "Untitled" [ref=e596] [cursor=pointer]:
+                - /url: /documents/8dd63259-05e4-400f-a6a5-2f7b934af301
+              - button "Delete document" [ref=e597] [cursor=pointer]:
+                - img [ref=e598]
+              - button "Add sub-document" [ref=e600] [cursor=pointer]:
+                - img [ref=e601]
+          - treeitem "Untitled Delete document Add sub-document" [ref=e603]:
+            - generic [ref=e604]:
+              - img [ref=e606]
+              - link "Untitled" [ref=e608] [cursor=pointer]:
+                - /url: /documents/cc70b40b-038f-4ab2-8d99-1326b70c1ea8
+              - button "Delete document" [ref=e609] [cursor=pointer]:
+                - img [ref=e610]
+              - button "Add sub-document" [ref=e612] [cursor=pointer]:
+                - img [ref=e613]
+          - treeitem "Untitled Delete document Add sub-document" [ref=e615]:
+            - generic [ref=e616]:
+              - img [ref=e618]
+              - link "Untitled" [ref=e620] [cursor=pointer]:
+                - /url: /documents/f4c82251-acab-4c5c-8c7a-5c85ee79a04e
+              - button "Delete document" [ref=e621] [cursor=pointer]:
+                - img [ref=e622]
+              - button "Add sub-document" [ref=e624] [cursor=pointer]:
+                - img [ref=e625]
+          - treeitem "Untitled Delete document Add sub-document" [ref=e627]:
+            - generic [ref=e628]:
+              - img [ref=e630]
+              - link "Untitled" [ref=e632] [cursor=pointer]:
+                - /url: /documents/bdb47bc2-357d-424c-a3b9-e311f3665180
+              - button "Delete document" [ref=e633] [cursor=pointer]:
+                - img [ref=e634]
+              - button "Add sub-document" [ref=e636] [cursor=pointer]:
+                - img [ref=e637]
+          - treeitem "Untitled Delete document Add sub-document" [ref=e639]:
+            - generic [ref=e640]:
+              - img [ref=e642]
+              - link "Untitled" [ref=e644] [cursor=pointer]:
+                - /url: /documents/f40ee697-0904-430b-9257-3b71638d7d2d
+              - button "Delete document" [ref=e645] [cursor=pointer]:
+                - img [ref=e646]
+              - button "Add sub-document" [ref=e648] [cursor=pointer]:
+                - img [ref=e649]
+          - treeitem "Untitled Delete document Add sub-document" [ref=e651]:
+            - generic [ref=e652]:
+              - img [ref=e654]
+              - link "Untitled" [ref=e656] [cursor=pointer]:
+                - /url: /documents/ed479d0d-0bba-4672-a695-db0e88d824f7
+              - button "Delete document" [ref=e657] [cursor=pointer]:
+                - img [ref=e658]
+              - button "Add sub-document" [ref=e660] [cursor=pointer]:
+                - img [ref=e661]
+          - treeitem "Untitled Delete document Add sub-document" [ref=e663]:
+            - generic [ref=e664]:
+              - img [ref=e666]
+              - link "Untitled" [ref=e668] [cursor=pointer]:
+                - /url: /documents/99cdfae9-892a-46c3-ac68-5f0ebf05f3b8
+              - button "Delete document" [ref=e669] [cursor=pointer]:
+                - img [ref=e670]
+              - button "Add sub-document" [ref=e672] [cursor=pointer]:
+                - img [ref=e673]
+          - treeitem "Untitled Delete document Add sub-document" [ref=e675]:
+            - generic [ref=e676]:
+              - img [ref=e678]
+              - link "Untitled" [ref=e680] [cursor=pointer]:
+                - /url: /documents/4d9a18bd-f71f-4fc2-8c88-ff933f96900d
+              - button "Delete document" [ref=e681] [cursor=pointer]:
+                - img [ref=e682]
+              - button "Add sub-document" [ref=e684] [cursor=pointer]:
+                - img [ref=e685]
+          - treeitem "Untitled Delete document Add sub-document" [ref=e687]:
+            - generic [ref=e688]:
+              - img [ref=e690]
+              - link "Untitled" [ref=e692] [cursor=pointer]:
+                - /url: /documents/2371799f-abf2-474a-bd76-a7ad1ae7389a
+              - button "Delete document" [ref=e693] [cursor=pointer]:
+                - img [ref=e694]
+              - button "Add sub-document" [ref=e696] [cursor=pointer]:
+                - img [ref=e697]
+          - treeitem "Untitled Delete document Add sub-document" [ref=e699]:
+            - generic [ref=e700]:
+              - img [ref=e702]
+              - link "Untitled" [ref=e704] [cursor=pointer]:
+                - /url: /documents/d704acca-1f9f-4b8f-8f35-63e3e661478c
+              - button "Delete document" [ref=e705] [cursor=pointer]:
+                - img [ref=e706]
+              - button "Add sub-document" [ref=e708] [cursor=pointer]:
+                - img [ref=e709]
+          - treeitem "Untitled Delete document Add sub-document" [ref=e711]:
+            - generic [ref=e712]:
+              - img [ref=e714]
+              - link "Untitled" [ref=e716] [cursor=pointer]:
+                - /url: /documents/691fc57d-0825-47cb-a667-126e2f4e2e2f
+              - button "Delete document" [ref=e717] [cursor=pointer]:
+                - img [ref=e718]
+              - button "Add sub-document" [ref=e720] [cursor=pointer]:
+                - img [ref=e721]
+          - treeitem "Untitled Delete document Add sub-document" [ref=e723]:
+            - generic [ref=e724]:
+              - img [ref=e726]
+              - link "Untitled" [ref=e728] [cursor=pointer]:
+                - /url: /documents/fbf6ce67-19e1-4eb0-b53b-8605ce682076
+              - button "Delete document" [ref=e729] [cursor=pointer]:
+                - img [ref=e730]
+              - button "Add sub-document" [ref=e732] [cursor=pointer]:
+                - img [ref=e733]
+          - treeitem "Untitled Delete document Add sub-document" [ref=e735]:
+            - generic [ref=e736]:
+              - img [ref=e738]
+              - link "Untitled" [ref=e740] [cursor=pointer]:
+                - /url: /documents/22d49350-15d8-4fb3-8588-6795523981f8
+              - button "Delete document" [ref=e741] [cursor=pointer]:
+                - img [ref=e742]
+              - button "Add sub-document" [ref=e744] [cursor=pointer]:
+                - img [ref=e745]
+          - treeitem "Untitled Delete document Add sub-document" [ref=e747]:
+            - generic [ref=e748]:
+              - img [ref=e750]
+              - link "Untitled" [ref=e752] [cursor=pointer]:
+                - /url: /documents/1e5bf5a2-12d2-4343-aaf9-88d524c8fca2
+              - button "Delete document" [ref=e753] [cursor=pointer]:
+                - img [ref=e754]
+              - button "Add sub-document" [ref=e756] [cursor=pointer]:
+                - img [ref=e757]
+          - treeitem "<img src=x onerror=alert(\"XSS\")> Delete document Add sub-document" [ref=e759]:
+            - generic [ref=e760]:
+              - img [ref=e762]
+              - link "<img src=x onerror=alert(\"XSS\")>" [ref=e764] [cursor=pointer]:
+                - /url: /documents/4c6a71f9-e27f-4165-8e50-cc5388b2c145
+              - button "Delete document" [ref=e765] [cursor=pointer]:
+                - img [ref=e766]
+              - button "Add sub-document" [ref=e768] [cursor=pointer]:
+                - img [ref=e769]
+          - treeitem "Untitled Delete document Add sub-document" [ref=e771]:
+            - generic [ref=e772]:
+              - img [ref=e774]
+              - link "Untitled" [ref=e776] [cursor=pointer]:
+                - /url: /documents/838c7e56-b036-4cf5-88f3-ae717b272664
+              - button "Delete document" [ref=e777] [cursor=pointer]:
+                - img [ref=e778]
+              - button "Add sub-document" [ref=e780] [cursor=pointer]:
+                - img [ref=e781]
+          - treeitem "Untitled Delete document Add sub-document" [ref=e783]:
+            - generic [ref=e784]:
+              - img [ref=e786]
+              - link "Untitled" [ref=e788] [cursor=pointer]:
+                - /url: /documents/a1f763fe-e170-4e24-9aa1-a277b51d56ce
+              - button "Delete document" [ref=e789] [cursor=pointer]:
+                - img [ref=e790]
+              - button "Add sub-document" [ref=e792] [cursor=pointer]:
+                - img [ref=e793]
+          - treeitem "Test Title Delete document Add sub-document" [ref=e795]:
+            - generic [ref=e796]:
+              - img [ref=e798]
+              - link "Test Title" [ref=e800] [cursor=pointer]:
+                - /url: /documents/45fcdd0e-0cb4-40d7-9866-2282c26f760a
+              - button "Delete document" [ref=e801] [cursor=pointer]:
+                - img [ref=e802]
+              - button "Add sub-document" [ref=e804] [cursor=pointer]:
+                - img [ref=e805]
+          - treeitem "Untitled Delete document Add sub-document" [ref=e807]:
+            - generic [ref=e808]:
+              - img [ref=e810]
+              - link "Untitled" [ref=e812] [cursor=pointer]:
+                - /url: /documents/6b9422e2-ba8d-4849-91dd-178ed88cb30f
+              - button "Delete document" [ref=e813] [cursor=pointer]:
+                - img [ref=e814]
+              - button "Add sub-document" [ref=e816] [cursor=pointer]:
+                - img [ref=e817]
+          - treeitem "Untitled Delete document Add sub-document" [ref=e819]:
+            - generic [ref=e820]:
+              - img [ref=e822]
+              - link "Untitled" [ref=e824] [cursor=pointer]:
+                - /url: /documents/68ebd805-7214-447b-af2d-639ea1ffe7ea
+              - button "Delete document" [ref=e825] [cursor=pointer]:
+                - img [ref=e826]
+              - button "Add sub-document" [ref=e828] [cursor=pointer]:
+                - img [ref=e829]
+          - treeitem "Untitled Delete document Add sub-document" [ref=e831]:
+            - generic [ref=e832]:
+              - img [ref=e834]
+              - link "Untitled" [ref=e836] [cursor=pointer]:
+                - /url: /documents/f6d95990-596f-4cb7-aa22-79a7502166a1
+              - button "Delete document" [ref=e837] [cursor=pointer]:
+                - img [ref=e838]
+              - button "Add sub-document" [ref=e840] [cursor=pointer]:
+                - img [ref=e841]
+          - treeitem "Untitled Delete document Add sub-document" [ref=e843]:
+            - generic [ref=e844]:
+              - img [ref=e846]
+              - link "Untitled" [ref=e848] [cursor=pointer]:
+                - /url: /documents/802a6f3d-dc97-41eb-81ce-112bbd19fbf5
+              - button "Delete document" [ref=e849] [cursor=pointer]:
+                - img [ref=e850]
+              - button "Add sub-document" [ref=e852] [cursor=pointer]:
+                - img [ref=e853]
+          - treeitem "Untitled Delete document Add sub-document" [ref=e855]:
+            - generic [ref=e856]:
+              - img [ref=e858]
+              - link "Untitled" [ref=e860] [cursor=pointer]:
+                - /url: /documents/3a852980-26d9-44fa-862c-c74fc80756c0
+              - button "Delete document" [ref=e861] [cursor=pointer]:
+                - img [ref=e862]
+              - button "Add sub-document" [ref=e864] [cursor=pointer]:
+                - img [ref=e865]
+          - treeitem "Untitled Delete document Add sub-document" [ref=e867]:
+            - generic [ref=e868]:
+              - img [ref=e870]
+              - link "Untitled" [ref=e872] [cursor=pointer]:
+                - /url: /documents/b839e59b-616b-499e-8c61-24714054607f
+              - button "Delete document" [ref=e873] [cursor=pointer]:
+                - img [ref=e874]
+              - button "Add sub-document" [ref=e876] [cursor=pointer]:
+                - img [ref=e877]
+          - treeitem "Untitled Delete document Add sub-document" [ref=e879]:
+            - generic [ref=e880]:
+              - img [ref=e882]
+              - link "Untitled" [ref=e884] [cursor=pointer]:
+                - /url: /documents/94084d07-f3bc-41b4-b517-101a88d8fdbf
+              - button "Delete document" [ref=e885] [cursor=pointer]:
+                - img [ref=e886]
+              - button "Add sub-document" [ref=e888] [cursor=pointer]:
+                - img [ref=e889]
+          - treeitem "Untitled Delete document Add sub-document" [ref=e891]:
+            - generic [ref=e892]:
+              - img [ref=e894]
+              - link "Untitled" [ref=e896] [cursor=pointer]:
+                - /url: /documents/284cb763-e9fe-478d-ade1-90697d44edca
+              - button "Delete document" [ref=e897] [cursor=pointer]:
+                - img [ref=e898]
+              - button "Add sub-document" [ref=e900] [cursor=pointer]:
+                - img [ref=e901]
+          - treeitem "Untitled Delete document Add sub-document" [ref=e903]:
+            - generic [ref=e904]:
+              - img [ref=e906]
+              - link "Untitled" [ref=e908] [cursor=pointer]:
+                - /url: /documents/58f78544-87dd-4517-a165-eba34602adad
+              - button "Delete document" [ref=e909] [cursor=pointer]:
+                - img [ref=e910]
+              - button "Add sub-document" [ref=e912] [cursor=pointer]:
+                - img [ref=e913]
+          - treeitem "Untitled Delete document Add sub-document" [ref=e915]:
+            - generic [ref=e916]:
+              - img [ref=e918]
+              - link "Untitled" [ref=e920] [cursor=pointer]:
+                - /url: /documents/ed1e4aa2-c60b-4274-9392-7254c626f872
+              - button "Delete document" [ref=e921] [cursor=pointer]:
+                - img [ref=e922]
+              - button "Add sub-document" [ref=e924] [cursor=pointer]:
+                - img [ref=e925]
+          - treeitem "Untitled Delete document Add sub-document" [ref=e927]:
+            - generic [ref=e928]:
+              - img [ref=e930]
+              - link "Untitled" [ref=e932] [cursor=pointer]:
+                - /url: /documents/db697d55-23a4-4005-bf7a-7d3af6f86703
+              - button "Delete document" [ref=e933] [cursor=pointer]:
+                - img [ref=e934]
+              - button "Add sub-document" [ref=e936] [cursor=pointer]:
+                - img [ref=e937]
+          - treeitem "Final Title Delete document Add sub-document" [ref=e939]:
+            - generic [ref=e940]:
+              - img [ref=e942]
+              - link "Final Title" [ref=e944] [cursor=pointer]:
+                - /url: /documents/97d9959c-35e9-4273-a953-591aa6352c0d
+              - button "Delete document" [ref=e945] [cursor=pointer]:
+                - img [ref=e946]
+              - button "Add sub-document" [ref=e948] [cursor=pointer]:
+                - img [ref=e949]
+          - treeitem "Untitled Delete document Add sub-document" [ref=e951]:
+            - generic [ref=e952]:
+              - img [ref=e954]
+              - link "Untitled" [ref=e956] [cursor=pointer]:
+                - /url: /documents/cfde7b8f-f028-4d36-b020-534e4a6f305a
+              - button "Delete document" [ref=e957] [cursor=pointer]:
+                - img [ref=e958]
+              - button "Add sub-document" [ref=e960] [cursor=pointer]:
+                - img [ref=e961]
+          - treeitem "Expand Welcome to Ship Delete document Add sub-document" [ref=e963]:
+            - generic [ref=e964]:
+              - button "Expand" [ref=e965] [cursor=pointer]:
+                - img [ref=e966]
+              - link "Welcome to Ship" [ref=e968] [cursor=pointer]:
+                - /url: /documents/3e3e7467-7d9e-409e-8509-b60e3ed5911a
+              - button "Delete document" [ref=e969] [cursor=pointer]:
+                - img [ref=e970]
+              - button "Add sub-document" [ref=e972] [cursor=pointer]:
+                - img [ref=e973]
+          - treeitem "Project Overview Delete document Add sub-document" [ref=e975]:
+            - generic [ref=e976]:
+              - img [ref=e978]
+              - link "Project Overview" [ref=e980] [cursor=pointer]:
+                - /url: /documents/5a545e6f-8a67-41b1-a44d-8e89e0bd61fe
+              - button "Delete document" [ref=e981] [cursor=pointer]:
+                - img [ref=e982]
+              - button "Add sub-document" [ref=e984] [cursor=pointer]:
+                - img [ref=e985]
+          - treeitem "Architecture Guide Delete document Add sub-document" [ref=e987]:
+            - generic [ref=e988]:
+              - img [ref=e990]
+              - link "Architecture Guide" [ref=e992] [cursor=pointer]:
+                - /url: /documents/977e3659-e4e6-4fb6-a3f3-c824393ae0ef
+              - button "Delete document" [ref=e993] [cursor=pointer]:
+                - img [ref=e994]
+              - button "Add sub-document" [ref=e996] [cursor=pointer]:
+                - img [ref=e997]
+    - complementary "Document properties"
+```
