@@ -1,4 +1,5 @@
 import { useState, useMemo, useCallback, useRef } from 'react';
+import { FleetGraphPortfolioSummary } from '@/components/fleet/FleetGraphPortfolioSummary';
 import { useNavigate } from 'react-router-dom';
 import { usePrograms, Program } from '@/contexts/ProgramsContext';
 import { SelectableList, RowRenderProps } from '@/components/SelectableList';
@@ -196,6 +197,13 @@ export function ProgramsPage() {
           }}
         />
       </div>
+
+      {/* Portfolio Drift Summary */}
+      {sortedPrograms.length > 0 && (
+        <div className="border-b border-border">
+          <FleetGraphPortfolioSummary workspaceId="" />
+        </div>
+      )}
 
       {/* Programs List */}
       <div className="flex-1 overflow-auto pb-20">

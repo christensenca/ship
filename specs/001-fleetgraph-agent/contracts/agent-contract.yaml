@@ -1,0 +1,305 @@
+openapi: 3.1.0
+info:
+  title: FleetGraph Agent Contract
+  version: 1.0.0
+  description: >
+    Contract for FleetGraph agent endpoints. All routes are implemented in
+    api/src/routes/fleetgraph.ts, validated with Zod schemas in
+    api/src/openapi/schemas/fleetgraph.ts, and registered with OpenAPI.
+    Implementation verified against all 5 endpoints with 21 passing tests.
+paths:
+  /api/agent/contextual-guidance:
+    post:
+      summary: Generate guidance for the current Ship view
+      operationId: generateContextualGuidance
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContextualGuidanceRequest'
+      responses:
+        '200':
+          description: Guidance generated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContextualGuidanceResponse'
+  /api/agent/proactive-findings:
+    post:
+      summary: Run a proactive scan for a workspace, week, project, or program
+      operationId: runProactiveFindingsScan
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProactiveFindingsRequest'
+      responses:
+        '200':
+          description: Findings generated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProactiveFindingsResponse'
+  /api/agent/drafts:
+    post:
+      summary: Create an automated draft for standup, weekly planning, or summary content
+      operationId: createAgentDraft
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDraftRequest'
+      responses:
+        '200':
+          description: Draft generated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateDraftResponse'
+  /api/agent/recommendations/{recommendationId}/confirm:
+    post:
+      summary: Confirm or reject a recommendation requiring human approval
+      operationId: confirmRecommendation
+      parameters:
+        - name: recommendationId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecommendationDecisionRequest'
+      responses:
+        '200':
+          description: Decision recorded successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecommendationDecisionResponse'
+  /api/agent/portfolio-summary:
+    post:
+      summary: Generate a portfolio drift summary for leadership views
+      operationId: generatePortfolioSummary
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PortfolioSummaryRequest'
+      responses:
+        '200':
+          description: Portfolio summary generated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PortfolioSummaryResponse'
+components:
+  schemas:
+    ContextualGuidanceRequest:
+      type: object
+      required: [workspaceId, viewType]
+      properties:
+        workspaceId:
+          type: string
+        viewType:
+          type: string
+          enum: [issue, week, project, program, person]
+        documentId:
+          type: string
+        actorUserId:
+          type: string
+        prompt:
+          type: string
+    ContextualGuidanceResponse:
+      type: object
+      required: [summary, findings, recommendations]
+      properties:
+        summary:
+          type: string
+        findings:
+          type: array
+          items:
+            $ref: '#/components/schemas/Finding'
+        recommendations:
+          type: array
+          items:
+            $ref: '#/components/schemas/Recommendation'
+        fallback:
+          $ref: '#/components/schemas/Fallback'
+    ProactiveFindingsRequest:
+      type: object
+      required: [workspaceId, scopeType]
+      properties:
+        workspaceId:
+          type: string
+        scopeType:
+          type: string
+          enum: [workspace, week, project, program]
+        scopeId:
+          type: string
+        triggerType:
+          type: string
+          enum: [scheduled, event]
+    ProactiveFindingsResponse:
+      type: object
+      required: [findings]
+      properties:
+        findings:
+          type: array
+          items:
+            $ref: '#/components/schemas/Finding'
+        generatedAt:
+          type: string
+          format: date-time
+    CreateDraftRequest:
+      type: object
+      required: [workspaceId, draftType, sourceContext]
+      properties:
+        workspaceId:
+          type: string
+        draftType:
+          type: string
+          enum: [standup, weekly_plan, week_summary, portfolio_report]
+        sourceContext:
+          type: object
+          additionalProperties: true
+        persist:
+          type: boolean
+          default: false
+    CreateDraftResponse:
+      type: object
+      required: [draft]
+      properties:
+        draft:
+          $ref: '#/components/schemas/Draft'
+    RecommendationDecisionRequest:
+      type: object
+      required: [decision]
+      properties:
+        decision:
+          type: string
+          enum: [approve, reject]
+        comment:
+          type: string
+    RecommendationDecisionResponse:
+      type: object
+      required: [recommendationId, status]
+      properties:
+        recommendationId:
+          type: string
+        status:
+          type: string
+          enum: [approved, rejected]
+    PortfolioSummaryRequest:
+      type: object
+      required: [workspaceId]
+      properties:
+        workspaceId:
+          type: string
+        programIds:
+          type: array
+          items:
+            type: string
+    PortfolioSummaryResponse:
+      type: object
+      required: [summary, programs]
+      properties:
+        summary:
+          type: string
+        programs:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProgramSummary'
+    Finding:
+      type: object
+      required: [id, category, severity, headline, rationale, requiresHumanAction]
+      properties:
+        id:
+          type: string
+        category:
+          type: string
+        severity:
+          type: string
+          enum: [critical, high, medium, low]
+        headline:
+          type: string
+        rationale:
+          type: string
+        evidence:
+          type: array
+          items:
+            type: string
+        relatedDocumentIds:
+          type: array
+          items:
+            type: string
+        recommendedAudience:
+          type: array
+          items:
+            type: string
+        requiresHumanAction:
+          type: boolean
+        confidence:
+          type: number
+    Recommendation:
+      type: object
+      required: [id, type, reason, expectedImpact, approvalStatus]
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+        reason:
+          type: string
+        expectedImpact:
+          type: string
+        approvalStatus:
+          type: string
+          enum: [not_required, pending, approved, rejected, expired]
+        affectedDocumentIds:
+          type: array
+          items:
+            type: string
+    Draft:
+      type: object
+      required: [type, title, body, status, automated]
+      properties:
+        type:
+          type: string
+        title:
+          type: string
+        body:
+          type: string
+        status:
+          type: string
+          enum: [draft, reviewed, published]
+        automated:
+          type: boolean
+    ProgramSummary:
+      type: object
+      required: [programId, status, headline]
+      properties:
+        programId:
+          type: string
+        status:
+          type: string
+          enum: [on_track, at_risk, stalled]
+        headline:
+          type: string
+        blockers:
+          type: integer
+        silentDays:
+          type: integer
+    Fallback:
+      type: object
+      properties:
+        message:
+          type: string
+        retryable:
+          type: boolean

@@ -8,6 +8,7 @@ import { useAssignableMembersQuery } from '@/hooks/useTeamMembersQuery';
 import { useActiveWeeksQuery } from '@/hooks/useWeeksQuery';
 import { apiPatch, apiDelete } from '@/lib/api';
 import type { DocumentTabProps } from '@/lib/document-tabs';
+import { FleetGraphWeekPanel } from '@/components/fleet/FleetGraphWeekPanel';
 
 function getString(value: unknown): string | undefined {
   return typeof value === 'string' ? value : undefined;
@@ -136,14 +137,24 @@ export default function SprintOverviewTab({ documentId, document }: DocumentTabP
   if (!user) return null;
 
   return (
-    <UnifiedEditor
-      document={unifiedDocument}
-      sidebarData={sidebarData}
-      onUpdate={handleUpdate}
-      onBack={handleBack}
-      backLabel="weeks"
-      onDelete={handleDelete}
-      showTypeSelector={false}
-    />
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      <div style={{ flex: 1, minHeight: 0 }}>
+        <UnifiedEditor
+          document={unifiedDocument}
+          sidebarData={sidebarData}
+          onUpdate={handleUpdate}
+          onBack={handleBack}
+          backLabel="weeks"
+          onDelete={handleDelete}
+          showTypeSelector={false}
+        />
+      </div>
+      <div style={{ borderTop: '1px solid var(--color-border, #e5e7eb)', maxHeight: '240px', overflowY: 'auto' }}>
+        <FleetGraphWeekPanel
+          weekId={documentId}
+          workspaceId={document.workspace_id ?? ''}
+        />
+      </div>
+    </div>
   );
 }

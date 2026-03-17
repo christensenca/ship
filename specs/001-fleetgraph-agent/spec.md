@@ -1,0 +1,122 @@
+# Feature Specification: FleetGraph Agent
+
+**Feature Branch**: `codex/001-fleetgraph-agent`  
+**Created**: 2026-03-16  
+**Status**: Draft  
+**Input**: User description: "Build the FleetGraph agent specification from docs/research/fleetgraph-presearch.md"
+
+## User Scenarios & Testing *(mandatory)*
+
+### User Story 1 - Surface Sprint Risk Early (Priority: P1)
+
+A PM or week owner opens an active week and immediately sees the most important plan-versus-reality risks, including slipping scope, stale work, unresolved blockers, and missing planning approvals, with enough context to decide what action to take.
+
+**Why this priority**: Active-week risk detection is the highest-value use case because it helps teams recover before the week is lost and keeps accountability visible.
+
+**Independent Test**: Can be fully tested by preparing an active week with a mix of completed, stale, blocked, and unapproved work, then confirming the week view presents the right findings, owners, and recommended next actions.
+
+**Acceptance Scenarios**:
+
+1. **Given** an active week has issues with stale progress and unresolved blockers, **When** a PM opens the week view, **Then** the system shows a prioritized health summary that identifies the affected issues, why they are at risk, and who should act.
+2. **Given** an active week has no approved plan, **When** the proactive scan runs or a week owner opens that week, **Then** the system surfaces the missing approval as an action-required finding instead of treating it as normal noise.
+3. **Given** a week is nearing its end with more than half of planned issues still not started, **When** the system evaluates that week, **Then** it flags likely spillover and recommends a scope or staffing review.
+
+---
+
+### User Story 2 - Guide Daily Work in Context (Priority: P2)
+
+An engineer can ask what to work on next or request a standup draft from the current issue, week, or person view and receive recommendations that reflect their assigned work, current blockers, and the surrounding team context.
+
+**Why this priority**: Context-aware guidance saves time for individual contributors and turns the agent into a useful daily workflow assistant instead of only a reporting layer.
+
+**Independent Test**: Can be fully tested by assigning one engineer multiple issues across active weeks, recording recent progress and blockers, and confirming the system returns a ranked next-work recommendation and a standup draft grounded in that activity.
+
+**Acceptance Scenarios**:
+
+1. **Given** an engineer has multiple assigned issues with different urgency and dependency impact, **When** they ask what to work on next, **Then** the system returns a prioritized list with clear reasoning tied to their current commitments.
+2. **Given** an engineer has made changes across assigned work during the day, **When** they request a standup draft, **Then** the system summarizes completed work, planned work, and blockers using that day's activity.
+3. **Given** the current view is a specific issue or week, **When** the engineer asks for guidance there, **Then** the response reflects that page context rather than generic workspace-wide advice.
+
+---
+
+### User Story 3 - Summarize Portfolio Drift (Priority: P3)
+
+A director or program lead can review a cross-program summary that highlights which programs are on track, drifting, or stalled so they can decide where to intervene.
+
+**Why this priority**: Portfolio-level awareness is valuable, but it depends on the lower-level week and issue signals already being trustworthy.
+
+**Independent Test**: Can be fully tested by setting up multiple programs with different activity patterns and confirming the resulting summary correctly ranks risk, notes silent areas, and identifies where leadership attention is needed.
+
+**Acceptance Scenarios**:
+
+1. **Given** multiple programs have different completion, blocker, and activity patterns, **When** a director requests a portfolio summary, **Then** the system produces a ranked report that distinguishes on-track, at-risk, and stalled programs.
+2. **Given** one project has had no meaningful activity for more than a week, **When** the system prepares the report, **Then** it marks that project as silent and routes the summary to the appropriate leadership audience.
+
+### Edge Cases
+
+- A week has no assigned owner, no issue assignees, or both; the system should still surface the finding and route it to the next accountable fallback audience.
+- An issue is in progress but has incomplete history; the system should describe the confidence limits of the finding instead of presenting unsupported certainty.
+- A person is assigned across multiple active weeks; workload and recommendations should reflect all active commitments, not only the current page.
+- A project legitimately has dormant backlog work; the system should avoid surfacing old but unplanned backlog as a problem unless it conflicts with an active commitment.
+- A draft generated by the agent is never reviewed by a human; the draft should remain clearly marked as automated and should not be treated as approved or final.
+
+## Requirements *(mandatory)*
+
+### Functional Requirements
+
+- **FR-001**: The system MUST monitor plan-versus-reality signals for active work, including issue progress, blocker persistence, assignment changes, week timing, planning approval state, and meaningful absence of expected activity.  
+  **Verification**: Validate with seeded examples covering each signal type and confirm each appears only when its trigger conditions are met.
+- **FR-002**: The system MUST surface only findings that indicate actionable drift and suppress conditions that are normal backlog behavior or otherwise non-actionable noise.  
+  **Verification**: Review a mixed workspace and confirm non-actionable states are excluded while action-required findings remain visible.
+- **FR-003**: The system MUST prioritize proactive findings for active weeks so that unresolved blockers, unapproved plans, stale in-progress work, and likely spillover appear before lower-urgency reminders.  
+  **Verification**: Compare displayed findings against a known priority order in a week containing multiple simultaneous risks.
+- **FR-004**: The system MUST identify the responsible audience for each finding, including direct assignees, week owners, approvers, project leaders, or fallback workspace admins when primary ownership is missing.  
+  **Verification**: Exercise findings with complete ownership, partial ownership, and missing ownership and confirm the notification target changes appropriately.
+- **FR-005**: Users MUST be able to request on-demand guidance from issue, week, project, program, and person views, and the response MUST reflect the current view's context rather than generic workspace data.  
+  **Verification**: Invoke the feature from different views and confirm the response changes based on the page being viewed.
+- **FR-006**: The system MUST provide next-work recommendations for individuals that account for current assignments, unfinished in-progress work, blocking impact on teammates, priority, and upcoming week deadlines.  
+  **Verification**: Present one user with competing assignments and confirm the resulting ranking matches the documented prioritization rules.
+- **FR-007**: The system MUST generate standup and weekly planning drafts from relevant recent activity, but those drafts MUST remain editable drafts until a human reviews and confirms them.  
+  **Verification**: Generate drafts from recent activity and confirm the drafts can be reviewed before they are treated as shared or final.
+- **FR-008**: The system MUST never change issue state, assignee, priority, week assignment, plan approval, or other document data without explicit human confirmation.  
+  **Verification**: Attempt each recommended change path and confirm no underlying data changes occur before confirmation.
+- **FR-009**: When the system recommends a change, it MUST explain the reason, the expected impact, and the specific decision the human is being asked to make.  
+  **Verification**: Review recommendation outputs and confirm each includes rationale, consequence, and requested action.
+- **FR-010**: The system MUST support recurring portfolio and week summaries that distinguish on-track, at-risk, and stalled work using the same underlying signals as the detailed views.  
+  **Verification**: Compare summary outputs to underlying week and issue conditions and confirm the classifications are consistent.
+- **FR-011**: Any persisted automated summary, draft, or insight created by this feature MUST fit the unified document model as a document, child document, or document-linked artifact, and it MUST remain clearly marked as automated output.  
+  **Verification**: Create each persisted output type and confirm it is represented through existing document concepts and retains an automated marker.
+- **FR-012**: If this feature changes document authoring surfaces, it MUST reuse the shared `Editor` component and existing four-panel layout rather than introducing a separate authoring experience.  
+  **Verification**: Review affected authoring flows and confirm they open within the shared editor structure.
+- **FR-013**: If this feature adds or changes API routes for findings, contextual guidance, draft generation, or confirmation actions, the affected routes MUST be registered with OpenAPI before release.  
+  **Verification**: Confirm every added or changed route appears in the published API description and matches the delivered behavior.
+- **FR-014**: If this feature requires data model changes, those changes MUST be delivered through numbered SQL migrations rather than direct edits to the base schema definition.  
+  **Verification**: Confirm any schema change is represented by a new numbered migration file and can be applied in a clean environment.
+- **FR-015**: If the feature creates a new user-visible document, the default title MUST remain exactly `Untitled` until a human changes it.  
+  **Verification**: Create a new agent-generated document and confirm its initial title uses the shared default.
+- **FR-016**: Every behavior change introduced by this feature MUST have a concrete verification path, either through automated tests or a documented manual workflow that can be repeated by reviewers.  
+  **Verification**: Review the delivery artifacts and confirm each requirement maps to a repeatable test or manual check.
+
+### Key Entities *(include if feature involves data)*
+
+- **Agent Finding**: A time-bound, actionable signal about drift between planned work and observed work, including severity, rationale, affected work, and intended audience.
+- **Recommendation**: A suggested human decision tied to a finding, such as re-scoping, reassigning, or escalating work, with stated reason and expected outcome.
+- **Automated Draft**: A system-generated draft of user-facing content such as a standup, weekly plan, or summary that remains editable and unapproved until reviewed by a person.
+- **Portfolio Summary**: A roll-up view of program or project health that groups work into on-track, at-risk, and stalled categories using shared signal definitions.
+
+## Success Criteria *(mandatory)*
+
+### Measurable Outcomes
+
+- **SC-001**: In usability review sessions, PMs or week owners can identify the highest-priority risk in an active week within 2 minutes of opening the week view.
+- **SC-002**: At least 90% of proactive findings sampled during acceptance testing are judged by reviewers to be actionable rather than noise.
+- **SC-003**: Engineers can obtain a next-work recommendation or standup draft in under 1 minute from a relevant page and complete the task without leaving that workflow.
+- **SC-004**: In acceptance testing with mixed-risk sample data, reviewers agree that at least 85% of high-severity blockers and likely spillover cases are surfaced to the correct audience.
+- **SC-005**: Directors or program leads can review a weekly portfolio summary for a multi-program workspace in under 5 minutes and correctly identify which programs need intervention.
+
+## Assumptions
+
+- The feature is intended to cover both proactive monitoring and on-demand guidance described in `docs/research/fleetgraph-presearch.md`.
+- Workspace-level permissions remain unchanged; the feature works within existing visibility rules rather than introducing document-level access controls.
+- Notifications are delivered as system-originated FleetGraph messages or prompts rather than impersonating individual users.
+- The first release focuses on actionable drift detection, recommendations, and draft generation, not autonomous execution of workflow changes.

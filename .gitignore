@@ -41,9 +41,14 @@ Thumbs.db
 
 # Claude agents
 .claude/agents/
+.claude/commands/
 
 # Playwright MCP screenshots
 .playwright-mcp/
+
+# Local agent prompt/tooling state
+.codex/
+.specify/
 
 # Evidence/verification screenshots
 evidence/

@@ -7,6 +7,7 @@ import { useToast } from '@/components/ui/Toast';
 import { useAuth } from '@/hooks/useAuth';
 import { useInvalidateStandupStatus } from '@/hooks/useStandupStatusQuery';
 import { apiPost, apiPatch, apiDelete, apiGet } from '@/lib/api';
+import { useGenerateDraft } from '@/hooks/useFleetGraphGuidance';
 
 interface Standup {
   id: string;
@@ -33,6 +34,7 @@ export function StandupFeed({ sprintId }: StandupFeedProps) {
   const { showToast } = useToast();
   const { user } = useAuth();
   const invalidateStandupStatus = useInvalidateStandupStatus();
+  const draftMutation = useGenerateDraft();
 
   // TipTap editor for creating new standups
   const createEditor = useEditor({
@@ -217,6 +219,27 @@ export function StandupFeed({ sprintId }: StandupFeedProps) {
                 className="rounded-md px-3 py-1.5 text-sm text-muted hover:bg-border transition-colors"
               >
                 Cancel
+              </button>
+              <button
+                onClick={async () => {
+                  if (!user) return;
+                  try {
+                    const result = await draftMutation.mutateAsync({
+                      workspaceId: '', // Will use session workspace
+                      draftType: 'standup',
+                      sourceContext: { personId: user.id },
+                    });
+                    if (result.draft.body && createEditor) {
+                      createEditor.commands.setContent(`<p>${result.draft.body.replace(/\n/g, '</p><p>')}</p>`);
+                    }
+                  } catch {
+                    showToast('Failed to generate draft', 'error');
+                  }
+                }}
+                disabled={draftMutation.isPending}
+                className="rounded-md border border-border px-3 py-1.5 text-sm text-muted hover:bg-border transition-colors disabled:opacity-50"
+              >
+                {draftMutation.isPending ? 'Generating...' : 'Draft with AI'}
               </button>
               <button
                 onClick={handleSubmit}
