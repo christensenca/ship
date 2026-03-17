@@ -5,8 +5,9 @@ type DocumentType = 'wiki' | 'issue' | 'project' | 'program' | 'sprint' | 'perso
 interface CurrentDocumentContextValue {
   currentDocumentType: DocumentType;
   currentDocumentId: string | null;
+  currentDocumentTitle: string | null;
   currentDocumentProjectId: string | null;
-  setCurrentDocument: (id: string | null, type: DocumentType, projectId?: string | null) => void;
+  setCurrentDocument: (id: string | null, type: DocumentType, projectId?: string | null, title?: string | null) => void;
   clearCurrentDocument: () => void;
 }
 
@@ -15,17 +16,20 @@ const CurrentDocumentContext = createContext<CurrentDocumentContextValue | undef
 export function CurrentDocumentProvider({ children }: { children: ReactNode }) {
   const [currentDocumentId, setCurrentDocumentId] = useState<string | null>(null);
   const [currentDocumentType, setCurrentDocumentType] = useState<DocumentType>(null);
+  const [currentDocumentTitle, setCurrentDocumentTitle] = useState<string | null>(null);
   const [currentDocumentProjectId, setCurrentDocumentProjectId] = useState<string | null>(null);
 
-  const setCurrentDocument = useCallback((id: string | null, type: DocumentType, projectId?: string | null) => {
+  const setCurrentDocument = useCallback((id: string | null, type: DocumentType, projectId?: string | null, title?: string | null) => {
     setCurrentDocumentId(id);
     setCurrentDocumentType(type);
+    setCurrentDocumentTitle(title ?? null);
     setCurrentDocumentProjectId(projectId ?? null);
   }, []);
 
   const clearCurrentDocument = useCallback(() => {
     setCurrentDocumentId(null);
     setCurrentDocumentType(null);
+    setCurrentDocumentTitle(null);
     setCurrentDocumentProjectId(null);
   }, []);
 
@@ -34,6 +38,7 @@ export function CurrentDocumentProvider({ children }: { children: ReactNode }) {
       value={{
         currentDocumentType,
         currentDocumentId,
+        currentDocumentTitle,
         currentDocumentProjectId,
         setCurrentDocument,
         clearCurrentDocument,

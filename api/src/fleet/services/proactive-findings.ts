@@ -1,99 +1,129 @@
 /**
- * T018: Proactive findings orchestration and recommendation shaping.
- *
- * Orchestrates the week-risk detectors and shapes findings into
- * recommendations for the API response.
+ * Proactive findings orchestration — wires through the full FleetGraph graph pipeline.
+ * Persists runs to agent_runs, checks notification dedup via agent_notifications.
  */
 
 import { v4 as uuid } from 'uuid';
 import type {
   FleetGraphFinding,
   FleetGraphRecommendation,
+  FleetGraphViewType,
   ProactiveFindingsRequest,
   ProactiveFindingsResponse,
 } from '@ship/shared';
-import { ShipAPIClient, type ShipIssue, type ShipWeek } from '../ship-api-client.js';
-import { getFleetGraphConfig } from '../runtime.js';
-import { runWeekRiskDetectors } from '../detectors/week-risk.js';
+import { buildFleetGraph, type FleetGraphStateType } from '../graph.js';
+import type { InvocationContext } from '../state.js';
+import { pool } from '../../db/client.js';
 
 /**
- * Run a proactive findings scan for a given scope.
+ * Run a proactive findings scan for a given scope using the full graph pipeline.
  */
 export async function runProactiveFindingsScan(
   request: ProactiveFindingsRequest,
 ): Promise<ProactiveFindingsResponse> {
-  const config = getFleetGraphConfig();
-  const client = new ShipAPIClient({
-    baseUrl: config.shipApiBaseUrl,
-    apiToken: config.shipApiToken,
-  });
+  const runId = uuid();
+  const startedAt = new Date();
 
-  let findings: FleetGraphFinding[] = [];
+  // Record run start
+  await pool.query(
+    `INSERT INTO agent_runs (id, workspace_id, trigger_type, scope_type, scope_id, status, started_at)
+     VALUES ($1, $2, $3, $4, $5, 'running', $6)`,
+    [runId, request.workspaceId, request.triggerType ?? 'scheduled', request.scopeType, request.scopeId ?? null, startedAt],
+  );
 
-  if (request.scopeType === 'week' && request.scopeId) {
-    findings = await scanWeekScope(client, request.scopeId);
-  } else if (request.scopeType === 'workspace') {
-    findings = await scanWorkspaceScope(client);
-  }
-  // project and program scope stubs for future phases
-
-  return {
-    findings,
-    generatedAt: new Date().toISOString(),
-  };
-}
-
-/**
- * Scan a single week for risk findings.
- */
-async function scanWeekScope(
-  client: ShipAPIClient,
-  weekId: string,
-): Promise<FleetGraphFinding[]> {
   try {
-    const [week, issues] = await Promise.all([
-      client.getWeek(weekId),
-      client.getWeekIssues(weekId),
-    ]);
+    const graph = buildFleetGraph();
 
-    return runWeekRiskDetectors(issues as ShipIssue[], week as ShipWeek);
-  } catch (err) {
-    console.error('Week scope scan failed:', err);
-    return [];
-  }
-}
+    const invocation: InvocationContext = {
+      triggerType: request.triggerType ?? 'scheduled',
+      viewType: request.scopeType === 'workspace' ? 'workspace' : request.scopeType as FleetGraphViewType,
+      documentId: request.scopeId,
+      workspaceId: request.workspaceId,
+      correlationId: runId,
+    };
 
-/**
- * Scan all active weeks in the workspace.
- */
-async function scanWorkspaceScope(
-  client: ShipAPIClient,
-): Promise<FleetGraphFinding[]> {
-  try {
-    const weeks = await client.listWeeks();
-    const activeWeeks = weeks.filter(
-      w => (w.properties as any).status === 'active',
+    const result = await graph.invoke({
+      invocation,
+    }) as FleetGraphStateType;
+
+    // Apply notification dedup
+    const { surfaced, skipped } = await deduplicateFindings(
+      request.workspaceId,
+      result.detectedFindings,
     );
 
-    const allFindings: FleetGraphFinding[] = [];
-    for (const week of activeWeeks) {
-      const issues = await client.getWeekIssues(week.id);
-      const findings = runWeekRiskDetectors(
-        issues as ShipIssue[],
-        week as ShipWeek,
-      );
-      allFindings.push(...findings);
-    }
+    // Update run record
+    await pool.query(
+      `UPDATE agent_runs SET status = 'completed', findings_count = $1, actions_proposed = $2,
+       degradation_tier = $3, completed_at = NOW() WHERE id = $4`,
+      [surfaced.length, result.recommendedActions.length, result.degradationTier ?? 'full', runId],
+    );
 
-    return allFindings;
+    return {
+      findings: surfaced,
+      generatedAt: new Date().toISOString(),
+    };
   } catch (err) {
-    console.error('Workspace scope scan failed:', err);
-    return [];
+    const message = err instanceof Error ? err.message : String(err);
+    await pool.query(
+      `UPDATE agent_runs SET status = 'failed', error_message = $1, completed_at = NOW() WHERE id = $2`,
+      [message, runId],
+    );
+    console.error('Proactive findings scan failed:', err);
+    return { findings: [], generatedAt: new Date().toISOString() };
   }
 }
 
 /**
- * Shape findings into actionable recommendations.
+ * Check notification dedup — filter out findings already notified within 24h.
+ */
+async function deduplicateFindings(
+  workspaceId: string,
+  findings: FleetGraphFinding[],
+): Promise<{ surfaced: FleetGraphFinding[]; skipped: number }> {
+  const surfaced: FleetGraphFinding[] = [];
+  let skipped = 0;
+
+  for (const finding of findings) {
+    const findingKey = computeFindingKey(finding);
+
+    // Check if already notified within 24h
+    const { rows } = await pool.query(
+      `SELECT 1 FROM agent_notifications
+       WHERE workspace_id = $1 AND finding_key = $2
+       AND notified_at > NOW() - INTERVAL '24 hours'`,
+      [workspaceId, findingKey],
+    );
+
+    if (rows.length > 0) {
+      skipped++;
+      continue;
+    }
+
+    // Upsert notification record
+    await pool.query(
+      `INSERT INTO agent_notifications (workspace_id, finding_category, finding_key, notified_at)
+       VALUES ($1, $2, $3, NOW())
+       ON CONFLICT (workspace_id, finding_key) DO UPDATE SET notified_at = NOW()`,
+      [workspaceId, finding.category, findingKey],
+    );
+
+    surfaced.push(finding);
+  }
+
+  return { surfaced, skipped };
+}
+
+/**
+ * Compute a stable dedup key for a finding: category + sorted related document IDs.
+ */
+function computeFindingKey(finding: FleetGraphFinding): string {
+  const sortedIds = [...finding.relatedDocumentIds].sort().join(',');
+  return `${finding.category}:${sortedIds}`;
+}
+
+/**
+ * Shape findings into actionable recommendations (kept for backward compatibility).
  */
 export function shapeRecommendations(
   findings: FleetGraphFinding[],

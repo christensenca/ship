@@ -124,6 +124,21 @@ export class ShipAPIClient {
     return this.request<ShipActivity[]>(`/api/activity${params}`);
   }
 
+  // === Iterations ===
+
+  async listIterations(issueId: string): Promise<ShipIteration[]> {
+    return this.request<ShipIteration[]>(`/api/issues/${issueId}/iterations`);
+  }
+
+  // === Mutations (for HITL action execution) ===
+
+  async patchIssue(issueId: string, patch: Record<string, unknown>): Promise<ShipIssue> {
+    return this.request<ShipIssue>(`/api/issues/${issueId}`, {
+      method: 'PATCH',
+      body: patch,
+    });
+  }
+
   // === View Context Helper ===
 
   async getViewContext(viewType: FleetGraphViewType, documentId?: string): Promise<ViewContext> {
@@ -212,6 +227,16 @@ export interface ShipActivity {
   created_at: string;
   user_id?: string;
   details?: Record<string, unknown>;
+}
+
+export interface ShipIteration {
+  id: string;
+  issue_id: string;
+  status: 'pass' | 'fail' | 'in_progress';
+  what_attempted?: string;
+  blockers_encountered?: string;
+  author_id?: string;
+  created_at: string;
 }
 
 export interface ViewContext {

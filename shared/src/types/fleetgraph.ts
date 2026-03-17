@@ -4,7 +4,7 @@
 
 export type FleetGraphViewType = 'issue' | 'week' | 'project' | 'program' | 'person' | 'workspace';
 export type FleetGraphTriggerType = 'on_demand' | 'scheduled' | 'event';
-export type FleetGraphScopeType = 'workspace' | 'week' | 'project' | 'program';
+export type FleetGraphScopeType = 'workspace' | 'week' | 'project' | 'program' | 'person' | 'issue';
 
 export type FindingCategory =
   | 'blocker'
@@ -34,6 +34,12 @@ export type GateType = 'mutation' | 'notification_send' | 'document_publish';
 export type GateStatus = 'pending' | 'approved' | 'rejected' | 'expired';
 
 export type ProgramHealthStatus = 'on_track' | 'at_risk' | 'stalled';
+
+export type DegradationTier = 'full' | 'partial' | 'offline';
+
+export type ActionType = 'move_issue' | 'reassign' | 'change_priority' | 'change_state';
+export type ActionStatus = 'pending' | 'approved' | 'dismissed' | 'snoozed' | 'expired' | 'executed';
+export type ActionDecision = 'approve' | 'dismiss' | 'snooze';
 
 // === Core Entities ===
 
@@ -78,6 +84,27 @@ export interface FleetGraphProgramSummary {
   headline: string;
   blockers?: number;
   silentDays?: number;
+}
+
+// === Chat Types ===
+
+export interface ChatMessage {
+  role: 'user' | 'assistant';
+  content: string;
+}
+
+// === Action Types ===
+
+export interface ActionShape {
+  id: string;
+  actionType: ActionType;
+  targetDocumentId: string;
+  targetDocumentTitle: string;
+  proposedChange: { field: string; old_value: unknown; new_value: unknown };
+  description: string;
+  findingId: string;
+  status: ActionStatus;
+  createdAt: string;
 }
 
 // === Request Types ===
@@ -140,4 +167,65 @@ export interface RecommendationDecisionResponse {
 export interface PortfolioSummaryResponse {
   summary: string;
   programs: FleetGraphProgramSummary[];
+}
+
+// === Chat Request/Response ===
+
+export interface ChatRequest {
+  workspaceId: string;
+  viewType: FleetGraphViewType;
+  documentId?: string;
+  messages: ChatMessage[];
+}
+
+export interface ChatResponse {
+  message: string;
+  findings: FleetGraphFinding[];
+  proposedActions: ActionShape[];
+  degradationTier: DegradationTier;
+  refetchedScope: boolean;
+}
+
+// === Action Management Request/Response ===
+
+export interface ActionDecideRequest {
+  decision: ActionDecision;
+  snoozeHours?: number;
+  comment?: string;
+}
+
+export interface ActionDecideResponse {
+  actionId: string;
+  status: 'approved' | 'dismissed' | 'snoozed';
+  executionResult?: {
+    success: boolean;
+    documentId: string;
+    changeApplied: { field: string; old_value: unknown; new_value: unknown };
+  };
+}
+
+export interface ActionListResponse {
+  actions: ActionShape[];
+}
+
+// === Check Blockers Request/Response ===
+
+export interface CheckBlockersRequest {
+  workspaceId: string;
+}
+
+export interface CheckBlockersResponse {
+  findings: FleetGraphFinding[];
+  escalated: number;
+  skipped: number;
+}
+
+// === Expire Actions Request/Response ===
+
+export interface ExpireActionsRequest {
+  workspaceId: string;
+}
+
+export interface ExpireActionsResponse {
+  expired: number;
 }

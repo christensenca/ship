@@ -4,7 +4,11 @@
  * POST /api/agent/contextual-guidance  - On-demand guidance for current view
  * POST /api/agent/proactive-findings   - Proactive risk scan
  * POST /api/agent/drafts               - Generate automated draft
- * POST /api/agent/recommendations/:id/confirm - Approve/reject recommendation
+ * POST /api/agent/chat                 - Multi-turn conversational chat
+ * POST /api/agent/actions/:id/decide   - Approve/dismiss/snooze action
+ * GET  /api/agent/actions              - List pending actions
+ * POST /api/agent/check-blockers       - Blocker escalation check
+ * POST /api/agent/expire-actions       - Expire stale actions
  * POST /api/agent/portfolio-summary    - Portfolio drift summary
  * GET  /api/agent/status               - Check if FleetGraph is available
  */
@@ -13,15 +17,21 @@ import { Router, Request, Response } from 'express';
 import rateLimit from 'express-rate-limit';
 import { authMiddleware } from '../middleware/auth.js';
 import { isFleetGraphAvailable } from '../fleet/runtime.js';
-import { runProactiveFindingsScan, shapeRecommendations } from '../fleet/services/proactive-findings.js';
+import { runProactiveFindingsScan } from '../fleet/services/proactive-findings.js';
 import { generateContextualGuidance, generateDraft } from '../fleet/services/contextual-guidance.js';
 import { generatePortfolioSummary } from '../fleet/services/portfolio-summary.js';
+import { handleChat } from '../fleet/services/chat-service.js';
+import { createActionService } from '../fleet/services/action-service.js';
+import { runBlockerCheck } from '../fleet/services/blocker-check.js';
 import {
   ContextualGuidanceRequestSchema,
   ProactiveFindingsRequestSchema,
   CreateDraftRequestSchema,
-  RecommendationDecisionRequestSchema,
   PortfolioSummaryRequestSchema,
+  ChatRequestSchema,
+  ActionDecideRequestSchema,
+  CheckBlockersRequestSchema,
+  ExpireActionsRequestSchema,
 } from '../openapi/schemas/fleetgraph.js';
 
 type RouterType = ReturnType<typeof Router>;
@@ -95,24 +105,97 @@ router.post('/drafts', authMiddleware, async (req: Request, res: Response) => {
   }
 });
 
-// POST /api/agent/recommendations/:recommendationId/confirm
-router.post('/recommendations/:recommendationId/confirm', authMiddleware, async (req: Request, res: Response) => {
+// POST /api/agent/chat
+router.post('/chat', authMiddleware, async (req: Request, res: Response) => {
   try {
-    const parsed = RecommendationDecisionRequestSchema.safeParse(req.body);
+    const parsed = ChatRequestSchema.safeParse(req.body);
+    if (!parsed.success) {
+      console.error('FleetGraph chat validation error:', parsed.error.flatten());
+      res.status(400).json({ error: 'Invalid request', details: parsed.error.flatten() });
+      return;
+    }
+
+    console.log('[FleetGraph] Chat request:', { viewType: parsed.data.viewType, documentId: parsed.data.documentId, messageCount: parsed.data.messages.length });
+    const result = await handleChat(parsed.data);
+    console.log('[FleetGraph] Chat result:', { degradationTier: result.degradationTier, messageLen: result.message.length });
+    res.json(result);
+  } catch (err) {
+    console.error('FleetGraph chat error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// POST /api/agent/actions/:actionId/decide
+router.post('/actions/:actionId/decide', authMiddleware, async (req: Request, res: Response) => {
+  try {
+    const parsed = ActionDecideRequestSchema.safeParse(req.body);
     if (!parsed.success) {
       res.status(400).json({ error: 'Invalid request', details: parsed.error.flatten() });
       return;
     }
 
-    const { recommendationId } = req.params;
-
-    // Placeholder: will be implemented in T019
-    res.json({
-      recommendationId,
-      status: parsed.data.decision === 'approve' ? 'approved' : 'rejected',
-    });
+    const actionId = req.params.actionId as string;
+    const userId = (req as any).user?.id as string | undefined;
+    const actionService = createActionService();
+    const result = await actionService.decideAction(actionId, parsed.data as any, userId);
+    res.json(result);
   } catch (err) {
-    console.error('FleetGraph recommendation confirm error:', err);
+    console.error('FleetGraph action decide error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// GET /api/agent/actions
+router.get('/actions', authMiddleware, async (req: Request, res: Response) => {
+  try {
+    const workspaceId = req.query.workspaceId as string;
+    const status = (req.query.status as string) ?? 'pending';
+
+    if (!workspaceId) {
+      res.status(400).json({ error: 'workspaceId query parameter is required' });
+      return;
+    }
+
+    const actionService = createActionService();
+    const actions = await actionService.listActions(workspaceId, status);
+    res.json({ actions });
+  } catch (err) {
+    console.error('FleetGraph actions list error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// POST /api/agent/check-blockers
+router.post('/check-blockers', authMiddleware, async (req: Request, res: Response) => {
+  try {
+    const parsed = CheckBlockersRequestSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ error: 'Invalid request', details: parsed.error.flatten() });
+      return;
+    }
+
+    const result = await runBlockerCheck(parsed.data);
+    res.json(result);
+  } catch (err) {
+    console.error('FleetGraph check-blockers error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// POST /api/agent/expire-actions
+router.post('/expire-actions', authMiddleware, async (req: Request, res: Response) => {
+  try {
+    const parsed = ExpireActionsRequestSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ error: 'Invalid request', details: parsed.error.flatten() });
+      return;
+    }
+
+    const actionService = createActionService();
+    const expired = await actionService.expireStaleActions(parsed.data.workspaceId);
+    res.json({ expired });
+  } catch (err) {
+    console.error('FleetGraph expire-actions error:', err);
     res.status(500).json({ error: 'Internal server error' });
   }
 });

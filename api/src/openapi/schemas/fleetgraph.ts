@@ -119,6 +119,88 @@ const PortfolioSummaryResponseSchema = z.object({
   programs: z.array(ProgramSummarySchema),
 }).openapi('PortfolioSummaryResponse');
 
+// ============== New Schemas (Chat + Actions + Blockers) ==============
+
+const ChatMessageSchema = z.object({
+  role: z.enum(['user', 'assistant']),
+  content: z.string(),
+}).openapi('ChatMessage');
+
+const ActionShapeSchema = z.object({
+  id: z.string(),
+  actionType: z.enum(['move_issue', 'reassign', 'change_priority', 'change_state']),
+  targetDocumentId: z.string(),
+  targetDocumentTitle: z.string(),
+  proposedChange: z.object({
+    field: z.string(),
+    old_value: z.unknown(),
+    new_value: z.unknown(),
+  }),
+  description: z.string(),
+  findingId: z.string(),
+  status: z.enum(['pending', 'approved', 'dismissed', 'snoozed', 'expired', 'executed']),
+  createdAt: z.string(),
+}).openapi('ActionShape');
+
+registry.register('ActionShape', ActionShapeSchema);
+
+const ChatRequestSchema = z.object({
+  workspaceId: z.string(),
+  viewType: z.enum(['issue', 'week', 'project', 'program', 'person']),
+  documentId: z.string().optional(),
+  messages: z.array(ChatMessageSchema).max(10),
+}).openapi('ChatRequest');
+
+const ChatResponseSchema = z.object({
+  message: z.string(),
+  findings: z.array(FindingSchema),
+  proposedActions: z.array(ActionShapeSchema),
+  degradationTier: z.enum(['full', 'partial', 'offline']),
+  refetchedScope: z.boolean(),
+}).openapi('ChatResponse');
+
+const ActionDecideRequestSchema = z.object({
+  decision: z.enum(['approve', 'dismiss', 'snooze']),
+  snoozeHours: z.number().int().positive().optional(),
+  comment: z.string().optional(),
+}).openapi('ActionDecideRequest');
+
+const ActionDecideResponseSchema = z.object({
+  actionId: z.string(),
+  status: z.enum(['approved', 'dismissed', 'snoozed']),
+  executionResult: z.object({
+    success: z.boolean(),
+    documentId: z.string(),
+    changeApplied: z.object({
+      field: z.string(),
+      old_value: z.unknown(),
+      new_value: z.unknown(),
+    }),
+  }).optional(),
+}).openapi('ActionDecideResponse');
+
+const ActionListResponseSchema = z.object({
+  actions: z.array(ActionShapeSchema),
+}).openapi('ActionListResponse');
+
+const CheckBlockersRequestSchema = z.object({
+  workspaceId: z.string(),
+}).openapi('CheckBlockersRequest');
+
+const CheckBlockersResponseSchema = z.object({
+  findings: z.array(FindingSchema),
+  escalated: z.number().int(),
+  skipped: z.number().int(),
+}).openapi('CheckBlockersResponse');
+
+const ExpireActionsRequestSchema = z.object({
+  workspaceId: z.string(),
+}).openapi('ExpireActionsRequest');
+
+const ExpireActionsResponseSchema = z.object({
+  expired: z.number().int(),
+}).openapi('ExpireActionsResponse');
+
 // ============== Endpoint Registration ==============
 
 registry.registerPath({
@@ -212,6 +294,100 @@ registry.registerPath({
   },
 });
 
+// New endpoint registrations
+
+registry.registerPath({
+  method: 'post',
+  path: '/agent/chat',
+  tags: ['FleetGraph'],
+  summary: 'Multi-turn conversational chat with FleetGraph',
+  request: {
+    body: {
+      content: { 'application/json': { schema: ChatRequestSchema } },
+    },
+  },
+  responses: {
+    200: {
+      description: 'Chat response generated',
+      content: { 'application/json': { schema: ChatResponseSchema } },
+    },
+  },
+});
+
+registry.registerPath({
+  method: 'post',
+  path: '/agent/actions/{actionId}/decide',
+  tags: ['FleetGraph'],
+  summary: 'Approve, dismiss, or snooze a proposed action',
+  request: {
+    params: z.object({ actionId: z.string() }),
+    body: {
+      content: { 'application/json': { schema: ActionDecideRequestSchema } },
+    },
+  },
+  responses: {
+    200: {
+      description: 'Decision recorded',
+      content: { 'application/json': { schema: ActionDecideResponseSchema } },
+    },
+  },
+});
+
+registry.registerPath({
+  method: 'get',
+  path: '/agent/actions',
+  tags: ['FleetGraph'],
+  summary: 'List pending actions for a workspace',
+  request: {
+    query: z.object({
+      workspaceId: z.string(),
+      status: z.string().optional(),
+    }),
+  },
+  responses: {
+    200: {
+      description: 'Actions listed',
+      content: { 'application/json': { schema: ActionListResponseSchema } },
+    },
+  },
+});
+
+registry.registerPath({
+  method: 'post',
+  path: '/agent/check-blockers',
+  tags: ['FleetGraph'],
+  summary: 'Check for blocker escalation across workspace',
+  request: {
+    body: {
+      content: { 'application/json': { schema: CheckBlockersRequestSchema } },
+    },
+  },
+  responses: {
+    200: {
+      description: 'Blocker check completed',
+      content: { 'application/json': { schema: CheckBlockersResponseSchema } },
+    },
+  },
+});
+
+registry.registerPath({
+  method: 'post',
+  path: '/agent/expire-actions',
+  tags: ['FleetGraph'],
+  summary: 'Expire stale pending actions older than 48h',
+  request: {
+    body: {
+      content: { 'application/json': { schema: ExpireActionsRequestSchema } },
+    },
+  },
+  responses: {
+    200: {
+      description: 'Actions expired',
+      content: { 'application/json': { schema: ExpireActionsResponseSchema } },
+    },
+  },
+});
+
 // Export schemas for use in route validation
 export {
   ContextualGuidanceRequestSchema,
@@ -224,9 +400,19 @@ export {
   RecommendationDecisionResponseSchema,
   PortfolioSummaryRequestSchema,
   PortfolioSummaryResponseSchema,
+  ChatRequestSchema,
+  ChatResponseSchema,
+  ActionDecideRequestSchema,
+  ActionDecideResponseSchema,
+  ActionListResponseSchema,
+  CheckBlockersRequestSchema,
+  CheckBlockersResponseSchema,
+  ExpireActionsRequestSchema,
+  ExpireActionsResponseSchema,
   FindingSchema,
   RecommendationSchema,
   DraftSchema,
   FallbackSchema,
   ProgramSummarySchema,
+  ActionShapeSchema,
 };

@@ -6,8 +6,10 @@
  */
 
 import React from 'react';
-import type { FleetGraphFinding, FleetGraphRecommendation } from '@ship/shared';
+import type { FleetGraphFinding } from '@ship/shared';
 import { useWeekFindingsQuery } from '../../hooks/useFleetGraphWeekQuery';
+import { useFleetGraphActions } from '../../hooks/useFleetGraphActions';
+import { ActionCard } from './ActionCard';
 
 interface FleetGraphWeekPanelProps {
   weekId: string;
@@ -32,8 +34,10 @@ const SEVERITY_BG: Record<string, string> = {
 
 export function FleetGraphWeekPanel({ weekId, workspaceId, findings: propFindings }: FleetGraphWeekPanelProps) {
   const { data, isLoading } = useWeekFindingsQuery(weekId, workspaceId);
+  const { data: actionsData } = useFleetGraphActions(workspaceId);
 
   const findings = propFindings ?? data?.findings ?? [];
+  const pendingActions = actionsData?.actions ?? [];
 
   if (isLoading && !propFindings) {
     return (
@@ -67,6 +71,27 @@ export function FleetGraphWeekPanel({ weekId, workspaceId, findings: propFinding
       {findings.map((finding) => (
         <FindingCard key={finding.id} finding={finding} />
       ))}
+
+      {pendingActions.length > 0 && (
+        <>
+          <div style={{
+            padding: '8px 16px',
+            marginTop: '8px',
+            fontSize: '11px',
+            fontWeight: 600,
+            textTransform: 'uppercase',
+            letterSpacing: '0.05em',
+            color: '#6b7280',
+          }}>
+            Pending Actions ({pendingActions.length})
+          </div>
+          <div style={{ padding: '0 12px' }}>
+            {pendingActions.map((action) => (
+              <ActionCard key={action.id} action={action} />
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 }

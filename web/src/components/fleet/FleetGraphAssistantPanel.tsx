@@ -1,10 +1,11 @@
 /**
- * T029: Assistant panel for contextual guidance and draft actions.
+ * Assistant panel — contextual guidance, chat input, draft actions, and inline action cards.
  */
 
 import React from 'react';
-import type { FleetGraphRecommendation, FleetGraphViewType } from '@ship/shared';
-import { useContextualGuidance, useGenerateDraft } from '../../hooks/useFleetGraphGuidance';
+import type { FleetGraphRecommendation, FleetGraphViewType, ChatMessage, ActionShape } from '@ship/shared';
+import { useContextualGuidance, useGenerateDraft, useFleetGraphChat } from '../../hooks/useFleetGraphGuidance';
+import { ActionCard } from './ActionCard';
 
 interface FleetGraphAssistantPanelProps {
   viewType: FleetGraphViewType;
@@ -23,6 +24,11 @@ export function FleetGraphAssistantPanel({
 }: FleetGraphAssistantPanelProps) {
   const guidanceMutation = useContextualGuidance();
   const draftMutation = useGenerateDraft();
+  const chatMutation = useFleetGraphChat();
+
+  const [chatInput, setChatInput] = React.useState('');
+  const [chatMessages, setChatMessages] = React.useState<ChatMessage[]>([]);
+  const [proposedActions, setProposedActions] = React.useState<ActionShape[]>([]);
 
   const summary = propSummary ?? guidanceMutation.data?.summary;
   const recommendations = propRecommendations ?? guidanceMutation.data?.recommendations ?? [];
@@ -43,8 +49,51 @@ export function FleetGraphAssistantPanel({
     });
   };
 
+  const handleSendChat = () => {
+    if (!chatInput.trim()) return;
+
+    const newMessages: ChatMessage[] = [
+      ...chatMessages,
+      { role: 'user' as const, content: chatInput.trim() },
+    ];
+
+    // Keep max 10 messages
+    const trimmedMessages = newMessages.slice(-10);
+    setChatMessages(trimmedMessages);
+    setChatInput('');
+
+    chatMutation.mutate(
+      {
+        workspaceId,
+        viewType,
+        documentId,
+        messages: trimmedMessages,
+      },
+      {
+        onSuccess: (data) => {
+          setChatMessages(prev => [
+            ...prev,
+            { role: 'assistant' as const, content: data.message },
+          ].slice(-10));
+
+          if (data.proposedActions.length > 0) {
+            setProposedActions(prev => [...prev, ...data.proposedActions]);
+          }
+        },
+      },
+    );
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendChat();
+    }
+  };
+
   return (
     <div style={{ padding: '12px 16px', fontSize: '13px' }}>
+      {/* Action buttons */}
       <div style={{
         display: 'flex',
         gap: '8px',
@@ -86,6 +135,90 @@ export function FleetGraphAssistantPanel({
         )}
       </div>
 
+      {/* Chat message history */}
+      {chatMessages.length > 0 && (
+        <div style={{ marginBottom: '8px', maxHeight: '300px', overflowY: 'auto' }}>
+          {chatMessages.map((msg, i) => (
+            <div
+              key={i}
+              style={{
+                padding: '8px 10px',
+                borderRadius: '6px',
+                marginBottom: '4px',
+                backgroundColor: msg.role === 'user' ? '#eff6ff' : '#f9fafb',
+                border: `1px solid ${msg.role === 'user' ? '#bfdbfe' : '#e5e7eb'}`,
+              }}
+            >
+              <div style={{
+                fontSize: '10px',
+                fontWeight: 600,
+                color: msg.role === 'user' ? '#1d4ed8' : '#6b7280',
+                marginBottom: '2px',
+                textTransform: 'uppercase',
+              }}>
+                {msg.role === 'user' ? 'You' : 'FleetGraph'}
+              </div>
+              <div style={{ fontSize: '12px', whiteSpace: 'pre-wrap' }}>
+                {msg.content}
+              </div>
+            </div>
+          ))}
+          {chatMutation.isPending && (
+            <div style={{
+              padding: '8px 10px',
+              borderRadius: '6px',
+              backgroundColor: '#f9fafb',
+              border: '1px solid #e5e7eb',
+              color: '#6b7280',
+              fontSize: '12px',
+            }}>
+              Thinking...
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Chat input */}
+      <div style={{
+        display: 'flex',
+        gap: '6px',
+        marginBottom: '12px',
+      }}>
+        <input
+          type="text"
+          value={chatInput}
+          onChange={(e) => setChatInput(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder="Ask FleetGraph..."
+          disabled={chatMutation.isPending}
+          style={{
+            flex: 1,
+            padding: '8px 10px',
+            borderRadius: '6px',
+            border: '1px solid #d1d5db',
+            fontSize: '12px',
+            outline: 'none',
+          }}
+        />
+        <button
+          onClick={handleSendChat}
+          disabled={chatMutation.isPending || !chatInput.trim()}
+          style={{
+            padding: '8px 14px',
+            borderRadius: '6px',
+            border: '1px solid #3b82f6',
+            backgroundColor: '#3b82f6',
+            color: '#fff',
+            cursor: 'pointer',
+            fontSize: '12px',
+            fontWeight: 500,
+          }}
+        >
+          Send
+        </button>
+      </div>
+
+      {/* Guidance summary */}
       {summary && (
         <div style={{
           padding: '10px 12px',
@@ -98,6 +231,26 @@ export function FleetGraphAssistantPanel({
         </div>
       )}
 
+      {/* Proposed actions from chat */}
+      {proposedActions.length > 0 && (
+        <div style={{ marginBottom: '8px' }}>
+          <div style={{
+            fontSize: '11px',
+            fontWeight: 600,
+            textTransform: 'uppercase',
+            letterSpacing: '0.05em',
+            color: '#6b7280',
+            marginBottom: '6px',
+          }}>
+            Proposed Actions
+          </div>
+          {proposedActions.map((action) => (
+            <ActionCard key={action.id} action={action} />
+          ))}
+        </div>
+      )}
+
+      {/* Recommendations */}
       {recommendations.length > 0 && (
         <div>
           <div style={{
@@ -130,6 +283,7 @@ export function FleetGraphAssistantPanel({
         </div>
       )}
 
+      {/* Draft output */}
       {draftMutation.data && (
         <div style={{
           marginTop: '8px',

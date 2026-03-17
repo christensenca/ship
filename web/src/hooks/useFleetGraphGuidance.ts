@@ -6,6 +6,8 @@ import { useMutation } from '@tanstack/react-query';
 import type {
   ContextualGuidanceResponse,
   CreateDraftResponse,
+  ChatResponse,
+  ChatMessage,
   FleetGraphViewType,
   DraftType,
 } from '@ship/shared';
@@ -51,6 +53,28 @@ export function useContextualGuidance() {
         viewType,
         documentId,
         prompt,
+      }),
+  });
+}
+
+export function useFleetGraphChat() {
+  return useMutation({
+    mutationFn: ({
+      workspaceId,
+      viewType,
+      documentId,
+      messages,
+    }: {
+      workspaceId: string;
+      viewType: FleetGraphViewType;
+      documentId?: string;
+      messages: ChatMessage[];
+    }) =>
+      apiPost<ChatResponse>('/chat', {
+        workspaceId,
+        viewType,
+        documentId,
+        messages,
       }),
   });
 }

@@ -6,8 +6,9 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Load environment variables (.env.local takes precedence)
+// Load environment variables (.env.local takes precedence, then root .env.local)
 config({ path: join(__dirname, '../.env.local') });
+config({ path: join(__dirname, '../../.env.local') });
 config({ path: join(__dirname, '../.env') });
 
 async function main() {

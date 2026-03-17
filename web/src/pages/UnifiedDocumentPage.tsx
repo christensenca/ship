@@ -19,7 +19,6 @@ import {
   getDocumentConversionErrorMessage,
   getDocumentConversionPermission,
 } from '@/lib/documentConversion';
-import { FleetGraphAssistantPanel } from '@/components/fleet/FleetGraphAssistantPanel';
 import {
   getTabsForDocument,
   documentTypeHasTabs,
@@ -186,7 +185,7 @@ export function UnifiedDocumentPage(): JSX.Element | null {
       const projectId = (document.document_type === 'weekly_plan' || document.document_type === 'weekly_retro')
         ? getString(document.properties?.project_id) ?? null
         : null;
-      setCurrentDocument(id, document.document_type, projectId);
+      setCurrentDocument(id, document.document_type, projectId, document.title);
     }
     return () => {
       clearCurrentDocument();
@@ -722,8 +721,6 @@ export function UnifiedDocumentPage(): JSX.Element | null {
   }
 
   // Non-tabbed documents render directly in editor
-  const showAssistant = document?.document_type === 'issue' || document?.document_type === 'person';
-
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <div style={{ flex: 1, minHeight: 0 }}>
@@ -740,15 +737,6 @@ export function UnifiedDocumentPage(): JSX.Element | null {
           titleSuffix={standupAuthorName}
         />
       </div>
-      {showAssistant && document && id && (
-        <div style={{ borderTop: '1px solid var(--color-border, #e5e7eb)', maxHeight: '200px', overflowY: 'auto' }}>
-          <FleetGraphAssistantPanel
-            viewType={document.document_type as 'issue' | 'person'}
-            documentId={id}
-            workspaceId={document.workspace_id ?? ''}
-          />
-        </div>
-      )}
     </div>
   );
 }

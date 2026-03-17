@@ -13,6 +13,8 @@ import type {
   FleetGraphFallback,
   GateType,
   GateStatus,
+  DegradationTier,
+  ChatMessage,
 } from '@ship/shared';
 import type { ShipDocument } from './ship-api-client.js';
 
@@ -65,6 +67,15 @@ export interface FleetGraphState {
   recommendedActions: FleetGraphRecommendation[];
   draftOutputs: FleetGraphDraft[];
 
+  // Chat message history (stateless, sent by client)
+  chatMessages?: ChatMessage[];
+
+  // LLM response
+  llmSummary?: string;
+
+  // Degradation tracking
+  degradationTier: DegradationTier;
+
   // Approval tracking
   approvalRequirements: ApprovalGate[];
 
@@ -88,6 +99,7 @@ export function createInitialState(invocation: InvocationContext): FleetGraphSta
     detectedFindings: [],
     recommendedActions: [],
     draftOutputs: [],
+    degradationTier: 'full',
     approvalRequirements: [],
     errors: [],
     fallbackStatus: [],

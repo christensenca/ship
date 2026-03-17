@@ -101,38 +101,6 @@ describe('POST /api/agent/proactive-findings', () => {
   });
 });
 
-describe('POST /api/agent/recommendations/:id/confirm', () => {
-  it('returns 400 for invalid decision', async () => {
-    const res = await request(app)
-      .post('/api/agent/recommendations/rec-001/confirm')
-      .set(...AUTH_HEADER)
-      .send({ decision: 'invalid' });
-
-    expect(res.status).toBe(400);
-  });
-
-  it('accepts approve decision', async () => {
-    const res = await request(app)
-      .post('/api/agent/recommendations/rec-001/confirm')
-      .set(...AUTH_HEADER)
-      .send({ decision: 'approve' });
-
-    expect(res.status).toBe(200);
-    expect(res.body.recommendationId).toBe('rec-001');
-    expect(res.body.status).toBe('approved');
-  });
-
-  it('accepts reject decision with comment', async () => {
-    const res = await request(app)
-      .post('/api/agent/recommendations/rec-001/confirm')
-      .set(...AUTH_HEADER)
-      .send({ decision: 'reject', comment: 'Not applicable this week' });
-
-    expect(res.status).toBe(200);
-    expect(res.body.status).toBe('rejected');
-  });
-});
-
 describe('GET /api/agent/status', () => {
   it('returns availability status', async () => {
     const res = await request(app)
