@@ -25,6 +25,10 @@ export interface InvocationContext {
   viewType: FleetGraphViewType;
   documentId?: string;
   actorUserId?: string;
+  /** The person document ID for the authenticated user (resolved from actorUserId) */
+  actorPersonId?: string;
+  /** Display name of the authenticated user */
+  actorName?: string;
   workspaceId: string;
   timeWindow?: { start: string; end: string };
   correlationId: string;

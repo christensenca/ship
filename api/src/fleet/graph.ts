@@ -45,6 +45,7 @@ export const FleetGraphAnnotation = Annotation.Root({
   fallbackStatus: Annotation<FallbackEvent[]>({ reducer: (a, b) => [...a, ...b], default: () => [] }),
   fallback: Annotation<FleetGraphFallback | undefined>({ reducer: (_, b) => b, default: () => undefined }),
   userPrompt: Annotation<string | undefined>({ reducer: (_, b) => b, default: () => undefined }),
+  llmSummary: Annotation<string | undefined>({ reducer: (_, b) => b, default: () => undefined }),
 });
 
 export type FleetGraphStateType = typeof FleetGraphAnnotation.State;

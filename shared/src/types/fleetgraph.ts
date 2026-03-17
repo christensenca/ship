@@ -63,6 +63,10 @@ export interface FleetGraphRecommendation {
   expectedImpact: string;
   approvalStatus: ApprovalStatus;
   affectedDocumentIds: string[];
+  /** The concrete action type from the LLM (e.g., 'reassign', 'change_state') */
+  actionType?: ActionType;
+  /** The proposed mutation details from the LLM */
+  proposedChange?: { field: string; old_value: unknown; new_value: unknown } | null;
 }
 
 export interface FleetGraphDraft {
@@ -178,10 +182,19 @@ export interface ChatRequest {
   messages: ChatMessage[];
 }
 
+export interface SuggestedIssue {
+  documentId: string;
+  title: string;
+  state: string;
+  priority: string;
+  reason?: string;
+}
+
 export interface ChatResponse {
   message: string;
   findings: FleetGraphFinding[];
   proposedActions: ActionShape[];
+  suggestedIssues?: SuggestedIssue[];
   degradationTier: DegradationTier;
   refetchedScope: boolean;
 }
@@ -192,6 +205,7 @@ export interface ActionDecideRequest {
   decision: ActionDecision;
   snoozeHours?: number;
   comment?: string;
+  targetDocumentId?: string;
 }
 
 export interface ActionDecideResponse {

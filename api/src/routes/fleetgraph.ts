@@ -63,7 +63,7 @@ router.post('/contextual-guidance', authMiddleware, async (req: Request, res: Re
       return;
     }
 
-    const result = await generateContextualGuidance(parsed.data);
+    const result = await generateContextualGuidance(parsed.data, req.userId);
     res.json(result);
   } catch (err) {
     console.error('FleetGraph contextual-guidance error:', err);
@@ -116,8 +116,8 @@ router.post('/chat', authMiddleware, async (req: Request, res: Response) => {
     }
 
     console.log('[FleetGraph] Chat request:', { viewType: parsed.data.viewType, documentId: parsed.data.documentId, messageCount: parsed.data.messages.length });
-    const result = await handleChat(parsed.data);
-    console.log('[FleetGraph] Chat result:', { degradationTier: result.degradationTier, messageLen: result.message.length });
+    const result = await handleChat(parsed.data, req.userId);
+    console.log('[FleetGraph] Chat result:', { degradationTier: result.degradationTier, messageLen: result.message.length, actionsCount: result.proposedActions.length, suggestedIssuesCount: result.suggestedIssues?.length ?? 0 });
     res.json(result);
   } catch (err) {
     console.error('FleetGraph chat error:', err);
@@ -135,13 +135,14 @@ router.post('/actions/:actionId/decide', authMiddleware, async (req: Request, re
     }
 
     const actionId = req.params.actionId as string;
-    const userId = (req as any).user?.id as string | undefined;
+    const userId = req.userId;
     const actionService = createActionService();
     const result = await actionService.decideAction(actionId, parsed.data as any, userId);
     res.json(result);
   } catch (err) {
-    console.error('FleetGraph action decide error:', err);
-    res.status(500).json({ error: 'Internal server error' });
+    const message = err instanceof Error ? err.message : String(err);
+    console.error('FleetGraph action decide error:', message, err);
+    res.status(500).json({ error: message });
   }
 });
 

@@ -31,6 +31,16 @@ export async function reasoningNode(state: FleetGraphStateType): Promise<Partial
     detectorFindings.push(...runPersonWorkloadDetectors(issues, invocation.documentId));
   }
 
+  // Also run person workload detectors for the actor if we have their issues
+  if (invocation.actorPersonId && invocation.viewType !== 'person') {
+    detectorFindings.push(...runPersonWorkloadDetectors(issues, invocation.actorPersonId));
+  }
+
+  // Build actor context for LLM personalization
+  const actor = invocation.actorPersonId
+    ? { name: invocation.actorName, personId: invocation.actorPersonId }
+    : undefined;
+
   // Step 2: LLM synthesis
   try {
     if (chatMessages && chatMessages.length > 0) {
@@ -40,6 +50,7 @@ export async function reasoningNode(state: FleetGraphStateType): Promise<Partial
         detectorFindings,
         fetchedResources,
         contextSummary,
+        actor,
       );
 
       // Convert LLM recommendations to FleetGraphRecommendation format
@@ -48,7 +59,7 @@ export async function reasoningNode(state: FleetGraphStateType): Promise<Partial
       return {
         detectedFindings: detectorFindings,
         recommendedActions: recommendations,
-        contextSummary: result.message,
+        llmSummary: result.message,
       };
     } else {
       // Proactive mode: synthesize detector findings
@@ -63,7 +74,7 @@ export async function reasoningNode(state: FleetGraphStateType): Promise<Partial
       return {
         detectedFindings: detectorFindings,
         recommendedActions: recommendations,
-        contextSummary: result.summary,
+        llmSummary: result.summary,
       };
     }
   } catch (err) {
@@ -94,5 +105,7 @@ function toRecommendation(r: {
     expectedImpact: r.expectedImpact,
     approvalStatus: r.actionType ? 'pending' : 'not_required',
     affectedDocumentIds: r.targetDocumentId ? [r.targetDocumentId] : [],
+    actionType: (r.actionType as FleetGraphRecommendation['actionType']) ?? undefined,
+    proposedChange: r.proposedChange ?? undefined,
   };
 }

@@ -4,7 +4,8 @@
  */
 
 import React from 'react';
-import type { ChatMessage, ActionShape, FleetGraphViewType, FleetGraphFinding, FindingSeverity } from '@ship/shared';
+import Markdown from 'react-markdown';
+import type { ChatMessage, ActionShape, SuggestedIssue, FleetGraphViewType, FleetGraphFinding, FindingSeverity } from '@ship/shared';
 import { useFleetGraphChat } from '../../hooks/useFleetGraphGuidance';
 import { useProactiveScan } from '../../hooks/useProactiveScan';
 import { useCurrentDocument } from '../../contexts/CurrentDocumentContext';
@@ -35,6 +36,7 @@ export function FleetGraphChatWidget() {
   const [chatInput, setChatInput] = React.useState('');
   const [chatMessages, setChatMessages] = React.useState<ChatMessage[]>([]);
   const [proposedActions, setProposedActions] = React.useState<ActionShape[]>([]);
+  const [suggestedIssues, setSuggestedIssues] = React.useState<SuggestedIssue[]>([]);
   const messagesEndRef = React.useRef<HTMLDivElement>(null);
 
   const chatMutation = useFleetGraphChat();
@@ -93,6 +95,11 @@ export function FleetGraphChatWidget() {
           );
           if (realActions.length > 0) {
             setProposedActions(prev => [...prev, ...realActions]);
+          }
+
+          // Store suggested issues for assignment dropdown
+          if (data.suggestedIssues && data.suggestedIssues.length > 0) {
+            setSuggestedIssues(data.suggestedIssues);
           }
         },
         onError: (err) => {
@@ -216,6 +223,7 @@ export function FleetGraphChatWidget() {
               onClick={() => {
                 setChatMessages([]);
                 setProposedActions([]);
+                setSuggestedIssues([]);
               }}
               style={{
                 fontSize: '11px',
@@ -334,13 +342,29 @@ export function FleetGraphChatWidget() {
                   backgroundColor: msg.role === 'user' ? '#005ea2' : '#262626',
                   color: '#f5f5f5',
                   fontSize: '13px',
-                  whiteSpace: 'pre-wrap',
                   lineHeight: '1.4',
                   alignSelf: msg.role === 'user' ? 'flex-end' : 'flex-start',
                   maxWidth: '85%',
+                  ...(msg.role === 'user' ? { whiteSpace: 'pre-wrap' as const } : {}),
                 }}
               >
-                {msg.content}
+                {msg.role === 'assistant' ? (
+                  <Markdown
+                    components={{
+                      p: ({ children }) => <p style={{ margin: '0 0 8px 0' }}>{children}</p>,
+                      ul: ({ children }) => <ul style={{ margin: '4px 0', paddingLeft: '20px' }}>{children}</ul>,
+                      ol: ({ children }) => <ol style={{ margin: '4px 0', paddingLeft: '20px' }}>{children}</ol>,
+                      li: ({ children }) => <li style={{ marginBottom: '2px' }}>{children}</li>,
+                      strong: ({ children }) => <strong style={{ color: '#fff' }}>{children}</strong>,
+                      h1: ({ children }) => <div style={{ fontSize: '15px', fontWeight: 700, color: '#fff', margin: '8px 0 4px' }}>{children}</div>,
+                      h2: ({ children }) => <div style={{ fontSize: '14px', fontWeight: 600, color: '#fff', margin: '8px 0 4px' }}>{children}</div>,
+                      h3: ({ children }) => <div style={{ fontSize: '13px', fontWeight: 600, color: '#e0e0e0', margin: '6px 0 4px' }}>{children}</div>,
+                      code: ({ children }) => <code style={{ fontSize: '11px', backgroundColor: '#1a1a1a', color: '#93c5fd', padding: '1px 4px', borderRadius: '3px' }}>{children}</code>,
+                    }}
+                  >
+                    {msg.content}
+                  </Markdown>
+                ) : msg.content}
               </div>
             ))}
 
@@ -371,7 +395,12 @@ export function FleetGraphChatWidget() {
                   Proposed Actions
                 </div>
                 {proposedActions.map((action) => (
-                  <ActionCard key={action.id} action={action} />
+                  <ActionCard
+                    key={action.id}
+                    action={action}
+                    suggestedIssues={suggestedIssues}
+                    onDecided={(id) => setProposedActions(prev => prev.filter(a => a.id !== id))}
+                  />
                 ))}
               </div>
             )}

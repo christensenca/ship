@@ -14,12 +14,14 @@ import type {
 } from '@ship/shared';
 import { ShipAPIClient, type ShipIssue } from '../ship-api-client.js';
 import { getFleetGraphConfig } from '../runtime.js';
+import { resolveActor } from './resolve-actor.js';
 
 /**
  * Generate contextual guidance based on the current view.
  */
 export async function generateContextualGuidance(
   request: ContextualGuidanceRequest,
+  userId?: string,
 ): Promise<ContextualGuidanceResponse> {
   const config = getFleetGraphConfig();
   const client = new ShipAPIClient({
@@ -30,8 +32,11 @@ export async function generateContextualGuidance(
   try {
     const { viewType, documentId } = request;
 
+    // Resolve the current user's person document for personalized guidance
+    const actor = userId ? await resolveActor(userId, request.workspaceId) : null;
+
     if (viewType === 'issue' && documentId) {
-      return await generateIssueGuidance(client, documentId);
+      return await generateIssueGuidance(client, documentId, actor?.personId);
     }
 
     if (viewType === 'week' && documentId) {
@@ -61,6 +66,7 @@ export async function generateContextualGuidance(
 async function generateIssueGuidance(
   client: ShipAPIClient,
   issueId: string,
+  _actorPersonId?: string,
 ): Promise<ContextualGuidanceResponse> {
   const issue = await client.getIssue(issueId);
   const findings: FleetGraphFinding[] = [];

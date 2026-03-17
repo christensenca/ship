@@ -62,19 +62,26 @@ export function useActionDecide() {
       decision,
       snoozeHours,
       comment,
+      targetDocumentId,
     }: {
       actionId: string;
       decision: ActionDecision;
       snoozeHours?: number;
       comment?: string;
+      targetDocumentId?: string;
     }) =>
       apiPost<ActionDecideResponse>(`/actions/${actionId}/decide`, {
         decision,
         snoozeHours,
         comment,
+        targetDocumentId,
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['fleetgraph-actions'] });
+      // Refetch issue data so the UI reflects the change
+      queryClient.invalidateQueries({ queryKey: ['issues'] });
+      queryClient.invalidateQueries({ queryKey: ['issue'] });
+      queryClient.invalidateQueries({ queryKey: ['document'] });
     },
   });
 }

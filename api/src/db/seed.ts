@@ -1241,6 +1241,21 @@ async function seed() {
       console.log(`✅ Created ${weeklyRetrosCreated} weekly retros`);
     }
 
+    // Create FleetGraph agent API token (matches SHIP_API_TOKEN in .env.local)
+    const agentToken = process.env.SHIP_API_TOKEN;
+    if (agentToken) {
+      const crypto = await import('crypto');
+      const tokenHash = crypto.createHash('sha256').update(agentToken).digest('hex');
+      const tokenPrefix = agentToken.substring(0, 8);
+      await pool.query(
+        `INSERT INTO api_tokens (user_id, workspace_id, token_hash, token_prefix, name)
+         VALUES ($1, $2, $3, $4, 'FleetGraph Agent')
+         ON CONFLICT DO NOTHING`,
+        [allUsers.find((u: { name: string }) => u.name === 'Dev User')?.id ?? allUsers[0]?.id, workspaceId, tokenHash, tokenPrefix],
+      );
+      console.log('✅ Created FleetGraph agent API token');
+    }
+
     console.log('');
     console.log('🎉 Seed complete!');
     console.log('');

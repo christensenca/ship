@@ -7,7 +7,7 @@ import type { FleetGraphStateType } from '../graph.js';
 
 export async function contextNode(state: FleetGraphStateType): Promise<Partial<FleetGraphStateType>> {
   const { invocation } = state;
-  const { triggerType, viewType, documentId, workspaceId } = invocation;
+  const { triggerType, viewType, documentId, workspaceId, actorName } = invocation;
 
   const parts: string[] = [];
 
@@ -15,6 +15,8 @@ export async function contextNode(state: FleetGraphStateType): Promise<Partial<F
     parts.push('Scheduled proactive scan');
   } else if (triggerType === 'event') {
     parts.push('Event-triggered analysis');
+  } else if (actorName) {
+    parts.push(`On-demand analysis requested by ${actorName}`);
   } else {
     parts.push('On-demand analysis');
   }

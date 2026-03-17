@@ -9,7 +9,7 @@ import type {
   ActionShape,
   ActionType,
 } from '@ship/shared';
-import { ShipAPIClient } from '../ship-api-client.js';
+import { ShipAPIClient, ShipAPIError } from '../ship-api-client.js';
 import { getFleetGraphConfig } from '../runtime.js';
 import { pool } from '../../db/client.js';
 
@@ -38,7 +38,7 @@ export function createActionService(): ActionService {
         `INSERT INTO agent_actions (run_id, workspace_id, action_type, target_document_id, proposed_change, description, finding_id)
          VALUES ($1, $2, $3, $4, $5, $6, $7)
          ON CONFLICT (workspace_id, target_document_id, action_type) WHERE status = 'pending'
-         DO NOTHING
+         DO UPDATE SET description = EXCLUDED.description, proposed_change = EXCLUDED.proposed_change, run_id = EXCLUDED.run_id
          RETURNING id`,
         [params.runId, params.workspaceId, params.actionType, params.targetDocumentId, JSON.stringify(params.proposedChange), params.description, params.findingId],
       );
@@ -70,7 +70,7 @@ export function createActionService(): ActionService {
     },
 
     async decideAction(actionId, decision, userId) {
-      const { decision: decisionType, snoozeHours, comment } = decision;
+      const { decision: decisionType, snoozeHours, comment, targetDocumentId: overrideDocId } = decision;
 
       if (decisionType === 'approve') {
         // Fetch the action details
@@ -88,6 +88,15 @@ export function createActionService(): ActionService {
           ? JSON.parse(action.proposed_change)
           : action.proposed_change;
 
+        // Allow override of target document (e.g. user picks a different issue from dropdown)
+        const effectiveDocId = overrideDocId ?? action.target_document_id;
+        if (overrideDocId && overrideDocId !== action.target_document_id) {
+          await pool.query(
+            `UPDATE agent_actions SET target_document_id = $1 WHERE id = $2`,
+            [overrideDocId, actionId],
+          );
+        }
+
         // Execute the mutation via Ship API
         const config = getFleetGraphConfig();
         const client = new ShipAPIClient({
@@ -95,10 +104,27 @@ export function createActionService(): ActionService {
           apiToken: config.shipApiToken,
         });
 
-        await client.patchIssue(action.target_document_id, {
-          [proposedChange.field]: proposedChange.new_value,
-          automated_by: 'fleetgraph',
+        console.log('[ActionService] Executing patchIssue:', {
+          docId: effectiveDocId,
+          field: proposedChange.field,
+          newValue: proposedChange.new_value,
         });
+
+        try {
+          await client.patchIssue(effectiveDocId, {
+            [proposedChange.field]: proposedChange.new_value,
+          });
+        } catch (patchErr) {
+          // Treat "No fields to update" as success — desired state already achieved
+          if (patchErr instanceof ShipAPIError && patchErr.statusCode === 400 && patchErr.responseBody?.includes('No fields to update')) {
+            console.log('[ActionService] No-op: field already has desired value');
+          } else {
+            if (patchErr instanceof ShipAPIError) {
+              console.error('[ActionService] patchIssue failed:', patchErr.statusCode, patchErr.responseBody);
+            }
+            throw patchErr;
+          }
+        }
 
         // Update action status
         await pool.query(

@@ -102,6 +102,17 @@ export async function fetchNode(state: FleetGraphStateType): Promise<Partial<Fle
         return [doc];
       },
     });
+    // Fetch sibling issues in the same project for broader context
+    fetchers.push({
+      name: 'issue-project-siblings',
+      fn: async () => {
+        const doc = await client.getDocument(invocation.documentId!);
+        const projectAssoc = doc.belongs_to?.find(bt => bt.type === 'project');
+        if (!projectAssoc) return [];
+        const siblings = await client.listIssues({ project_id: projectAssoc.id });
+        return normalizeIssues(siblings);
+      },
+    });
   } else if (invocation.viewType === 'person' && invocation.documentId) {
     fetchers.push({
       name: 'person',
@@ -155,6 +166,20 @@ export async function fetchNode(state: FleetGraphStateType): Promise<Partial<Fle
       fn: async () => {
         const program = await client.getProgram(invocation.documentId!);
         return [program];
+      },
+    });
+  }
+
+  // If we know who the actor is, fetch their assigned issues for personalized context.
+  // Skip if we're already viewing the actor's person page (would be redundant).
+  if (invocation.actorPersonId &&
+      !(invocation.viewType === 'person' && invocation.documentId === invocation.actorPersonId)) {
+    fetchers.push({
+      name: 'actor-issues',
+      fn: async () => {
+        const issues = await client.listIssues({ assignee_id: invocation.actorPersonId! });
+        // Tag these so downstream nodes can distinguish actor's issues
+        return normalizeIssues(issues).map(i => ({ ...i, _isActorIssue: true } as any));
       },
     });
   }

@@ -14,6 +14,7 @@ import {
   SYSTEM_PROMPT,
   buildProactiveSynthesisPrompt,
   buildChatPrompt,
+  type ActorContext,
 } from './prompts.js';
 
 export interface SynthesisResult {
@@ -82,6 +83,7 @@ export async function synthesizeChat(
   detectorFindings: FleetGraphFinding[],
   resources: ShipDocument[],
   contextSummary: string,
+  actor?: ActorContext,
 ): Promise<ChatSynthesisResult> {
   const llm = getLLMClient();
   if (!llm) {
@@ -91,7 +93,7 @@ export async function synthesizeChat(
     };
   }
 
-  const userPrompt = buildChatPrompt(messages, detectorFindings, resources, contextSummary);
+  const userPrompt = buildChatPrompt(messages, detectorFindings, resources, contextSummary, actor);
 
   const response = await llm.invoke([
     new SystemMessage(SYSTEM_PROMPT),
@@ -149,12 +151,22 @@ function parseChatResponse(
 
     const parsed = JSON.parse(jsonMatch[0]);
     return {
-      message: parsed.message ?? raw,
+      message: stripUUIDs(parsed.message ?? raw),
       recommendations: Array.isArray(parsed.recommendations) ? parsed.recommendations : [],
     };
   } catch {
-    return { message: raw, recommendations: [] };
+    return { message: stripUUIDs(raw), recommendations: [] };
   }
+}
+
+/** Strip UUIDs and HTML doc-id comments from user-facing text. */
+function stripUUIDs(text: string): string {
+  return text
+    .replace(/<!-- doc:[0-9a-f-]+ -->/g, '')
+    .replace(/\(id: [0-9a-f-]+\)/g, '')
+    .replace(/\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b/g, '')
+    .replace(/ {2,}/g, ' ')
+    .trim();
 }
 
 function buildFallbackChatResponse(findings: FleetGraphFinding[], contextSummary: string): string {

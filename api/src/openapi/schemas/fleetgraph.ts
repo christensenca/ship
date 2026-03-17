@@ -151,10 +151,19 @@ const ChatRequestSchema = z.object({
   messages: z.array(ChatMessageSchema).max(10),
 }).openapi('ChatRequest');
 
+const SuggestedIssueSchema = z.object({
+  documentId: z.string(),
+  title: z.string(),
+  state: z.string(),
+  priority: z.string(),
+  reason: z.string().optional(),
+}).openapi('SuggestedIssue');
+
 const ChatResponseSchema = z.object({
   message: z.string(),
   findings: z.array(FindingSchema),
   proposedActions: z.array(ActionShapeSchema),
+  suggestedIssues: z.array(SuggestedIssueSchema).optional(),
   degradationTier: z.enum(['full', 'partial', 'offline']),
   refetchedScope: z.boolean(),
 }).openapi('ChatResponse');
@@ -163,6 +172,7 @@ const ActionDecideRequestSchema = z.object({
   decision: z.enum(['approve', 'dismiss', 'snooze']),
   snoozeHours: z.number().int().positive().optional(),
   comment: z.string().optional(),
+  targetDocumentId: z.string().uuid().optional(),
 }).openapi('ActionDecideRequest');
 
 const ActionDecideResponseSchema = z.object({
