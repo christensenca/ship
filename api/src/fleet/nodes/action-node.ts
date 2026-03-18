@@ -1,38 +1,32 @@
-/**
- * Action node — routes based on findings:
- * - No findings → clean path (END)
- * - Findings without mutations → notify path
- * - Findings with mutation recommendations → persist-action path
- *
- * Returns a routing key for conditional edges.
- */
-
+import { v4 as uuid } from 'uuid';
 import type { FleetGraphStateType } from '../graph.js';
 
-export type ActionRoute = 'clean' | 'notify' | 'persist_action';
+export type ActionRoute = 'cleanResponse' | 'actionPlanning' | 'fallbackHandler';
 
 export async function actionNode(state: FleetGraphStateType): Promise<Partial<FleetGraphStateType>> {
-  // Action node doesn't modify state — routing is handled by the conditional edge function.
-  // It exists as a decision point in the graph.
-  return {};
+  const { candidateAction } = state;
+  if (!candidateAction) {
+    return {};
+  }
+
+  return {
+    recommendedActions: [{
+      id: `rec-${uuid()}`,
+      type: 'reassign',
+      reason: candidateAction.description,
+      expectedImpact: 'Reduces assignment drift and keeps the next best owner on the work.',
+      approvalStatus: 'pending',
+      affectedDocumentIds: [candidateAction.targetDocumentId],
+      actionType: 'reassign',
+      proposedChange: candidateAction.proposedChange,
+    }],
+  };
 }
 
-/**
- * Routing function for conditional edges after the action node.
- */
 export function actionRouter(state: FleetGraphStateType): ActionRoute {
-  const { detectedFindings, recommendedActions } = state;
-
-  if (detectedFindings.length === 0) {
-    return 'clean';
+  if (state.errors.length > 0 && state.fetchedResources.length === 0) {
+    return 'fallbackHandler';
   }
 
-  // Check if any recommendations suggest mutations (have pending approval)
-  const hasMutations = recommendedActions.some(r => r.approvalStatus === 'pending');
-
-  if (hasMutations) {
-    return 'persist_action';
-  }
-
-  return 'notify';
+  return state.candidateAction ? 'actionPlanning' : 'cleanResponse';
 }

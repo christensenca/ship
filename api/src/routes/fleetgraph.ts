@@ -20,9 +20,9 @@ import { isFleetGraphAvailable } from '../fleet/runtime.js';
 import { runProactiveFindingsScan } from '../fleet/services/proactive-findings.js';
 import { generateContextualGuidance, generateDraft } from '../fleet/services/contextual-guidance.js';
 import { generatePortfolioSummary } from '../fleet/services/portfolio-summary.js';
-import { handleChat } from '../fleet/services/chat-service.js';
 import { createActionService } from '../fleet/services/action-service.js';
 import { runBlockerCheck } from '../fleet/services/blocker-check.js';
+import { invokeChatAgent } from '../fleet/services/invoke-agent.js';
 import {
   ContextualGuidanceRequestSchema,
   ProactiveFindingsRequestSchema,
@@ -115,10 +115,12 @@ router.post('/chat', authMiddleware, async (req: Request, res: Response) => {
       return;
     }
 
-    console.log('[FleetGraph] Chat request:', { viewType: parsed.data.viewType, documentId: parsed.data.documentId, messageCount: parsed.data.messages.length });
-    const result = await handleChat(parsed.data, req.userId);
-    console.log('[FleetGraph] Chat result:', { degradationTier: result.degradationTier, messageLen: result.message.length, actionsCount: result.proposedActions.length, suggestedIssuesCount: result.suggestedIssues?.length ?? 0 });
-    res.json(result);
+    const result = await invokeChatAgent(parsed.data, req.userId);
+    res.json({
+      ...result,
+      message: result.summary,
+      refetchedScope: true,
+    });
   } catch (err) {
     console.error('FleetGraph chat error:', err);
     res.status(500).json({ error: 'Internal server error' });

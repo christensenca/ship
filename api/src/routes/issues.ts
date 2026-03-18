@@ -13,6 +13,7 @@ import {
 } from '../utils/document-crud.js';
 import { broadcastToUser } from '../collaboration/index.js';
 import { measureRequestPerf, measureRequestPerfAsync } from '../middleware/request-performance.js';
+import { publishAssignmentChanged } from '../fleet/assignment-change-events.js';
 
 type RouterType = ReturnType<typeof Router>;
 const router: RouterType = Router();
@@ -126,7 +127,7 @@ const updateIssueSchema = z.object({
   confirm_orphan_children: z.boolean().optional(),
   // Claude Code integration metadata
   claude_metadata: z.object({
-    updated_by: z.literal('claude'),
+    updated_by: z.enum(['claude', 'fleetgraph']),
     story_id: z.string().optional(),
     prd_name: z.string().optional(),
     session_context: z.string().optional(),
@@ -1121,6 +1122,20 @@ router.patch('/:id', authMiddleware, async (req: Request, res: Response): Promis
 
     const issue = extractIssueFromRow(row);
     const belongsTo = await getBelongsToAssociations(id);
+
+    const assigneeChange = changes.find((change) => change.field === 'assignee_id');
+    if (assigneeChange && String(automatedBy ?? '') !== 'fleetgraph') {
+      const projectId = belongsTo.find((assoc) => assoc.type === 'project')?.id;
+      publishAssignmentChanged({
+        workspaceId,
+        issueId: id,
+        projectId,
+        oldAssigneeId: assigneeChange.oldValue,
+        newAssigneeId: assigneeChange.newValue,
+        changedByUserId: userId,
+        changedAt: new Date().toISOString(),
+      });
+    }
 
     // Broadcast accountability update when an action item issue is completed
     if (isClosingIssue && wasNotClosed) {

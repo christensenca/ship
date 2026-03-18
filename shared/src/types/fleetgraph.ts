@@ -1,10 +1,11 @@
 // FleetGraph Agent shared types
 
-// === Enums ===
-
 export type FleetGraphViewType = 'issue' | 'week' | 'project' | 'program' | 'person' | 'workspace';
 export type FleetGraphTriggerType = 'on_demand' | 'scheduled' | 'event';
 export type FleetGraphScopeType = 'workspace' | 'week' | 'project' | 'program' | 'person' | 'issue';
+
+export type AgentMode = 'chat' | 'event';
+export type AgentEventType = 'assignment_changed';
 
 export type FindingCategory =
   | 'blocker'
@@ -13,7 +14,8 @@ export type FindingCategory =
   | 'planning_gap'
   | 'slipping_scope'
   | 'silent_project'
-  | 'missing_standup';
+  | 'missing_standup'
+  | 'assignment_risk';
 
 export type FindingSeverity = 'critical' | 'high' | 'medium' | 'low';
 
@@ -26,22 +28,16 @@ export type RecommendationType =
   | 'publish_draft';
 
 export type ApprovalStatus = 'not_required' | 'pending' | 'approved' | 'rejected' | 'expired';
-
 export type DraftType = 'standup' | 'weekly_plan' | 'week_summary' | 'portfolio_report';
 export type DraftStatus = 'draft' | 'reviewed' | 'published';
-
 export type GateType = 'mutation' | 'notification_send' | 'document_publish';
 export type GateStatus = 'pending' | 'approved' | 'rejected' | 'expired';
-
 export type ProgramHealthStatus = 'on_track' | 'at_risk' | 'stalled';
-
 export type DegradationTier = 'full' | 'partial' | 'offline';
 
 export type ActionType = 'move_issue' | 'reassign' | 'change_priority' | 'change_state';
 export type ActionStatus = 'pending' | 'approved' | 'dismissed' | 'snoozed' | 'expired' | 'executed';
 export type ActionDecision = 'approve' | 'dismiss' | 'snooze';
-
-// === Core Entities ===
 
 export interface FleetGraphFinding {
   id: string;
@@ -63,9 +59,7 @@ export interface FleetGraphRecommendation {
   expectedImpact: string;
   approvalStatus: ApprovalStatus;
   affectedDocumentIds: string[];
-  /** The concrete action type from the LLM (e.g., 'reassign', 'change_state') */
   actionType?: ActionType;
-  /** The proposed mutation details from the LLM */
   proposedChange?: { field: string; old_value: unknown; new_value: unknown } | null;
 }
 
@@ -90,14 +84,10 @@ export interface FleetGraphProgramSummary {
   silentDays?: number;
 }
 
-// === Chat Types ===
-
 export interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
 }
-
-// === Action Types ===
 
 export interface ActionShape {
   id: string;
@@ -111,7 +101,66 @@ export interface ActionShape {
   createdAt: string;
 }
 
-// === Request Types ===
+export interface AssignmentChangedEventPayload {
+  workspaceId: string;
+  issueId: string;
+  projectId?: string;
+  oldAssigneeId?: string | null;
+  newAssigneeId?: string | null;
+  changedByUserId?: string;
+  changedAt: string;
+}
+
+export interface AgentInvocationContext {
+  mode: AgentMode;
+  triggerType: FleetGraphTriggerType;
+  workspaceId: string;
+  viewType: FleetGraphViewType;
+  documentId?: string;
+  actorUserId?: string;
+  actorPersonId?: string;
+  actorName?: string;
+  scope?: {
+    issueId?: string;
+    projectId?: string;
+    weekId?: string;
+    personId?: string;
+  };
+  eventType?: AgentEventType;
+  eventPayload?: AssignmentChangedEventPayload;
+  correlationId: string;
+}
+
+export interface AgentResult {
+  runId: string;
+  summary: string;
+  findings: FleetGraphFinding[];
+  proposedActions: ActionShape[];
+  degradationTier: DegradationTier;
+}
+
+export interface ChatRequest {
+  workspaceId: string;
+  viewType: FleetGraphViewType;
+  documentId?: string;
+  messages: ChatMessage[];
+}
+
+export interface SuggestedIssue {
+  documentId: string;
+  title: string;
+  state: string;
+  priority: string;
+  reason?: string;
+}
+
+export interface ChatResponse extends AgentResult {
+  message: string;
+  suggestedIssues?: SuggestedIssue[];
+  refetchedScope: boolean;
+}
+
+export interface AssignmentChangedEventRequest extends AssignmentChangedEventPayload {}
 
 export interface ContextualGuidanceRequest {
   workspaceId: string;
@@ -145,8 +194,6 @@ export interface PortfolioSummaryRequest {
   programIds?: string[];
 }
 
-// === Response Types ===
-
 export interface ContextualGuidanceResponse {
   summary: string;
   findings: FleetGraphFinding[];
@@ -173,34 +220,6 @@ export interface PortfolioSummaryResponse {
   programs: FleetGraphProgramSummary[];
 }
 
-// === Chat Request/Response ===
-
-export interface ChatRequest {
-  workspaceId: string;
-  viewType: FleetGraphViewType;
-  documentId?: string;
-  messages: ChatMessage[];
-}
-
-export interface SuggestedIssue {
-  documentId: string;
-  title: string;
-  state: string;
-  priority: string;
-  reason?: string;
-}
-
-export interface ChatResponse {
-  message: string;
-  findings: FleetGraphFinding[];
-  proposedActions: ActionShape[];
-  suggestedIssues?: SuggestedIssue[];
-  degradationTier: DegradationTier;
-  refetchedScope: boolean;
-}
-
-// === Action Management Request/Response ===
-
 export interface ActionDecideRequest {
   decision: ActionDecision;
   snoozeHours?: number;
@@ -222,8 +241,6 @@ export interface ActionListResponse {
   actions: ActionShape[];
 }
 
-// === Check Blockers Request/Response ===
-
 export interface CheckBlockersRequest {
   workspaceId: string;
 }
@@ -233,8 +250,6 @@ export interface CheckBlockersResponse {
   escalated: number;
   skipped: number;
 }
-
-// === Expire Actions Request/Response ===
 
 export interface ExpireActionsRequest {
   workspaceId: string;

@@ -18,6 +18,9 @@ export function ActionCard({ action, suggestedIssues, onDecided }: ActionCardPro
   const decideMutation = useActionDecide();
   const [snoozeHours, setSnoozeHours] = React.useState(24);
   const [selectedDocId, setSelectedDocId] = React.useState(action.targetDocumentId);
+  const isSelfAssignAction = action.actionType === 'reassign'
+    && action.proposedChange.field === 'assignee_id'
+    && /to you/i.test(action.description);
 
   const handleDecide = React.useCallback((params: Parameters<typeof decideMutation.mutate>[0]) => {
     decideMutation.mutate(params, {
@@ -152,7 +155,7 @@ export function ActionCard({ action, suggestedIssues, onDecided }: ActionCardPro
             fontWeight: 600,
           }}
         >
-          {isPending ? '...' : 'Approve'}
+          {isPending ? '...' : isSelfAssignAction ? 'Assign to me' : 'Approve'}
         </button>
 
         <button

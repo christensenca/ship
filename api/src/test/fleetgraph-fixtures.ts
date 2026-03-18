@@ -11,13 +11,14 @@ import type {
   ProactiveFindingsRequest,
   CreateDraftRequest,
   PortfolioSummaryRequest,
+  AgentInvocationContext,
 } from '@ship/shared';
-import type { InvocationContext } from '../fleet/state.js';
 
 // === Invocation Contexts ===
 
-export function createWeekInvocationContext(overrides?: Partial<InvocationContext>): InvocationContext {
+export function createWeekInvocationContext(overrides?: Partial<AgentInvocationContext>): AgentInvocationContext {
   return {
+    mode: 'chat',
     triggerType: 'on_demand',
     viewType: 'week',
     workspaceId: 'ws-test-001',
@@ -28,8 +29,9 @@ export function createWeekInvocationContext(overrides?: Partial<InvocationContex
   };
 }
 
-export function createIssueInvocationContext(overrides?: Partial<InvocationContext>): InvocationContext {
+export function createIssueInvocationContext(overrides?: Partial<AgentInvocationContext>): AgentInvocationContext {
   return {
+    mode: 'chat',
     triggerType: 'on_demand',
     viewType: 'issue',
     workspaceId: 'ws-test-001',

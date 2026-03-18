@@ -1,35 +1,30 @@
-/**
- * Unified context node — extracts trigger type, view metadata, actor, workspace,
- * and time window from the invocation. No LLM call.
- */
-
 import type { FleetGraphStateType } from '../graph.js';
 
 export async function contextNode(state: FleetGraphStateType): Promise<Partial<FleetGraphStateType>> {
   const { invocation } = state;
-  const { triggerType, viewType, documentId, workspaceId, actorName } = invocation;
-
   const parts: string[] = [];
 
-  if (triggerType === 'scheduled') {
-    parts.push('Scheduled proactive scan');
-  } else if (triggerType === 'event') {
-    parts.push('Event-triggered analysis');
-  } else if (actorName) {
-    parts.push(`On-demand analysis requested by ${actorName}`);
+  if (invocation.mode === 'chat') {
+    parts.push(invocation.actorName ? `${invocation.actorName} asked FleetGraph for work guidance` : 'On-demand work guidance');
   } else {
-    parts.push('On-demand analysis');
+    parts.push('Assignment change event received');
   }
 
-  parts.push(`for ${viewType} view`);
+  parts.push(`view=${invocation.viewType}`);
 
-  if (documentId) {
-    parts.push(`(document: ${documentId})`);
+  if (invocation.documentId) {
+    parts.push(`document=${invocation.documentId}`);
   }
 
-  parts.push(`in workspace ${workspaceId}`);
+  if (invocation.eventType === 'assignment_changed' && invocation.eventPayload) {
+    parts.push(`issue=${invocation.eventPayload.issueId}`);
+    parts.push(`oldAssignee=${invocation.eventPayload.oldAssigneeId ?? 'none'}`);
+    parts.push(`newAssignee=${invocation.eventPayload.newAssigneeId ?? 'none'}`);
+  }
+
+  parts.push(`workspace=${invocation.workspaceId}`);
 
   return {
-    contextSummary: parts.join(' '),
+    contextSummary: parts.join(' | '),
   };
 }

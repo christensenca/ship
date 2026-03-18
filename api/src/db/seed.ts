@@ -1,10 +1,10 @@
-import { config } from 'dotenv';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { readFileSync } from 'fs';
 import pg from 'pg';
 import bcrypt from 'bcryptjs';
 import { loadProductionSecrets } from '../config/ssm.js';
+import { loadLocalEnv } from '../config/load-env.js';
 import { WELCOME_DOCUMENT_TITLE, WELCOME_DOCUMENT_CONTENT } from './welcomeDocument.js';
 
 const { Pool } = pg;
@@ -12,9 +12,7 @@ const { Pool } = pg;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Load environment (local dev only - production uses SSM)
-config({ path: join(__dirname, '../../.env.local') });
-config({ path: join(__dirname, '../../.env') });
+loadLocalEnv();
 
 /**
  * Helper to create document associations in the junction table

@@ -1,17 +1,16 @@
-/**
- * Parallel fetch node — uses Promise.all to fetch issues, week, people, iterations.
- * Per-fetch try/catch for error isolation. Writes to fetchedResources and errors.
- */
-
-import type { FleetGraphStateType } from '../graph.js';
-import { ShipAPIClient, type ShipDocument, type ShipIssue, type ShipWeek } from '../ship-api-client.js';
-import { getFleetGraphConfig } from '../runtime.js';
 import type { DegradationTier } from '@ship/shared';
+import type { FleetGraphStateType } from '../graph.js';
+import { logFleetGraph } from '../observability.js';
+import { getFleetGraphConfig } from '../runtime.js';
+import { ShipAPIClient, type ShipDocument, type ShipIssue, type ShipWeek } from '../ship-api-client.js';
 
-/**
- * Normalize flat API responses into the shapes expected by detectors.
- * Ship REST endpoints return flat objects, but detectors expect nested properties.
- */
+function createClient(): ShipAPIClient {
+  const config = getFleetGraphConfig();
+  return new ShipAPIClient({
+    baseUrl: config.shipApiBaseUrl,
+    apiToken: config.shipApiToken,
+  });
+}
 
 function normalizeIssue(raw: any): ShipIssue {
   if (raw.document_type === 'issue' && raw.properties?.state) {
@@ -21,6 +20,7 @@ function normalizeIssue(raw: any): ShipIssue {
     ...raw,
     document_type: 'issue',
     workspace_id: raw.workspace_id ?? '',
+    title: raw.title ?? 'Untitled',
     properties: {
       state: raw.state ?? 'unknown',
       priority: raw.priority ?? 'medium',
@@ -31,10 +31,6 @@ function normalizeIssue(raw: any): ShipIssue {
   } as ShipIssue;
 }
 
-function normalizeIssues(raws: any[]): ShipIssue[] {
-  return raws.map(normalizeIssue);
-}
-
 function normalizeWeek(raw: any): ShipWeek {
   if (raw.document_type === 'sprint' && raw.properties?.sprint_number != null) {
     return raw as ShipWeek;
@@ -42,176 +38,201 @@ function normalizeWeek(raw: any): ShipWeek {
   return {
     ...raw,
     document_type: 'sprint',
-    title: raw.title ?? raw.name ?? `Week ${raw.sprint_number ?? '?'}`,
+    title: raw.title ?? raw.name ?? 'Untitled',
     workspace_id: raw.workspace_id ?? '',
     properties: {
       sprint_number: raw.sprint_number ?? 0,
-      owner_id: raw.owner ?? '',
+      owner_id: raw.owner_id ?? '',
       status: raw.status ?? undefined,
-      plan_approval: raw.has_plan ? { state: 'approved' } : null,
+      plan_approval: raw.plan_approval ?? null,
     },
   } as ShipWeek;
 }
 
-function createClient(): ShipAPIClient {
-  const config = getFleetGraphConfig();
-  return new ShipAPIClient({
-    baseUrl: config.shipApiBaseUrl,
-    apiToken: config.shipApiToken,
-  });
+async function runFetch(
+  name: string,
+  fn: () => Promise<ShipDocument[]>,
+  errors: string[],
+): Promise<ShipDocument[]> {
+  try {
+    return await fn();
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    errors.push(`Fetch ${name} failed: ${message}`);
+    return [];
+  }
+}
+
+function dedupeResources(resources: ShipDocument[]): ShipDocument[] {
+  const merged = new Map<string, ShipDocument>();
+
+  for (const [index, resource] of resources.entries()) {
+    if (!resource.id) {
+      merged.set(`missing-id-${index}`, resource);
+      continue;
+    }
+
+    const existing = merged.get(resource.id);
+    if (!existing) {
+      merged.set(resource.id, resource);
+      continue;
+    }
+
+    const existingScope = getScopePriority((existing as any)._scope);
+    const incomingScope = getScopePriority((resource as any)._scope);
+
+    if (incomingScope > existingScope) {
+      merged.set(resource.id, { ...existing, ...resource });
+      continue;
+    }
+
+    merged.set(resource.id, { ...resource, ...existing });
+  }
+
+  return Array.from(merged.values());
+}
+
+function getScopePriority(scope?: string): number {
+  switch (scope) {
+    case 'project':
+      return 5;
+    case 'week':
+      return 4;
+    case 'person':
+      return 3;
+    case 'actor':
+      return 2;
+    case 'workspace-unassigned':
+      return 1;
+    default:
+      return 0;
+  }
 }
 
 export async function fetchNode(state: FleetGraphStateType): Promise<Partial<FleetGraphStateType>> {
-  const { invocation } = state;
   const client = createClient();
-
-  const resources: ShipDocument[] = [];
+  const { invocation } = state;
   const errors: string[] = [];
+  let resources: ShipDocument[] = [];
 
-  const fetchers: Array<{ name: string; fn: () => Promise<ShipDocument[]> }> = [];
+  if (invocation.mode === 'event' && invocation.eventType === 'assignment_changed' && invocation.eventPayload) {
+    const { issueId, projectId, oldAssigneeId, newAssigneeId } = invocation.eventPayload;
 
-  // Determine what to fetch based on view type and context
-  if (invocation.viewType === 'week' && invocation.documentId) {
-    fetchers.push({
-      name: 'week',
-      fn: async () => {
-        const week = await client.getWeek(invocation.documentId!);
-        return [normalizeWeek(week)];
-      },
-    });
-    fetchers.push({
-      name: 'week-issues',
-      fn: async () => {
-        const issues = await client.getWeekIssues(invocation.documentId!);
-        return normalizeIssues(issues);
-      },
-    });
-    fetchers.push({
-      name: 'team',
-      fn: async () => {
-        const team = await client.listTeam();
-        return team;
-      },
-    });
-  } else if (invocation.viewType === 'issue' && invocation.documentId) {
-    fetchers.push({
-      name: 'issue',
-      fn: async () => {
-        // Use /documents/:id to get full document shape (with document_type, properties)
-        const doc = await client.getDocument(invocation.documentId!);
-        return [doc];
-      },
-    });
-    // Fetch sibling issues in the same project for broader context
-    fetchers.push({
-      name: 'issue-project-siblings',
-      fn: async () => {
-        const doc = await client.getDocument(invocation.documentId!);
-        const projectAssoc = doc.belongs_to?.find(bt => bt.type === 'project');
-        if (!projectAssoc) return [];
-        const siblings = await client.listIssues({ project_id: projectAssoc.id });
-        return normalizeIssues(siblings);
-      },
-    });
-  } else if (invocation.viewType === 'person' && invocation.documentId) {
-    fetchers.push({
-      name: 'person',
-      fn: async () => {
-        const person = await client.getDocument(invocation.documentId!);
-        return [person];
-      },
-    });
-    fetchers.push({
-      name: 'person-issues',
-      fn: async () => {
-        const issues = await client.listIssues({ assignee_id: invocation.documentId! });
-        return normalizeIssues(issues);
-      },
-    });
-  } else if (invocation.viewType === 'workspace' || !invocation.documentId) {
-    // Workspace-wide: fetch all active weeks and their issues
-    fetchers.push({
-      name: 'weeks',
-      fn: async () => {
-        const weeks = await client.listWeeks();
-        return weeks;
-      },
-    });
-    fetchers.push({
-      name: 'team',
-      fn: async () => {
-        const team = await client.listTeam();
-        return team;
-      },
-    });
-  } else if (invocation.viewType === 'project' && invocation.documentId) {
-    fetchers.push({
-      name: 'project',
-      fn: async () => {
-        const project = await client.getDocument(invocation.documentId!);
-        return [project];
-      },
-    });
-    // Also fetch project issues for richer context
-    fetchers.push({
-      name: 'project-issues',
-      fn: async () => {
-        const issues = await client.listIssues({ project_id: invocation.documentId! });
-        return normalizeIssues(issues);
-      },
-    });
-  } else if (invocation.viewType === 'program' && invocation.documentId) {
-    fetchers.push({
-      name: 'program',
-      fn: async () => {
-        const program = await client.getProgram(invocation.documentId!);
-        return [program];
-      },
-    });
-  }
+    const fetches = await Promise.all([
+      runFetch('issue', async () => [await client.getDocument(issueId)], errors),
+      runFetch('project', async () => projectId ? [await client.getDocument(projectId)] : [], errors),
+      runFetch('project-issues', async () => {
+        if (!projectId) return [];
+        return (await client.listIssues({ project_id: projectId })).map(normalizeIssue);
+      }, errors),
+      runFetch('new-assignee-issues', async () => {
+        if (!newAssigneeId) return [];
+        return (await client.listIssues({ assignee_id: newAssigneeId })).map(issue => ({ ...normalizeIssue(issue), _scope: 'new-assignee' } as any));
+      }, errors),
+      runFetch('old-assignee-issues', async () => {
+        if (!oldAssigneeId) return [];
+        return (await client.listIssues({ assignee_id: oldAssigneeId })).map(issue => ({ ...normalizeIssue(issue), _scope: 'old-assignee' } as any));
+      }, errors),
+      runFetch('team', async () => await client.listTeam(), errors),
+    ]);
 
-  // If we know who the actor is, fetch their assigned issues for personalized context.
-  // Skip if we're already viewing the actor's person page (would be redundant).
-  if (invocation.actorPersonId &&
-      !(invocation.viewType === 'person' && invocation.documentId === invocation.actorPersonId)) {
-    fetchers.push({
-      name: 'actor-issues',
-      fn: async () => {
-        const issues = await client.listIssues({ assignee_id: invocation.actorPersonId! });
-        // Tag these so downstream nodes can distinguish actor's issues
-        return normalizeIssues(issues).map(i => ({ ...i, _isActorIssue: true } as any));
-      },
-    });
-  }
+    resources = fetches.flat();
+  } else {
+    const fetchers: Array<Promise<ShipDocument[]>> = [];
+    const shouldFetchWorkspaceUnassigned = invocation.mode === 'chat';
 
-  // Execute all fetches in parallel with per-fetch error isolation
-  const results = await Promise.all(
-    fetchers.map(async ({ name, fn }) => {
-      try {
-        return await fn();
-      } catch (err) {
-        const message = err instanceof Error ? err.message : String(err);
-        errors.push(`Fetch ${name} failed: ${message}`);
-        return [];
+    if (invocation.actorUserId) {
+      fetchers.push(runFetch('actor-issues', async () => {
+        const issues = await client.listIssues({ assignee_id: invocation.actorUserId! });
+        return issues.map(issue => ({ ...normalizeIssue(issue), _scope: 'actor' } as any));
+      }, errors));
+    }
+
+    if (shouldFetchWorkspaceUnassigned) {
+      fetchers.push(runFetch('workspace-unassigned-issues', async () => {
+        const issues = await client.listIssues({ assignee_id: 'unassigned' });
+        return issues.map(issue => ({ ...normalizeIssue(issue), _scope: 'workspace-unassigned' } as any));
+      }, errors));
+    }
+
+    if (invocation.actorPersonId) {
+      fetchers.push(runFetch('actor', async () => [await client.getDocument(invocation.actorPersonId!)], errors));
+    }
+
+    if (invocation.viewType === 'project' && invocation.documentId) {
+      fetchers.push(runFetch('project', async () => [await client.getDocument(invocation.documentId!)], errors));
+      fetchers.push(runFetch('project-issues', async () =>
+        (await client.listIssues({ project_id: invocation.documentId! }))
+          .map(issue => ({ ...normalizeIssue(issue), _scope: 'project' } as any)), errors));
+    } else if (invocation.viewType === 'week' && invocation.documentId) {
+      fetchers.push(runFetch('week', async () => [normalizeWeek(await client.getWeek(invocation.documentId!))], errors));
+      fetchers.push(runFetch('week-issues', async () =>
+        (await client.getWeekIssues(invocation.documentId!))
+          .map(issue => ({ ...normalizeIssue(issue), _scope: 'week' } as any)), errors));
+    } else if (invocation.viewType === 'issue' && invocation.documentId) {
+      const issueDocs = await runFetch('issue', async () => [await client.getDocument(invocation.documentId!)], errors);
+      resources.push(...issueDocs);
+      const issue = issueDocs[0];
+      const projectId = issue?.belongs_to?.find((assoc) => assoc.type === 'project')?.id;
+      const siblingFetches = await Promise.all([
+        runFetch('issue-project', async () => projectId ? [await client.getDocument(projectId)] : [], errors),
+        runFetch('issue-project-siblings', async () => projectId
+          ? (await client.listIssues({ project_id: projectId }))
+            .map(issue => ({ ...normalizeIssue(issue), _scope: 'project' } as any))
+          : [], errors),
+      ]);
+      resources.push(...siblingFetches.flat());
+    } else if (invocation.viewType === 'person' && invocation.documentId) {
+      const personDocs = await runFetch('person', async () => [await client.getDocument(invocation.documentId!)], errors);
+      resources.push(...personDocs);
+      const personUserId = String(personDocs[0]?.properties?.user_id ?? '');
+      if (personUserId) {
+        fetchers.push(runFetch('person-issues', async () => {
+          const issues = await client.listIssues({ assignee_id: personUserId });
+          return issues.map(issue => ({ ...normalizeIssue(issue), _scope: 'person' } as any));
+        }, errors));
       }
-    }),
-  );
+    }
 
-  for (const docs of results) {
-    resources.push(...docs);
+    const fetched = await Promise.all(fetchers);
+    resources.push(...fetched.flat());
   }
 
-  // Determine degradation tier based on fetch results
+  resources = dedupeResources(resources);
+
   let degradationTier: DegradationTier = 'full';
   if (errors.length > 0 && resources.length > 0) {
     degradationTier = 'partial';
-  } else if (errors.length > 0 && resources.length === 0) {
+  } else if (errors.length > 0) {
     degradationTier = 'offline';
   }
 
+  logFleetGraph({
+    level: 'info',
+    correlationId: invocation.correlationId,
+    action: 'fetch',
+    message: 'Fetched FleetGraph resources',
+    metadata: {
+      viewType: invocation.viewType,
+      documentId: invocation.documentId ?? null,
+      fetchedIssues: resources
+        .filter((resource) => resource.document_type === 'issue')
+        .map((resource: any) => ({
+          id: resource.id,
+          title: resource.title,
+          scope: resource._scope ?? 'workspace',
+          state: resource.properties?.state ?? null,
+          priority: resource.properties?.priority ?? null,
+          assigneeId: resource.properties?.assignee_id ?? null,
+        })),
+      totalResources: resources.length,
+      errors,
+    },
+  });
+
   return {
     fetchedResources: resources,
-    errors,
     degradationTier,
+    errors,
   };
 }

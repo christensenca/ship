@@ -1,40 +1,19 @@
 /**
  * FleetGraph invocation state and approval gate types.
- *
- * This is the in-flight state passed between LangGraph nodes.
  */
 
 import type {
-  FleetGraphViewType,
-  FleetGraphTriggerType,
+  AgentInvocationContext,
   FleetGraphFinding,
   FleetGraphRecommendation,
-  FleetGraphDraft,
   FleetGraphFallback,
   GateType,
   GateStatus,
   DegradationTier,
   ChatMessage,
+  ActionShape,
 } from '@ship/shared';
 import type { ShipDocument } from './ship-api-client.js';
-
-// === Invocation Context ===
-
-export interface InvocationContext {
-  triggerType: FleetGraphTriggerType;
-  viewType: FleetGraphViewType;
-  documentId?: string;
-  actorUserId?: string;
-  /** The person document ID for the authenticated user (resolved from actorUserId) */
-  actorPersonId?: string;
-  /** Display name of the authenticated user */
-  actorName?: string;
-  workspaceId: string;
-  timeWindow?: { start: string; end: string };
-  correlationId: string;
-}
-
-// === Approval Gate ===
 
 export interface ApprovalGate {
   gateId: string;
@@ -45,8 +24,6 @@ export interface ApprovalGate {
   blockedActionIds: string[];
 }
 
-// === Fallback Event ===
-
 export interface FallbackEvent {
   fallbackId: string;
   errorType: string;
@@ -56,55 +33,56 @@ export interface FallbackEvent {
   loggedAt: string;
 }
 
-// === Agent State (LangGraph annotation) ===
+export interface CandidateAction {
+  actionType: 'reassign';
+  targetDocumentId: string;
+  targetDocumentTitle: string;
+  proposedChange: { field: string; old_value: unknown; new_value: unknown };
+  description: string;
+  findingId: string;
+}
+
+export interface PreparedIssueCandidate {
+  issueId: string;
+  title: string;
+  state: string;
+  priority: string;
+  assigneeId?: string | null;
+  scope: 'project' | 'week' | 'person' | 'workspace' | 'actor';
+  recommendationKind: 'continue' | 'assign_to_me';
+  rationale: string;
+}
 
 export interface FleetGraphState {
-  // Invocation metadata
-  invocation: InvocationContext;
-
-  // Data fetched from Ship APIs
+  invocation: AgentInvocationContext;
   contextSummary: string;
   fetchedResources: ShipDocument[];
-
-  // Analysis outputs
   detectedFindings: FleetGraphFinding[];
   recommendedActions: FleetGraphRecommendation[];
-  draftOutputs: FleetGraphDraft[];
-
-  // Chat message history (stateless, sent by client)
   chatMessages?: ChatMessage[];
-
-  // LLM response
   llmSummary?: string;
-
-  // Degradation tracking
   degradationTier: DegradationTier;
-
-  // Approval tracking
   approvalRequirements: ApprovalGate[];
-
-  // Error and fallback tracking
+  surfacedActions: ActionShape[];
+  preparedCandidates: PreparedIssueCandidate[];
+  candidateAction?: CandidateAction;
   errors: string[];
   fallbackStatus: FallbackEvent[];
   fallback?: FleetGraphFallback;
-
-  // User prompt (for on-demand guidance)
-  userPrompt?: string;
 }
 
-/**
- * Create initial empty state for a new FleetGraph invocation.
- */
-export function createInitialState(invocation: InvocationContext): FleetGraphState {
+export function createInitialState(invocation: AgentInvocationContext, chatMessages?: ChatMessage[]): FleetGraphState {
   return {
     invocation,
     contextSummary: '',
     fetchedResources: [],
     detectedFindings: [],
     recommendedActions: [],
-    draftOutputs: [],
+    chatMessages,
     degradationTier: 'full',
     approvalRequirements: [],
+    surfacedActions: [],
+    preparedCandidates: [],
     errors: [],
     fallbackStatus: [],
   };

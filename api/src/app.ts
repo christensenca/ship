@@ -37,6 +37,7 @@ import { documentCommentsRouter, commentsRouter } from './routes/comments.js';
 import { setupSwagger } from './swagger.js';
 import { initializeCAIA } from './services/caia.js';
 import { requestPerformanceMiddleware } from './middleware/request-performance.js';
+import { initializeAssignmentChangeAgent } from './fleet/assignment-change-events.js';
 
 // Validate SESSION_SECRET in production
 if (process.env.NODE_ENV === 'production' && !process.env.SESSION_SECRET) {
@@ -95,6 +96,7 @@ const apiLimiter = rateLimit({
 
 export function createApp(corsOrigin: string = 'http://localhost:5173'): express.Express {
   const app = express();
+  initializeAssignmentChangeAgent();
   const jsonParser = express.json({ limit: '10mb' });
   const urlencodedParser = express.urlencoded({ extended: true, limit: '10mb' });
   const sessionMiddleware = session({

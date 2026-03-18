@@ -113,6 +113,7 @@ export function createActionService(): ActionService {
         try {
           await client.patchIssue(effectiveDocId, {
             [proposedChange.field]: proposedChange.new_value,
+            claude_metadata: { updated_by: 'fleetgraph' },
           });
         } catch (patchErr) {
           // Treat "No fields to update" as success — desired state already achieved
@@ -137,7 +138,7 @@ export function createActionService(): ActionService {
           status: 'approved' as const,
           executionResult: {
             success: true,
-            documentId: action.target_document_id,
+            documentId: effectiveDocId,
             changeApplied: proposedChange,
           },
         };

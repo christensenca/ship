@@ -12,7 +12,7 @@ export async function fallbackNode(state: FleetGraphStateType): Promise<Partial<
 
   if (errors.length === 0) return {};
 
-  const isOnDemand = invocation.triggerType === 'on_demand';
+  const isOnDemand = invocation.mode === 'chat';
 
   const fallbackEvent: FallbackEvent = {
     fallbackId: `fb-${Date.now()}`,

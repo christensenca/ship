@@ -1,182 +1,67 @@
-/**
- * LLM synthesis module — constructs prompts, calls ChatOpenAI, parses structured output.
- */
-
 import { HumanMessage, SystemMessage } from '@langchain/core/messages';
-import type {
-  FleetGraphFinding,
-  FleetGraphRecommendation,
-  ChatMessage,
-} from '@ship/shared';
-import type { ShipDocument } from '../ship-api-client.js';
+import type { ChatMessage, FleetGraphFinding } from '@ship/shared';
 import { getLLMClient } from '../runtime.js';
-import {
-  SYSTEM_PROMPT,
-  buildProactiveSynthesisPrompt,
-  buildChatPrompt,
-  type ActorContext,
-} from './prompts.js';
+import type { ShipDocument } from '../ship-api-client.js';
+import { buildReasoningPrompt, SYSTEM_PROMPT } from './prompts.js';
 
-export interface SynthesisResult {
+export interface UnifiedReasoningResult {
   summary: string;
-  enhancedFindings: Array<{ headline: string; rationale: string; severity: string }>;
-  recommendations: Array<{
-    type: string;
+  decisionType?: 'continue' | 'assign_to_me' | 'none' | null;
+  chosenIssueId?: string | null;
+  finding?: {
+    headline: string;
+    rationale: string;
+    severity: 'critical' | 'high' | 'medium' | 'low';
+  } | null;
+  recommendation?: {
     reason: string;
     expectedImpact: string;
-    actionType?: string | null;
-    targetDocumentId?: string | null;
-    proposedChange?: { field: string; old_value: unknown; new_value: unknown } | null;
-  }>;
+  } | null;
 }
 
-export interface ChatSynthesisResult {
-  message: string;
-  recommendations: Array<{
-    type: string;
-    reason: string;
-    expectedImpact: string;
-    actionType?: string | null;
-    targetDocumentId?: string | null;
-    proposedChange?: { field: string; old_value: unknown; new_value: unknown } | null;
+export async function synthesizeUnifiedReasoning(params: {
+  mode: 'chat' | 'event';
+  contextSummary: string;
+  resources: ShipDocument[];
+  findings: FleetGraphFinding[];
+  messages?: ChatMessage[];
+  candidateActionDescription?: string;
+  candidates?: Array<{
+    issueId: string;
+    title: string;
+    scope: string;
+    state: string;
+    priority: string;
+    recommendationKind: string;
+    rationale: string;
   }>;
-}
-
-/**
- * Run LLM synthesis for proactive scan results.
- * Returns enhanced findings and recommendations with narrative context.
- */
-export async function synthesizeProactiveFindings(
-  detectorFindings: FleetGraphFinding[],
-  resources: ShipDocument[],
-  contextSummary: string,
-): Promise<SynthesisResult> {
+}): Promise<UnifiedReasoningResult | null> {
   const llm = getLLMClient();
-  if (!llm) {
-    // Fallback: no LLM available, return detector findings as-is
-    return {
-      summary: contextSummary,
-      enhancedFindings: detectorFindings.map(f => ({
-        headline: f.headline,
-        rationale: f.rationale,
-        severity: f.severity,
-      })),
-      recommendations: [],
-    };
-  }
-
-  const userPrompt = buildProactiveSynthesisPrompt(detectorFindings, resources, contextSummary);
+  if (!llm) return null;
 
   const response = await llm.invoke([
     new SystemMessage(SYSTEM_PROMPT),
-    new HumanMessage(userPrompt),
+    new HumanMessage(buildReasoningPrompt(params)),
   ]);
 
-  return parseProactiveResponse(response.content as string, detectorFindings, contextSummary);
+  return parseReasoningResponse(String(response.content ?? ''));
 }
 
-/**
- * Run LLM synthesis for chat interaction.
- */
-export async function synthesizeChat(
-  messages: ChatMessage[],
-  detectorFindings: FleetGraphFinding[],
-  resources: ShipDocument[],
-  contextSummary: string,
-  actor?: ActorContext,
-): Promise<ChatSynthesisResult> {
-  const llm = getLLMClient();
-  if (!llm) {
-    return {
-      message: buildFallbackChatResponse(detectorFindings, contextSummary),
-      recommendations: [],
-    };
-  }
-
-  const userPrompt = buildChatPrompt(messages, detectorFindings, resources, contextSummary, actor);
-
-  const response = await llm.invoke([
-    new SystemMessage(SYSTEM_PROMPT),
-    new HumanMessage(userPrompt),
-  ]);
-
-  return parseChatResponse(response.content as string, detectorFindings, contextSummary);
-}
-
-function parseProactiveResponse(
-  raw: string,
-  fallbackFindings: FleetGraphFinding[],
-  fallbackSummary: string,
-): SynthesisResult {
+function parseReasoningResponse(raw: string): UnifiedReasoningResult {
   try {
-    // Extract JSON from response (may have markdown code fences)
-    const jsonMatch = raw.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) throw new Error('No JSON found in response');
-
-    const parsed = JSON.parse(jsonMatch[0]);
-    return {
-      summary: parsed.summary ?? fallbackSummary,
-      enhancedFindings: Array.isArray(parsed.findings) ? parsed.findings : fallbackFindings.map(f => ({
-        headline: f.headline,
-        rationale: f.rationale,
-        severity: f.severity,
-      })),
-      recommendations: Array.isArray(parsed.recommendations) ? parsed.recommendations : [],
-    };
-  } catch {
-    // Parse failure — return detector findings with raw text as summary
-    return {
-      summary: raw.slice(0, 500) || fallbackSummary,
-      enhancedFindings: fallbackFindings.map(f => ({
-        headline: f.headline,
-        rationale: f.rationale,
-        severity: f.severity,
-      })),
-      recommendations: [],
-    };
-  }
-}
-
-function parseChatResponse(
-  raw: string,
-  fallbackFindings: FleetGraphFinding[],
-  fallbackSummary: string,
-): ChatSynthesisResult {
-  try {
-    const jsonMatch = raw.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      // Treat entire response as a message (no structured data)
-      return { message: raw, recommendations: [] };
+    const match = raw.match(/\{[\s\S]*\}/);
+    if (!match) {
+      return { summary: raw.trim() || 'Analysis complete.' };
     }
-
-    const parsed = JSON.parse(jsonMatch[0]);
+    const parsed = JSON.parse(match[0]);
     return {
-      message: stripUUIDs(parsed.message ?? raw),
-      recommendations: Array.isArray(parsed.recommendations) ? parsed.recommendations : [],
+      summary: typeof parsed.summary === 'string' ? parsed.summary : 'Analysis complete.',
+      decisionType: parsed.decisionType ?? null,
+      chosenIssueId: parsed.chosenIssueId ?? null,
+      finding: parsed.finding ?? null,
+      recommendation: parsed.recommendation ?? null,
     };
   } catch {
-    return { message: stripUUIDs(raw), recommendations: [] };
+    return { summary: raw.trim() || 'Analysis complete.' };
   }
-}
-
-/** Strip UUIDs and HTML doc-id comments from user-facing text. */
-function stripUUIDs(text: string): string {
-  return text
-    .replace(/<!-- doc:[0-9a-f-]+ -->/g, '')
-    .replace(/\(id: [0-9a-f-]+\)/g, '')
-    .replace(/\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b/g, '')
-    .replace(/ {2,}/g, ' ')
-    .trim();
-}
-
-function buildFallbackChatResponse(findings: FleetGraphFinding[], contextSummary: string): string {
-  if (findings.length === 0) {
-    return `Based on available data: ${contextSummary}\n\nNo issues detected. Everything appears to be on track.`;
-  }
-
-  const findingList = findings
-    .map(f => `- **${f.headline}** (${f.severity}): ${f.rationale}`)
-    .join('\n');
-
-  return `Based on available data: ${contextSummary}\n\n**Findings:**\n${findingList}`;
 }

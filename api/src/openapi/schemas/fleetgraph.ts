@@ -160,6 +160,8 @@ const SuggestedIssueSchema = z.object({
 }).openapi('SuggestedIssue');
 
 const ChatResponseSchema = z.object({
+  runId: z.string(),
+  summary: z.string(),
   message: z.string(),
   findings: z.array(FindingSchema),
   proposedActions: z.array(ActionShapeSchema),
