@@ -80,7 +80,7 @@ const ProactiveFindingsRequestSchema = z.object({
   workspaceId: z.string(),
   scopeType: z.enum(['workspace', 'week', 'project', 'program']),
   scopeId: z.string().optional(),
-  triggerType: z.enum(['scheduled', 'event']).optional(),
+  triggerType: z.enum(['on_demand', 'scheduled', 'event']).optional(),
 }).openapi('ProactiveFindingsRequest');
 
 const ProactiveFindingsResponseSchema = z.object({

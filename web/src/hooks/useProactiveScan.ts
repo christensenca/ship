@@ -32,7 +32,7 @@ async function fetchProactiveFindings(
       workspaceId,
       scopeType,
       scopeId,
-      triggerType: 'event',
+      triggerType: 'on_demand',
     }),
   });
 
@@ -53,5 +53,6 @@ export function useProactiveScan(
     enabled: !!workspaceId && !!scopeType,
     staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
+    refetchInterval: 30000,
   });
 }

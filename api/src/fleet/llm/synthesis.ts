@@ -20,7 +20,7 @@ export interface UnifiedReasoningResult {
 }
 
 export async function synthesizeUnifiedReasoning(params: {
-  mode: 'chat' | 'event';
+  mode: 'chat' | 'event' | 'proactive';
   contextSummary: string;
   resources: ShipDocument[];
   findings: FleetGraphFinding[];

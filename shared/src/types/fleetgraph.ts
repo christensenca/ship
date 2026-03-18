@@ -4,7 +4,7 @@ export type FleetGraphViewType = 'issue' | 'week' | 'project' | 'program' | 'per
 export type FleetGraphTriggerType = 'on_demand' | 'scheduled' | 'event';
 export type FleetGraphScopeType = 'workspace' | 'week' | 'project' | 'program' | 'person' | 'issue';
 
-export type AgentMode = 'chat' | 'event';
+export type AgentMode = 'chat' | 'event' | 'proactive';
 export type AgentEventType = 'assignment_changed';
 
 export type FindingCategory =
@@ -174,7 +174,7 @@ export interface ProactiveFindingsRequest {
   workspaceId: string;
   scopeType: FleetGraphScopeType;
   scopeId?: string;
-  triggerType?: 'scheduled' | 'event';
+  triggerType?: 'on_demand' | 'scheduled' | 'event';
 }
 
 export interface CreateDraftRequest {

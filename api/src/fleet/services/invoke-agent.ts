@@ -6,6 +6,8 @@ import type {
   AssignmentChangedEventPayload,
   ChatMessage,
   ChatRequest,
+  ProactiveFindingsRequest,
+  ProactiveFindingsResponse,
 } from '@ship/shared';
 import { pool } from '../../db/client.js';
 import { buildFleetGraph, type FleetGraphStateType } from '../graph.js';
@@ -59,6 +61,29 @@ export async function invokeAssignmentChangedAgent(eventPayload: AssignmentChang
   };
 
   return invokeAgent(invocation, undefined, runId);
+}
+
+export async function invokeProactiveAgent(request: ProactiveFindingsRequest): Promise<ProactiveFindingsResponse> {
+  const runId = uuid();
+
+  const invocation: AgentInvocationContext = {
+    mode: 'proactive',
+    triggerType: request.triggerType ?? 'on_demand',
+    workspaceId: request.workspaceId,
+    viewType: request.scopeType,
+    documentId: request.scopeId,
+    scope: {
+      projectId: request.scopeType === 'project' ? request.scopeId : undefined,
+      weekId: request.scopeType === 'week' ? request.scopeId : undefined,
+    },
+    correlationId: runId,
+  };
+
+  const result = await invokeAgent(invocation, undefined, runId);
+  return {
+    findings: result.findings,
+    generatedAt: new Date().toISOString(),
+  };
 }
 
 async function invokeAgent(

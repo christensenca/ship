@@ -6,6 +6,8 @@ import { logFleetGraph } from '../observability.js';
 import { isLLMAvailable } from '../runtime.js';
 import type { ShipDocument, ShipIssue } from '../ship-api-client.js';
 import { synthesizeUnifiedReasoning } from '../llm/synthesis.js';
+import { runWeekRiskDetectors } from '../detectors/week-risk.js';
+import { runPersonWorkloadDetectors } from '../detectors/person-workload.js';
 
 interface CapacitySnapshot {
   personId: string;
@@ -14,11 +16,17 @@ interface CapacitySnapshot {
   workload: number;
 }
 
+const DEFAULT_CAPACITY_HOURS = 8;
+
 export async function reasoningNode(state: FleetGraphStateType): Promise<Partial<FleetGraphStateType>> {
   const { invocation, fetchedResources } = state;
 
   if (invocation.mode === 'event' && invocation.eventType === 'assignment_changed' && invocation.eventPayload) {
     return reasonAssignmentEvent(state, fetchedResources);
+  }
+
+  if (invocation.mode === 'proactive') {
+    return reasonProactive(state);
   }
 
   return reasonChat(state);
@@ -291,7 +299,7 @@ async function reasonAssignmentEvent(
     return {
       personId: String(person.properties?.user_id ?? person.id),
       name: person.title ?? 'Unknown',
-      capacity: Number(person.properties?.capacity_hours ?? 0),
+      capacity: Number(person.properties?.capacity_hours ?? DEFAULT_CAPACITY_HOURS),
       workload,
     } satisfies CapacitySnapshot;
   });
@@ -350,6 +358,42 @@ async function reasonAssignmentEvent(
   };
 }
 
+async function reasonProactive(state: FleetGraphStateType): Promise<Partial<FleetGraphStateType>> {
+  const resources = state.fetchedResources;
+  const issues = resources.filter((resource): resource is ShipIssue => resource.document_type === 'issue');
+  const findings = buildProactiveFindings(state, resources, issues);
+  const llm = await synthesizeUnifiedReasoning({
+    mode: 'proactive',
+    contextSummary: state.contextSummary,
+    resources,
+    findings,
+  }).catch(() => null);
+
+  const summary = llm?.summary ?? summarizeProactiveFindings(state.invocation.viewType, findings);
+
+  logFleetGraph({
+    level: 'info',
+    correlationId: state.invocation.correlationId,
+    action: 'reasoning',
+    message: 'Completed FleetGraph proactive reasoning',
+    metadata: {
+      llmAvailable: isLLMAvailable(),
+      findings: findings.map((finding) => ({
+        id: finding.id,
+        category: finding.category,
+        severity: finding.severity,
+        headline: finding.headline,
+      })),
+      summary,
+    },
+  });
+
+  return {
+    detectedFindings: findings,
+    llmSummary: summary,
+  };
+}
+
 function sumWorkload(issues: ShipIssue[]): number {
   return issues.reduce((total, issue) => total + Number(issue.properties.estimate ?? 0), 0);
 }
@@ -383,4 +427,102 @@ function createFinding(params: {
     requiresHumanAction: true,
     confidence: 0.82,
   };
+}
+
+function buildProactiveFindings(
+  state: FleetGraphStateType,
+  resources: ShipDocument[],
+  issues: ShipIssue[],
+): FleetGraphFinding[] {
+  if (state.invocation.viewType === 'week') {
+    const week = resources.find((resource) => resource.document_type === 'sprint');
+    return runWeekRiskDetectors(issues, week as any);
+  }
+
+  if (state.invocation.viewType === 'project') {
+    return summarizeContainerRisk(issues, 'project');
+  }
+
+  if (state.invocation.viewType === 'program' || state.invocation.viewType === 'workspace') {
+    const people = resources.filter((resource) => resource.document_type === 'person');
+    const workloadFindings = people.flatMap((person) => {
+      const userId = String(person.properties?.user_id ?? '');
+      return userId ? runPersonWorkloadDetectors(issues, userId) : [];
+    });
+    return [...summarizeContainerRisk(issues, state.invocation.viewType), ...workloadFindings].sort(compareFindings);
+  }
+
+  return [];
+}
+
+function summarizeContainerRisk(
+  issues: ShipIssue[],
+  scopeLabel: 'project' | 'program' | 'workspace',
+): FleetGraphFinding[] {
+  const activeIssues = issues.filter((issue) => !['done', 'cancelled'].includes(String(issue.properties?.state ?? '')));
+  const stale = activeIssues.filter((issue) => {
+    const state = String(issue.properties?.state ?? '');
+    if (!['in_progress', 'in_review'].includes(state)) return false;
+    const ageDays = (Date.now() - new Date(issue.updated_at).getTime()) / (1000 * 60 * 60 * 24);
+    return ageDays >= 3;
+  });
+  const notStarted = activeIssues.filter((issue) => ['triage', 'backlog', 'todo'].includes(String(issue.properties?.state ?? '')));
+
+  const findings: FleetGraphFinding[] = [];
+
+  if (stale.length > 0) {
+    findings.push({
+      id: `finding-${uuid()}`,
+      category: 'stale_work',
+      severity: stale.length >= 3 ? 'high' : 'medium',
+      headline: `${stale.length} ${scopeLabel} issue${stale.length === 1 ? '' : 's'} look stalled`,
+      rationale: `${stale.length} active issue${stale.length === 1 ? '' : 's'} have been in progress or review without updates for at least 3 days.`,
+      evidence: stale.slice(0, 5).map((issue) => `${issue.title} (#${issue.ticket_number}) last updated ${issue.updated_at}`),
+      relatedDocumentIds: stale.map((issue) => issue.id),
+      recommendedAudience: [],
+      requiresHumanAction: true,
+      confidence: 0.84,
+    });
+  }
+
+  if (activeIssues.length > 0 && notStarted.length / activeIssues.length >= 0.5) {
+    const percentage = Math.round((notStarted.length / activeIssues.length) * 100);
+    findings.push({
+      id: `finding-${uuid()}`,
+      category: 'slipping_scope',
+      severity: percentage >= 75 ? 'high' : 'medium',
+      headline: `${percentage}% of ${scopeLabel} work has not started`,
+      rationale: `${notStarted.length} of ${activeIssues.length} open issues are still in triage, backlog, or todo.`,
+      evidence: notStarted.slice(0, 5).map((issue) => `${issue.title} (#${issue.ticket_number}) is ${issue.properties.state}`),
+      relatedDocumentIds: notStarted.map((issue) => issue.id),
+      recommendedAudience: [],
+      requiresHumanAction: true,
+      confidence: 0.8,
+    });
+  }
+
+  return findings.sort(compareFindings);
+}
+
+function compareFindings(a: FleetGraphFinding, b: FleetGraphFinding): number {
+  const severityOrder: Record<FleetGraphFinding['severity'], number> = {
+    critical: 0,
+    high: 1,
+    medium: 2,
+    low: 3,
+  };
+  return severityOrder[a.severity] - severityOrder[b.severity];
+}
+
+function summarizeProactiveFindings(viewType: FleetGraphStateType['invocation']['viewType'], findings: FleetGraphFinding[]): string {
+  if (findings.length === 0) {
+    return `No proactive risks detected for this ${viewType}.`;
+  }
+
+  const topFinding = findings[0];
+  if (!topFinding) {
+    return `No proactive risks detected for this ${viewType}.`;
+  }
+
+  return `${topFinding.headline}${findings.length > 1 ? ` (${findings.length} findings total)` : ''}`;
 }

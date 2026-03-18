@@ -7,6 +7,7 @@ import Markdown from 'react-markdown';
 import type { ActionShape, ChatMessage, FleetGraphViewType } from '@ship/shared';
 import { useFleetGraphActions } from '../../hooks/useFleetGraphActions';
 import { useFleetGraphChat } from '../../hooks/useFleetGraphGuidance';
+import { useProactiveScan } from '../../hooks/useProactiveScan';
 import { useCurrentDocument } from '../../contexts/CurrentDocumentContext';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
 import { ActionCard } from './ActionCard';
@@ -41,6 +42,9 @@ export function FleetGraphChatWidget() {
 
   const { data: pendingActionsData } = useFleetGraphActions(workspaceId);
   const inboxActions = pendingActionsData?.actions ?? [];
+  const proactiveScan = useProactiveScan(workspaceId, currentDocumentId, currentDocumentType);
+  const proactiveFindings = proactiveScan.data?.findings ?? [];
+  const alertCount = inboxActions.length + proactiveFindings.length;
 
   React.useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -120,7 +124,7 @@ export function FleetGraphChatWidget() {
         aria-label={isOpen ? 'Close FleetGraph chat' : 'Open FleetGraph chat'}
       >
         {isOpen ? '+' : 'AI'}
-        {!isOpen && inboxActions.length > 0 && (
+        {!isOpen && alertCount > 0 && (
           <span
             style={{
               position: 'absolute',
@@ -140,7 +144,7 @@ export function FleetGraphChatWidget() {
               border: '2px solid #1a1a1a',
             }}
           >
-            {inboxActions.length > 9 ? '9+' : inboxActions.length}
+            {alertCount > 9 ? '9+' : alertCount}
           </span>
         )}
       </button>
@@ -206,27 +210,76 @@ export function FleetGraphChatWidget() {
               minHeight: '200px',
             }}
           >
-            {chatMessages.length === 0 && !chatMutation.isPending && inboxActions.length > 0 && (
-              <div style={{ borderBottom: '1px solid #333', paddingBottom: '12px', marginBottom: '4px' }}>
-                <div
-                  style={{
-                    fontSize: '11px',
-                    fontWeight: 600,
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.05em',
-                    color: '#8a8a8a',
-                    marginBottom: '8px',
-                  }}
-                >
-                  Inbox
-                </div>
-                {inboxActions.map((action) => (
-                  <ActionCard key={action.id} action={action} />
-                ))}
+            {chatMessages.length === 0 && !chatMutation.isPending && (
+              <div style={{ borderBottom: proactiveFindings.length > 0 || inboxActions.length > 0 ? '1px solid #333' : 'none', paddingBottom: proactiveFindings.length > 0 || inboxActions.length > 0 ? '12px' : 0, marginBottom: '4px' }}>
+                {proactiveFindings.length > 0 && (
+                  <>
+                    <div
+                      style={{
+                        fontSize: '11px',
+                        fontWeight: 600,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.05em',
+                        color: '#8a8a8a',
+                        marginBottom: '8px',
+                      }}
+                    >
+                      Current Risks
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: inboxActions.length > 0 ? '12px' : 0 }}>
+                      {proactiveFindings.map((finding) => (
+                        <div
+                          key={finding.id}
+                          style={{
+                            padding: '10px 12px',
+                            borderRadius: '8px',
+                            backgroundColor: '#262626',
+                            border: '1px solid #333',
+                            color: '#f5f5f5',
+                          }}
+                        >
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                            <span style={{
+                              fontSize: '10px',
+                              fontWeight: 700,
+                              letterSpacing: '0.04em',
+                              textTransform: 'uppercase',
+                              color: finding.severity === 'critical' ? '#fca5a5' : finding.severity === 'high' ? '#fdba74' : finding.severity === 'medium' ? '#fde68a' : '#bef264',
+                            }}>
+                              {finding.severity}
+                            </span>
+                            <span style={{ fontSize: '12px', fontWeight: 600 }}>{finding.headline}</span>
+                          </div>
+                          <div style={{ fontSize: '12px', color: '#d4d4d4', lineHeight: 1.4 }}>{finding.rationale}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
+
+                {inboxActions.length > 0 && (
+                  <>
+                    <div
+                      style={{
+                        fontSize: '11px',
+                        fontWeight: 600,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.05em',
+                        color: '#8a8a8a',
+                        marginBottom: '8px',
+                      }}
+                    >
+                      Inbox
+                    </div>
+                    {inboxActions.map((action) => (
+                      <ActionCard key={action.id} action={action} />
+                    ))}
+                  </>
+                )}
               </div>
             )}
 
-            {chatMessages.length === 0 && !chatMutation.isPending && inboxActions.length === 0 && (
+            {chatMessages.length === 0 && !chatMutation.isPending && proactiveFindings.length === 0 && inboxActions.length === 0 && (
               <div style={{ color: '#8a8a8a', fontSize: '13px', textAlign: 'center', padding: '32px 16px' }}>
                 Ask FleetGraph what you should work on next.
               </div>

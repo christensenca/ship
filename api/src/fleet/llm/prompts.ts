@@ -12,6 +12,7 @@ Rules:
 - Never include UUIDs in the user-facing summary.
 - For chat mode, answer the user directly and briefly.
 - For event mode, explain why the assignment change is healthy or risky.
+- For proactive mode, summarize the most important risks for the current scope.
 - In chat mode, if you choose an issue, the summary must describe that chosen issue only.
 - In chat mode, if no issue is chosen, do not mention a specific issue title.
 
@@ -32,7 +33,7 @@ Return strict JSON:
 }`;
 
 export function buildReasoningPrompt(params: {
-  mode: 'chat' | 'event';
+  mode: 'chat' | 'event' | 'proactive';
   contextSummary: string;
   resources: ShipDocument[];
   findings: FleetGraphFinding[];
@@ -87,7 +88,9 @@ Return summary that explains the choice.
 Only choose from the prepared candidates.
 For chat mode, also return "decisionType" and "chosenIssueId".
 Only choose "assign_to_me" if the user is asking to find or pick up new work.`
-      : 'Decide whether this assignment change created a capacity or rebalance problem worth surfacing.',
+      : params.mode === 'event'
+        ? 'Decide whether this assignment change created a capacity or rebalance problem worth surfacing.'
+        : 'Summarize the most important proactive risks in this scope. If no risk is justified, say so clearly.',
   ].join('\n');
 }
 

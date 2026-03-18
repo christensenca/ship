@@ -133,7 +133,7 @@ export async function fetchNode(state: FleetGraphStateType): Promise<Partial<Fle
         if (!oldAssigneeId) return [];
         return (await client.listIssues({ assignee_id: oldAssigneeId })).map(issue => ({ ...normalizeIssue(issue), _scope: 'old-assignee' } as any));
       }, errors),
-      runFetch('team', async () => await client.listTeam(), errors),
+      runFetch('team', async () => await client.listDocumentsByType('person', invocation.workspaceId), errors),
     ]);
 
     resources = fetches.flat();
@@ -164,6 +164,11 @@ export async function fetchNode(state: FleetGraphStateType): Promise<Partial<Fle
       fetchers.push(runFetch('project-issues', async () =>
         (await client.listIssues({ project_id: invocation.documentId! }))
           .map(issue => ({ ...normalizeIssue(issue), _scope: 'project' } as any)), errors));
+    } else if (invocation.viewType === 'program' && invocation.documentId) {
+      fetchers.push(runFetch('program', async () => [await client.getProgram(invocation.documentId!)], errors));
+      fetchers.push(runFetch('program-issues', async () =>
+        (await client.listIssues({ program_id: invocation.documentId! }))
+          .map(issue => ({ ...normalizeIssue(issue), _scope: 'program' } as any)), errors));
     } else if (invocation.viewType === 'week' && invocation.documentId) {
       fetchers.push(runFetch('week', async () => [normalizeWeek(await client.getWeek(invocation.documentId!))], errors));
       fetchers.push(runFetch('week-issues', async () =>
@@ -192,6 +197,12 @@ export async function fetchNode(state: FleetGraphStateType): Promise<Partial<Fle
           return issues.map(issue => ({ ...normalizeIssue(issue), _scope: 'person' } as any));
         }, errors));
       }
+    }
+
+    if (invocation.viewType === 'workspace') {
+      fetchers.push(runFetch('workspace-issues', async () =>
+        (await client.listIssues()).map(issue => ({ ...normalizeIssue(issue), _scope: 'workspace' } as any)), errors));
+      fetchers.push(runFetch('workspace-people', async () => await client.listDocumentsByType('person', invocation.workspaceId), errors));
     }
 
     const fetched = await Promise.all(fetchers);

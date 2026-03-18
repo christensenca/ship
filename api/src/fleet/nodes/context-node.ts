@@ -6,6 +6,8 @@ export async function contextNode(state: FleetGraphStateType): Promise<Partial<F
 
   if (invocation.mode === 'chat') {
     parts.push(invocation.actorName ? `${invocation.actorName} asked FleetGraph for work guidance` : 'On-demand work guidance');
+  } else if (invocation.mode === 'proactive') {
+    parts.push('Proactive scan requested');
   } else {
     parts.push('Assignment change event received');
   }
