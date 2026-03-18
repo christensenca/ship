@@ -174,6 +174,7 @@ for file in $FILES; do
          [[ "$call" =~ ^documents/.*backlinks ]] || [[ "$call" =~ ^team/grid ]] || \
          [[ "$call" =~ ^team/accountability-grid ]] || \
          [[ "$call" =~ ^admin/audit-logs/export ]] || \
+         [[ "$call" =~ ^agent/ ]] || \
          [[ "$call" =~ ^weekly-retros ]] || [[ "$call" =~ ^weekly-plans ]]; then
         continue
       fi

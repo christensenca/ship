@@ -13,6 +13,7 @@ import {
 } from '../utils/document-crud.js';
 import { broadcastToUser } from '../collaboration/index.js';
 import { measureRequestPerf, measureRequestPerfAsync } from '../middleware/request-performance.js';
+import { publishAssignmentChanged } from '../fleet/assignment-change-events.js';
 
 type RouterType = ReturnType<typeof Router>;
 const router: RouterType = Router();
@@ -126,7 +127,7 @@ const updateIssueSchema = z.object({
   confirm_orphan_children: z.boolean().optional(),
   // Claude Code integration metadata
   claude_metadata: z.object({
-    updated_by: z.literal('claude'),
+    updated_by: z.enum(['claude', 'fleetgraph']),
     story_id: z.string().optional(),
     prd_name: z.string().optional(),
     session_context: z.string().optional(),
@@ -1122,6 +1123,20 @@ router.patch('/:id', authMiddleware, async (req: Request, res: Response): Promis
     const issue = extractIssueFromRow(row);
     const belongsTo = await getBelongsToAssociations(id);
 
+    const assigneeChange = changes.find((change) => change.field === 'assignee_id');
+    if (assigneeChange && String(automatedBy ?? '') !== 'fleetgraph') {
+      const projectId = belongsTo.find((assoc) => assoc.type === 'project')?.id;
+      publishAssignmentChanged({
+        workspaceId,
+        issueId: id,
+        projectId,
+        oldAssigneeId: assigneeChange.oldValue,
+        newAssigneeId: assigneeChange.newValue,
+        changedByUserId: userId,
+        changedAt: new Date().toISOString(),
+      });
+    }
+
     // Broadcast accountability update when an action item issue is completed
     if (isClosingIssue && wasNotClosed) {
       const props = row.properties || {};
@@ -1293,11 +1308,31 @@ router.post('/bulk', authMiddleware, async (req: Request, res: Response): Promis
     }
 
     const validIds = ids.filter((id) => accessibleIds.has(id));
+    const oldAssigneeById = new Map<string, string | null>();
+    const projectIdById = new Map<string, string | undefined>();
 
     if (validIds.length === 0) {
       await client.query('ROLLBACK');
       res.status(404).json({ error: 'No valid issues found', failed });
       return;
+    }
+
+    if (action === 'update' && updates?.assignee_id !== undefined) {
+      const assigneeSnapshot = await client.query(
+        `SELECT d.id,
+                d.properties->>'assignee_id' as old_assignee_id,
+                da.related_id as project_id
+         FROM documents d
+         LEFT JOIN document_associations da
+           ON da.document_id = d.id AND da.relationship_type = 'project'
+         WHERE d.id = ANY($1) AND d.workspace_id = $2 AND d.document_type = 'issue'`,
+        [validIds, workspaceId]
+      );
+
+      for (const row of assigneeSnapshot.rows) {
+        oldAssigneeById.set(row.id, row.old_assignee_id ?? null);
+        projectIdById.set(row.id, row.project_id ?? undefined);
+      }
     }
 
     let result;
@@ -1436,6 +1471,28 @@ router.post('/bulk', authMiddleware, async (req: Request, res: Response): Promis
     }
 
     await client.query('COMMIT');
+
+    if (action === 'update' && updates?.assignee_id !== undefined) {
+      for (const row of result.rows) {
+        const issueId = String(row.id);
+        const oldAssigneeId = oldAssigneeById.get(issueId) ?? null;
+        const newAssigneeId = updates.assignee_id ?? null;
+
+        if (oldAssigneeId === newAssigneeId) {
+          continue;
+        }
+
+        publishAssignmentChanged({
+          workspaceId,
+          issueId,
+          projectId: updates.project_id ?? projectIdById.get(issueId),
+          oldAssigneeId,
+          newAssigneeId,
+          changedByUserId: userId,
+          changedAt: new Date().toISOString(),
+        });
+      }
+    }
 
     // Map results to issue format
     const updated = result.rows.map((row) => {

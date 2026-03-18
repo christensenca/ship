@@ -136,14 +136,18 @@ export default function SprintOverviewTab({ documentId, document }: DocumentTabP
   if (!user) return null;
 
   return (
-    <UnifiedEditor
-      document={unifiedDocument}
-      sidebarData={sidebarData}
-      onUpdate={handleUpdate}
-      onBack={handleBack}
-      backLabel="weeks"
-      onDelete={handleDelete}
-      showTypeSelector={false}
-    />
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      <div style={{ flex: 1, minHeight: 0 }}>
+        <UnifiedEditor
+          document={unifiedDocument}
+          sidebarData={sidebarData}
+          onUpdate={handleUpdate}
+          onBack={handleBack}
+          backLabel="weeks"
+          onDelete={handleDelete}
+          showTypeSelector={false}
+        />
+      </div>
+    </div>
   );
 }

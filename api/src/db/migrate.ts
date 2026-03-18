@@ -5,15 +5,14 @@
  * 2. Runs numbered migration files from migrations/ folder
  * 3. Tracks completed migrations in schema_migrations table
  */
-import { config } from 'dotenv';
 import { readdirSync, readFileSync } from 'fs';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 import { Pool } from 'pg';
 import { loadProductionSecrets } from '../config/ssm.js';
+import { loadLocalEnv } from '../config/load-env.js';
 
-// Load .env.local for local development
-config({ path: join(dirname(fileURLToPath(import.meta.url)), '../../.env.local') });
+loadLocalEnv();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);

@@ -31,11 +31,13 @@ import dashboardRoutes from './routes/dashboard.js';
 import associationsRoutes from './routes/associations.js';
 import accountabilityRoutes from './routes/accountability.js';
 import aiRoutes from './routes/ai.js';
+import fleetgraphRoutes from './routes/fleetgraph.js';
 import weeklyPlansRoutes, { weeklyRetrosRouter } from './routes/weekly-plans.js';
 import { documentCommentsRouter, commentsRouter } from './routes/comments.js';
 import { setupSwagger } from './swagger.js';
 import { initializeCAIA } from './services/caia.js';
 import { requestPerformanceMiddleware } from './middleware/request-performance.js';
+import { initializeAssignmentChangeAgent } from './fleet/assignment-change-events.js';
 
 // Validate SESSION_SECRET in production
 if (process.env.NODE_ENV === 'production' && !process.env.SESSION_SECRET) {
@@ -94,6 +96,7 @@ const apiLimiter = rateLimit({
 
 export function createApp(corsOrigin: string = 'http://localhost:5173'): express.Express {
   const app = express();
+  initializeAssignmentChangeAgent();
   const jsonParser = express.json({ limit: '10mb' });
   const urlencodedParser = express.urlencoded({ extended: true, limit: '10mb' });
   const sessionMiddleware = session({
@@ -230,6 +233,9 @@ export function createApp(corsOrigin: string = 'http://localhost:5173'): express
 
   // AI analysis routes - plan and retro quality feedback (CSRF protected)
   app.use('/api/ai', conditionalCsrf, aiRoutes);
+
+  // FleetGraph agent routes (CSRF protected)
+  app.use('/api/agent', conditionalCsrf, fleetgraphRoutes);
 
   // Weekly plans routes - per-person accountability documents (CSRF protected)
   app.use('/api/weekly-plans', conditionalCsrf, weeklyPlansRoutes);

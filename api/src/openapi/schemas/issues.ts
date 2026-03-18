@@ -144,7 +144,7 @@ export const UpdateIssueSchema = z.object({
     description: 'Confirm closing parent issue with incomplete children',
   }),
   claude_metadata: z.object({
-    updated_by: z.literal('claude'),
+    updated_by: z.enum(['claude', 'fleetgraph']),
     story_id: z.string().optional(),
     prd_name: z.string().optional(),
     session_context: z.string().optional(),

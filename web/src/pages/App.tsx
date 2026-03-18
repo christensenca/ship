@@ -12,6 +12,7 @@ import { usePrograms, Program } from '@/contexts/ProgramsContext';
 import { useIssues, Issue } from '@/contexts/IssuesContext';
 import { useProjects, Project } from '@/contexts/ProjectsContext';
 import { useCurrentDocumentType, useCurrentDocument } from '@/contexts/CurrentDocumentContext';
+import { FleetGraphChatWidget } from '@/components/fleet/FleetGraphChatWidget';
 import { documentKeys } from '@/hooks/useDocumentsQuery';
 import { issueKeys } from '@/hooks/useIssuesQuery';
 import { programKeys } from '@/hooks/useProgramsQuery';
@@ -575,6 +576,9 @@ export function AppLayout(): React.JSX.Element {
         open={actionItemsModalOpen}
         onClose={() => setActionItemsModalOpen(false)}
       />
+
+      {/* FleetGraph AI Chat */}
+      <FleetGraphChatWidget />
     </div>
     </SelectionPersistenceProvider>
     </TooltipProvider>

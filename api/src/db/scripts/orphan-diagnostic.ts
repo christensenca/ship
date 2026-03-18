@@ -7,16 +7,9 @@
  */
 
 import pg from 'pg';
-import { config } from 'dotenv';
-import { join, dirname } from 'path';
-import { fileURLToPath } from 'url';
+import { loadLocalEnv } from '../../config/load-env.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-// Load environment variables
-config({ path: join(__dirname, '../../../.env.local') });
-config({ path: join(__dirname, '../../../.env') });
+loadLocalEnv();
 
 const { Pool } = pg;
 

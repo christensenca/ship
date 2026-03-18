@@ -185,7 +185,7 @@ export function UnifiedDocumentPage(): JSX.Element | null {
       const projectId = (document.document_type === 'weekly_plan' || document.document_type === 'weekly_retro')
         ? getString(document.properties?.project_id) ?? null
         : null;
-      setCurrentDocument(id, document.document_type, projectId);
+      setCurrentDocument(id, document.document_type, projectId, document.title);
     }
     return () => {
       clearCurrentDocument();
@@ -722,17 +722,21 @@ export function UnifiedDocumentPage(): JSX.Element | null {
 
   // Non-tabbed documents render directly in editor
   return (
-    <UnifiedEditor
-      document={unifiedDocument}
-      sidebarData={sidebarData}
-      onUpdate={handleUpdate}
-      onTypeChange={handleTypeChange}
-      onDocumentConverted={handleDocumentConverted}
-      onBack={hideBackButton ? undefined : handleBack}
-      backLabel={hideBackButton ? undefined : backLabel}
-      onDelete={handleDelete}
-      showTypeSelector={true}
-      titleSuffix={standupAuthorName}
-    />
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      <div style={{ flex: 1, minHeight: 0 }}>
+        <UnifiedEditor
+          document={unifiedDocument}
+          sidebarData={sidebarData}
+          onUpdate={handleUpdate}
+          onTypeChange={handleTypeChange}
+          onDocumentConverted={handleDocumentConverted}
+          onBack={hideBackButton ? undefined : handleBack}
+          backLabel={hideBackButton ? undefined : backLabel}
+          onDelete={handleDelete}
+          showTypeSelector={true}
+          titleSuffix={standupAuthorName}
+        />
+      </div>
+    </div>
   );
 }

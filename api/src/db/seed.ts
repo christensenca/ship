@@ -1,10 +1,10 @@
-import { config } from 'dotenv';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { readFileSync } from 'fs';
 import pg from 'pg';
 import bcrypt from 'bcryptjs';
 import { loadProductionSecrets } from '../config/ssm.js';
+import { loadLocalEnv } from '../config/load-env.js';
 import { WELCOME_DOCUMENT_TITLE, WELCOME_DOCUMENT_CONTENT } from './welcomeDocument.js';
 
 const { Pool } = pg;
@@ -12,9 +12,7 @@ const { Pool } = pg;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Load environment (local dev only - production uses SSM)
-config({ path: join(__dirname, '../../.env.local') });
-config({ path: join(__dirname, '../../.env') });
+loadLocalEnv();
 
 /**
  * Helper to create document associations in the junction table
@@ -1239,6 +1237,21 @@ async function seed() {
     }
     if (weeklyRetrosCreated > 0) {
       console.log(`✅ Created ${weeklyRetrosCreated} weekly retros`);
+    }
+
+    // Create FleetGraph agent API token (matches SHIP_API_TOKEN in .env.local)
+    const agentToken = process.env.SHIP_API_TOKEN;
+    if (agentToken) {
+      const crypto = await import('crypto');
+      const tokenHash = crypto.createHash('sha256').update(agentToken).digest('hex');
+      const tokenPrefix = agentToken.substring(0, 8);
+      await pool.query(
+        `INSERT INTO api_tokens (user_id, workspace_id, token_hash, token_prefix, name)
+         VALUES ($1, $2, $3, $4, 'FleetGraph Agent')
+         ON CONFLICT DO NOTHING`,
+        [allUsers.find((u: { name: string }) => u.name === 'Dev User')?.id ?? allUsers[0]?.id, workspaceId, tokenHash, tokenPrefix],
+      );
+      console.log('✅ Created FleetGraph agent API token');
     }
 
     console.log('');

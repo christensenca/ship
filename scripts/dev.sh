@@ -12,6 +12,14 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(dirname "$SCRIPT_DIR")"
 
+ensure_dependencies() {
+  if [ ! -d "$ROOT_DIR/node_modules" ]; then
+    echo "Installing dependencies..."
+    cd "$ROOT_DIR"
+    pnpm install
+  fi
+}
+
 # Ensure api/.env.local exists
 if [ ! -f "$ROOT_DIR/api/.env.local" ]; then
   # Derive database name from worktree/directory name
@@ -44,11 +52,7 @@ EOF
     echo "Setting up fresh database..."
     cd "$ROOT_DIR"
 
-    # Ensure dependencies are installed
-    if [ ! -d "node_modules" ]; then
-      echo "Installing dependencies..."
-      pnpm install
-    fi
+    ensure_dependencies
 
     pnpm build:shared
 
@@ -60,6 +64,17 @@ EOF
     echo "Database setup complete!"
   fi
 fi
+
+# Always run migrations + reseed on dev startup so local data matches the latest code.
+ensure_dependencies
+echo "Refreshing database schema and seed data..."
+cd "$ROOT_DIR"
+pnpm build:shared
+cd "$ROOT_DIR/api"
+npx tsx src/db/migrate.ts
+npx tsx src/db/seed.ts
+cd "$ROOT_DIR"
+echo "Database refresh complete!"
 
 # Base ports
 API_BASE=3000

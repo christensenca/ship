@@ -1,18 +1,17 @@
-import { config } from 'dotenv';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import pg from 'pg';
 import bcrypt from 'bcryptjs';
 import { readFileSync } from 'fs';
 import { loadProductionSecrets } from '../config/ssm.js';
+import { loadLocalEnv } from '../config/load-env.js';
 
 const { Pool } = pg;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-config({ path: join(__dirname, '../../.env.local') });
-config({ path: join(__dirname, '../../.env') });
+loadLocalEnv();
 
 const WORKSPACE_NAME = 'Perf Benchmark Workspace';
 const SEED_KEY = 'api-latency-perf-v1';
