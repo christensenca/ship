@@ -18,8 +18,7 @@
 </p>
 
 <p align="center">
-  <a href="https://docs.google.com/document/d/1ejYaTAokblzvM-HIpMUKEx3_XrMvftYMFxvJlzcsWlE/edit?tab=t.0">Ship Audit + Documentation + Reflections + Discovery + LLM Usage</a><br>
-  <a href="https://docs.google.com/presentation/d/17nTzPHqHiund_u9MYsCdPXCbyzlJ2yuTMvQSson1mTc/edit?usp=sharing">Presentation slides</a>
+  <a href="./fleetgraph.md">FleetGraph</a> · <a href="https://docs.google.com/document/d/1ejYaTAokblzvM-HIpMUKEx3_XrMvftYMFxvJlzcsWlE/edit?tab=t.0">Ship Audit + Documentation + Reflections + Discovery + LLM Usage</a> · <a href="https://docs.google.com/presentation/d/17nTzPHqHiund_u9MYsCdPXCbyzlJ2yuTMvQSson1mTc/edit?usp=sharing">Presentation slides</a>
 </p>
 
 ---
